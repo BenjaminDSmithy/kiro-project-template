@@ -1,0 +1,12 @@
+{
+  "name": "Summarize on Agent Stop",
+  "version": "1.0.0",
+  "description": "After agent finishes, briefly summarize what was done and identify the next incomplete task in the current spec.",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Briefly summarize what was just completed in 2-3 sentences. If a spec's tasks.md is in context, identify the next incomplete task. Do not repeat the full task list."
+  }
+}

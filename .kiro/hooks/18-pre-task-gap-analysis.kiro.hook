@@ -1,0 +1,12 @@
+{
+  "name": "Pre-Task Context Reminder",
+  "version": "1.0.0",
+  "description": "Reminds agent to review requirements and existing patterns before starting a spec task",
+  "when": {
+    "type": "preTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before starting this task:\n\n1. Read the spec's `requirements.md` and `design.md` for context\n2. Search the codebase for existing patterns related to this task\n3. Identify files that will be created or modified\n4. Confirm the approach aligns with the design document\n\nProceed with implementation after review."
+  }
+}

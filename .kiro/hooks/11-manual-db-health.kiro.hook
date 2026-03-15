@@ -1,0 +1,12 @@
+{
+  "name": "Database Health Check",
+  "version": "1.0.0",
+  "description": "Manual hook to check database health and performance",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check database health and performance.\n\n## Checks to Perform\n1. Verify database connection is active\n2. List tables and check for structural issues\n3. Check applied migrations are up to date\n4. Review for pending schema changes\n\n## Output\n| Metric | Status | Value |\n|--------|--------|-------|\n| Connection | pass/fail | details |\n| Migrations | pass/warn | count applied |\n| Tables | pass/warn | count |\n\n## Recommendations\n- Flag any connection issues\n- Identify pending migrations\n- Check for schema drift between ORM and database\n\nNote: Requires database to be running locally."
+  }
+}
