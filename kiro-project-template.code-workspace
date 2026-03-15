@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "kiroAgent.configureMCP": "Disabled"
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "🚀 Run Setup Script",
+        "type": "node-terminal",
+        "request": "launch",
+        "command": "bash ${workspaceFolder}/setup.sh",
+        "cwd": "${workspaceFolder}"
+      }
+    ]
+  }
+}
