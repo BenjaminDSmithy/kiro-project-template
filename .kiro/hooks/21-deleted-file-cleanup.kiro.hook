@@ -1,0 +1,16 @@
+{
+  "name": "Deleted File Cleanup",
+  "version": "1.0.0",
+  "description": "When a file is deleted, reminds to clean up references and barrel exports",
+  "when": {
+    "type": "fileDeleted",
+    "patterns": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A source file was deleted. Check for:\n\n1. Stale imports referencing the deleted file\n2. Barrel export (`index.ts`) entries that need removing\n3. Test files that import from the deleted module\n4. Spec or documentation references to the deleted file\n\nSearch the codebase for the deleted filename and clean up any broken references."
+  }
+}

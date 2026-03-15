@@ -1,0 +1,16 @@
+{
+  "name": "Barrel Export Reminder",
+  "version": "1.0.0",
+  "description": "When a new TypeScript file is created, reminds to update barrel exports",
+  "when": {
+    "type": "fileCreated",
+    "patterns": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "New TypeScript file created. If this file exports public APIs:\n\n1. Check if the parent directory has an `index.ts` barrel file\n2. If yes, add the new exports to it\n3. If no, consider creating one if the directory has 2+ exported files\n4. Ensure import paths in consuming files use the barrel import\n\nSkip if this is a page.tsx, layout.tsx, or route.ts (Next.js conventions)."
+  }
+}
