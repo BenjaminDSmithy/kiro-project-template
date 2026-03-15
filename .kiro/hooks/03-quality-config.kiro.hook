@@ -1,0 +1,19 @@
+{
+  "name": "Config & Security Review",
+  "version": "1.0.0",
+  "description": "When config files are edited, prompts for security review",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      ".env*",
+      "docker-compose*.yml",
+      "*.config.ts",
+      "*.config.mjs",
+      "next.config.*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Config file modified. Check for:\n\n1. Exposed secrets or API keys (must use env vars)\n2. Insecure default values\n3. Missing documentation in .env.example\n4. Security best practices for the config type"
+  }
+}

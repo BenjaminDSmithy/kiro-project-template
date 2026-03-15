@@ -1,0 +1,19 @@
+{
+  "name": "API Changes Review",
+  "version": "1.0.0",
+  "description": "When API routes are modified, prompts to run tests and check docs",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/app/api/**/*.ts",
+      "src/api/**/*.ts",
+      "packages/*/src/api/**/*.ts",
+      "openapi.yaml",
+      "swagger.yaml"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "API code modified. Verify:\n\n1. Run affected API tests\n2. Check if API documentation needs updating\n3. Verify error response format matches standard\n4. Check for breaking changes to existing consumers"
+  }
+}

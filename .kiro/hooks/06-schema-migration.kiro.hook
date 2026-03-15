@@ -1,0 +1,17 @@
+{
+  "name": "Database Schema Change",
+  "version": "1.0.0",
+  "description": "When database schema files are edited, prompts to generate migration",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/lib/db/schema/*.ts",
+      "src/lib/db/schema.ts",
+      "packages/*/db/schema/*.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Database schema modified. Consider:\n\n1. Generate a migration file for the schema change\n2. Verify the migration is reversible\n3. Update TypeScript types if needed\n4. Check for data migration requirements\n\nRemember: Always generate migrations for production changes. Direct push is for dev only."
+  }
+}

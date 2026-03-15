@@ -1,0 +1,19 @@
+{
+  "name": "Test Quality Review",
+  "version": "1.0.0",
+  "description": "When test files are edited, prompts for quality review",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.property.test.ts",
+      "e2e/**/*.spec.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Test file modified. Verify:\n\n1. Follows AAA pattern (Arrange-Act-Assert)\n2. No anti-patterns (hard-coded waits, test.only, empty catch)\n3. Edge cases covered (null, empty, error states)\n4. Property tests have numRuns >= 100 and timeout >= 30000ms\n5. No `.only()` calls left in code"
+  }
+}
