@@ -1,0 +1,21 @@
+{
+  "name": "API Schema Validation",
+  "version": "1.0.0",
+  "description": "Validate OpenAPI and GraphQL schema files on save for correctness and consistency",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.openapi.yml",
+      "**/*.openapi.yaml",
+      "**/*.openapi.json",
+      "**/openapi.*",
+      "**/*.graphql",
+      "**/*.gql",
+      "**/schema.graphql"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "API schema file modified. Validate:\n\n1. Schema syntax is valid (OpenAPI 3.1 or GraphQL SDL)\n2. All referenced types and schemas are defined\n3. Required fields are marked correctly\n4. Response codes follow REST conventions (if OpenAPI)\n5. Naming conventions are consistent (camelCase for fields, PascalCase for types)\n6. Breaking changes from previous version are flagged\n\nReport any issues with specific locations and suggested fixes."
+  }
+}

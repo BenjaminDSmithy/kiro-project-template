@@ -1,0 +1,13 @@
+{
+  "name": "tRPC Router Quality Check",
+  "version": "1.0.0",
+  "description": "Validate tRPC router files follow T3/T4 conventions on save",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["**/server/api/routers/**/*.ts", "**/trpc/**/*.ts", "**/api/routers/**/*.ts"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check the saved tRPC router file for common issues:\n\n1. Every procedure must have `.input()` with a Zod schema — no unvalidated inputs\n2. Mutations must use `protectedProcedure` unless explicitly public\n3. Procedures should not contain business logic directly — extract to service layer in `src/lib/`\n4. Check that the router is exported and merged in the root router (`root.ts`)\n5. Verify no raw SQL or direct DB client usage — use Drizzle/Prisma query builders\n\nIf issues found, suggest fixes. If the file looks good, do nothing."
+  }
+}
