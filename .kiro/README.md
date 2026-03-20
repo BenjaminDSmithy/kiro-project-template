@@ -6,23 +6,33 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 
 ```text
 .kiro/
-├── hooks/                    # Agent automation hooks (15 hooks)
-│   ├── 01-07                 # File-triggered quality checks
-│   ├── 10-11                 # User-triggered manual tasks
-│   ├── 17-19                 # Spec task lifecycle hooks
-│   ├── 20-21                 # File create/delete automation
-│   └── 22                    # Agent stop summary
+├── hooks/                    # Agent automation hooks (34 hooks)
+│   ├── 01–09                 # File-triggered quality checks
+│   ├── 10–17e                # User-triggered manual tasks
+│   ├── 17–19                 # Spec task lifecycle hooks
+│   ├── 20–22                 # File create/delete/stop automation
+│   ├── 23–26                 # Sync and automation hooks
+│   ├── 27–28                 # Safety gate hooks (preToolUse)
+│   ├── 29–30                 # Task quality hooks (pre/postTaskExecution)
+│   └── 31–34                 # Stack-specific hooks
 ├── settings/
 │   └── mcp.json              # MCP server configuration
 ├── specs/                    # Feature specifications
 │   ├── _TEMPLATE/            # Standard spec template (requirements, design, tasks)
-│   └── _BUGFIX_TEMPLATE/     # Bugfix spec template (current/expected/unchanged)
-└── steering/                 # AI guidance documents (12 files)
-    ├── 00-09                 # Core rules, product, tech, structure
-    ├── 10-12                 # Development standards (code, errors, testing)
-    ├── 20-21                 # Workflow standards (git, task completion)
-    ├── 30-31                 # Reference guides (hooks, kiro best practices)
-    └── 50                    # Spec creation standards (conditional)
+│   ├── _BUGFIX_TEMPLATE/     # Bugfix spec template (bugfix.md + bugs.md)
+│   ├── ✅_00_sample-auth-setup/    # Example: complete spec
+│   ├── 📋_01_sample-user-notifications/  # Example: planned spec
+│   ├── 🚧_02_sample-dashboard/     # Example: in-progress spec
+│   └── ⏸️_03_sample-payments/      # Example: on-hold spec (blocked)
+└── steering/                 # AI guidance documents (38 files)
+    ├── 00–03                 # Core rules, product, tech, structure
+    ├── 10–12                 # Development standards (code, errors, testing)
+    ├── 20–21                 # Workflow standards (git, task completion)
+    ├── 30–31                 # Reference guides (hooks, kiro best practices)
+    ├── 40–52                 # Domain standards (security, API, DB, docs, etc.)
+    ├── 53–59                 # Framework and tooling (Next.js, Tailwind, i18n, etc.)
+    ├── 60–62                 # Stack presets (T3, T4, TanStack)
+    └── 63–65                 # Advanced patterns (stack selection, monorepo, errors)
 ```
 
 ## Getting Started
@@ -31,35 +41,89 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 2. Search for `<!-- TODO:` in steering files and customise for your project
 3. Update `settings/mcp.json` with your MCP server credentials
 4. Review hooks and disable any that don't suit your workflow
-5. Create your first spec: copy `specs/_TEMPLATE/` to `specs/📋_01_your-feature/`
+5. Delete example specs and create your first: copy `specs/_TEMPLATE/` to `specs/📋_01_your-feature/`
 
 ## Steering File Numbering
 
-| Range | Category                                            | Inclusion               |
-| ----- | --------------------------------------------------- | ----------------------- |
-| 00–09 | Core (rules, product, tech, structure)              | Always                  |
-| 10–19 | Development standards (code style, errors, testing) | Always                  |
-| 20–29 | Workflow standards (git, task completion)           | Always                  |
-| 30–39 | Reference guides (hooks, kiro best practices)       | Manual                  |
-| 50–59 | Spec creation standards                             | Conditional (fileMatch) |
+| Range | Category                                    | Inclusion   |
+| ----- | ------------------------------------------- | ----------- |
+| 00–03 | Core (rules, product, tech, structure)      | Always      |
+| 10–12 | Development (code style, errors, testing)   | Always      |
+| 20–21 | Workflow (git, task completion)              | Always      |
+| 30–31 | Reference guides (hooks, best practices)    | Manual      |
+| 40–52 | Domain (security, auth, API, DB, docs, CI)  | Always      |
+| 53–59 | Framework & tooling (Next.js, Tailwind, i18n, perf, env, realtime) | fileMatch |
+| 60–62 | Stack presets (T3, T4, TanStack)            | fileMatch   |
+| 63    | Stack selection decision tree               | Manual      |
+| 64–65 | Advanced patterns (monorepo, error boundaries) | fileMatch |
 
 ## Hook Numbering
 
-| Range | Category           | Trigger                                                   |
-| ----- | ------------------ | --------------------------------------------------------- |
-| 01–09 | Quality gates      | fileEdited / agentStop                                    |
-| 10–19 | Manual & lifecycle | userTriggered / pre/postTaskExecution                     |
-| 20–29 | File automation    | fileCreated / fileDeleted / agentStop / postTaskExecution |
+| Range  | Category           | Trigger                                          |
+| ------ | ------------------ | ------------------------------------------------ |
+| 01–09  | Quality gates      | fileEdited / agentStop                           |
+| 10–17e | Manual tasks       | userTriggered                                    |
+| 17–19  | Task lifecycle     | pre/postTaskExecution                            |
+| 20–22  | File automation    | fileCreated / fileDeleted / agentStop            |
+| 23–26  | Sync & automation  | fileEdited / fileCreated / postToolUse           |
+| 27–28  | Safety gates       | preToolUse (migration safety, context injection) |
+| 29–30  | Task quality       | preTaskExecution / postTaskExecution              |
+| 31–34  | Stack-specific     | fileEdited / fileCreated / postTaskExecution      |
+
+> **Note:** Hooks `01` and `22` both use `agentStop` — `01` runs quality checks on code changes while `22` provides a brief summary. Both fire on every agent stop; this is intentional.
+
+## Spec Lifecycle
+
+Specs follow a folder naming convention with emoji status prefixes:
+
+| Prefix | Status      | Meaning                              |
+| ------ | ----------- | ------------------------------------ |
+| `📋_`  | Planned     | Spec complete, implementation TBD    |
+| `🚧_`  | In Progress | Active development                   |
+| `⏸️_`  | On Hold     | Paused, awaiting dependencies        |
+| `✅_`  | Complete    | Fully implemented                    |
+
+Each spec folder contains:
+
+| File               | Purpose                                         |
+| ------------------ | ----------------------------------------------- |
+| `.config.kiro`     | Spec type and workflow configuration             |
+| `requirements.md`  | User stories with EARS acceptance criteria       |
+| `design.md`        | Architecture, interfaces, correctness properties |
+| `tasks.md`         | Implementation checklist with effort estimates   |
+
+## Example Specs
+
+| Spec | Demonstrates |
+| ---- | ------------ |
+| `✅_00_sample-auth-setup` | Complete spec — all tasks checked, progress table filled |
+| `📋_01_sample-user-notifications` | Planned spec — requirements and tasks, not yet started |
+| `🚧_02_sample-dashboard` | In-progress spec — Phase 1 done, Phase 2 partial |
+| `⏸️_03_sample-payments` | On-hold spec — blocked by dashboard dependency |
+
+## Stack Presets
+
+| Stack       | Steering Doc    | Key Technologies                         |
+| ----------- | --------------- | ---------------------------------------- |
+| Default     | `53-nextjs.md`  | Next.js + Supabase + Drizzle + Tailwind  |
+| T3          | `60-t3-stack.md`| Next.js + tRPC + Tailwind + TypeScript   |
+| T4          | `61-t4-stack.md`| Expo + Next.js + Tamagui + tRPC + Solito |
+| TanStack/T5 | `62-tanstack.md`| TanStack Start + Router + Query + Vite   |
+
+Use `#stack-selection` in chat to reference the stack selection decision tree (`63-stack-selection.md`).
 
 ## Customisation Checklist
 
 After copying this template into your project:
 
+- [ ] Run `./setup.sh` to replace placeholder tokens and select your stack
 - [ ] Search for `<!-- TODO:` in all steering files and fill in project-specific values
-- [ ] Update `01-product.md` with your product context, glossary, and personas
-- [ ] Update `02-tech.md` with your actual tech stack and database choices
+- [ ] Update `01-product.md` with your product context, glossary, and domain terms
+- [ ] Update `02-tech.md` with your actual tech stack and approved integrations
 - [ ] Update `03-structure.md` with your directory layout and naming conventions
 - [ ] Update `settings/mcp.json` with your MCP server credentials and preferences
 - [ ] Review each hook and disable any that don't match your workflow
 - [ ] Adjust commit message scopes in `19-commit-on-task-done.kiro.hook`
 - [ ] Decide which steering files should be `always` vs `manual` vs `fileMatch`
+- [ ] Delete example specs (`✅_00_sample-*`, `📋_01_sample-*`, `🚧_02_sample-*`, `⏸️_03_sample-*`) when ready
+- [ ] Create your first spec: copy `_TEMPLATE/` to `📋_01_your-feature/`
