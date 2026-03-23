@@ -1,0 +1,13 @@
+{
+  "name": "tRPC Router Validation",
+  "version": "1.0.0",
+  "description": "Validate tRPC router files follow T3 stack conventions when created or edited",
+  "when": {
+    "type": "fileCreated",
+    "patterns": ["**/server/api/routers/**/*.ts", "**/trpc/**/*.ts", "**/api/src/router/**/*.ts"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A tRPC router file was created. Verify it follows T3 stack conventions (see steering doc `60-t3-stack.md`):\n\n1. Uses `createTRPCRouter` to define the router\n2. All inputs are validated with Zod schemas\n3. Uses `protectedProcedure` for authenticated endpoints (not manual auth checks inside handlers)\n4. Procedures are thin — business logic is extracted to service layer in `src/lib/`\n5. Uses `superjson` transformer if returning Date, Map, or Set types\n6. Router is exported and merged in `root.ts`\n\nIf any issues are found, suggest corrections. If the file looks good, do nothing."
+  }
+}
