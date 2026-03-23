@@ -1,0 +1,18 @@
+{
+  "name": "Environment Sync",
+  "version": "1.0.0",
+  "description": "Keep .env.example in sync when environment variables are added or changed",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      ".env",
+      ".env.local",
+      ".env.development",
+      ".env.production"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "An environment file was modified. Check if `.env.example` needs updating:\n\n1. Compare variable names in the modified env file against `.env.example`\n2. If new variables were added, add them to `.env.example` with placeholder values (never real secrets)\n3. If variables were removed, flag them for removal from `.env.example`\n4. Ensure all placeholder values use descriptive formats like `your-api-key-here` or `CHANGE_ME`\n\nOnly update `.env.example` — never modify actual env files."
+  }
+}
