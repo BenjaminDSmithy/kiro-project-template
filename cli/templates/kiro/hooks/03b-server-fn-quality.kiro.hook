@@ -1,0 +1,13 @@
+{
+  "name": "Server Function Quality Check",
+  "version": "1.0.0",
+  "description": "Validate TanStack Start server function files follow conventions on save",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["**/*.functions.ts", "**/routes/**/*.tsx"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check the saved file for TanStack Start server function issues:\n\n1. Server functions created with `createServerFn` must have `.inputValidator()` with a Zod schema for any function that accepts input\n2. Server-only logic (DB queries, secrets) must be in `.server.ts` files, not directly in `.functions.ts`\n3. Server functions must use static imports — no dynamic `import()` for server functions\n4. Route files using `loader` or `beforeLoad` should call server functions, not contain server logic inline\n5. Check that `.server.ts` files are not imported in client components\n\nIf issues found, suggest fixes. If the file looks good, do nothing."
+  }
+}
