@@ -1,0 +1,13 @@
+{
+  "name": "T4 Cross-Platform Check",
+  "version": "1.0.0",
+  "description": "Verify cross-platform compatibility when shared package files are created",
+  "when": {
+    "type": "fileCreated",
+    "patterns": ["**/packages/app/**/*.tsx", "**/packages/ui/**/*.tsx"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A shared package file was created in a T4 monorepo. Verify cross-platform compatibility (see steering doc `61-t4-stack.md`):\n\n1. No web-only APIs used (window, document, localStorage) — use platform files (.web.tsx / .native.tsx) if needed\n2. Navigation uses `solito/router` and `solito/link`, not Next.js or Expo Router directly\n3. UI components use Tamagui primitives (YStack, XStack, Text, Button) not React Native or HTML elements directly\n4. Styling uses Tamagui tokens ($4, $background) not raw values\n5. No `'use client'` directive (this is a Next.js concept, not applicable in shared packages)\n\nIf platform-specific code is needed, suggest using the `.web.tsx` / `.native.tsx` file suffix pattern. If the file looks good, do nothing."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "TanStack Server Function Safety",
+  "version": "1.0.0",
+  "description": "Validate server function and server-only file conventions in TanStack Start projects",
+  "when": {
+    "type": "fileCreated",
+    "patterns": ["**/*.functions.ts", "**/*.server.ts", "**/routes/**/*.tsx"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A TanStack Start file was created. Verify it follows conventions (see steering doc `62-tanstack.md`):\n\nFor `.functions.ts` files:\n1. Uses `createServerFn` from `@tanstack/react-start`\n2. All inputs validated with `.inputValidator()` using Zod\n3. Uses static imports only (no dynamic imports for server functions)\n4. Does not import from `.server.ts` files directly — those are server-only\n\nFor `.server.ts` files:\n1. Contains only server-side code (DB queries, secrets, internal APIs)\n2. Is NOT imported by any client component or `.functions.ts` file directly\n3. Only called from within `createServerFn` handlers\n\nFor route files (`routes/**/*.tsx`):\n1. Uses `createFileRoute` for route definition\n2. Data fetching is in `loader`, not `useEffect`\n3. Auth guards use `beforeLoad`, not inline checks\n4. Uses `Route.useLoaderData()` for typed data access\n\nIf any issues are found, suggest corrections. If the file looks good, do nothing."
+  }
+}
