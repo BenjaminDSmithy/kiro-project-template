@@ -51,6 +51,7 @@ header()  { echo -e "\n${BOLD}$1${NC}"; echo "───────────�
 ask() {
   local prompt="$1" default="$2" var="$3"
   if [[ -n "${!var:-}" ]]; then return; fi
+  # shellcheck disable=SC2034 # input is used via eval on the next line
   if [[ -n "${default}" ]]; then
     read -rp "$(echo -e "${CYAN}?${NC}  ${prompt} ${YELLOW}[${default}]${NC}: ")" input
     eval "${var}=\"\${input:-${default}}\""
