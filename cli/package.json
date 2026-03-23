@@ -1,0 +1,34 @@
+{
+  "name": "create-kiro-project",
+  "version": "0.1.0",
+  "description": "CLI to scaffold new projects from the Kiro project template",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "create-kiro-project": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "prebuild": "bash scripts/copy-templates.sh",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4.9",
+    "fast-check": "^4.6.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
