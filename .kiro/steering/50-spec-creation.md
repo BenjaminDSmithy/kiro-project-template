@@ -11,11 +11,12 @@ Standards for feature specifications in `.kiro/specs/`. Reference templates in `
 
 Each spec folder contains three files:
 
-| File              | Purpose                                            |
-| ----------------- | -------------------------------------------------- |
-| `requirements.md` | User stories + EARS acceptance criteria            |
-| `design.md`       | Architecture + interfaces + correctness properties |
-| `tasks.md`        | Implementation checklist with effort estimates     |
+| File                       | Purpose                                            |
+| -------------------------- | -------------------------------------------------- |
+| `requirements.md`          | User stories + EARS acceptance criteria            |
+| `bugfix.md` (bugfix specs) | Current/expected/unchanged behaviour analysis      |
+| `design.md`                | Architecture + interfaces + correctness properties |
+| `tasks.md`                 | Implementation checklist with effort estimates     |
 
 ## Folder Naming
 
