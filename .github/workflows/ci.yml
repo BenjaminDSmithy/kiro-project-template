@@ -29,9 +29,13 @@ jobs:
         with:
           node-version: 18
           cache: pnpm
+          cache-dependency-path: cli/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter create-kiro-project build
-      - run: pnpm --filter create-kiro-project test -- --run
+        working-directory: cli
+      - run: pnpm build
+        working-directory: cli
+      - run: pnpm test -- --run
+        working-directory: cli
 
   publish:
     needs: build-and-test
@@ -46,9 +50,12 @@ jobs:
         with:
           node-version: 18
           cache: pnpm
+          cache-dependency-path: cli/pnpm-lock.yaml
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter create-kiro-project build
+        working-directory: cli
+      - run: pnpm build
+        working-directory: cli
       - run: npm publish --access public
         working-directory: cli
         env:
