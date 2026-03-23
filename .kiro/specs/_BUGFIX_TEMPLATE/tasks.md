@@ -6,12 +6,12 @@
 
 ## AI-Accelerated Effort Estimates
 
-| Complexity | AI-Accelerated | Examples                          |
-| ---------- | -------------- | --------------------------------- |
-| Simple     | 30min          | Typo fix, config correction       |
-| Medium     | 1h             | Logic error, edge case handling   |
-| Complex    | 2h             | Race condition, data migration    |
-| V.Complex  | 3h             | Architecture fix, security patch  |
+| Complexity | AI-Accelerated | Examples                         |
+| ---------- | -------------- | -------------------------------- |
+| Simple     | 30min          | Typo fix, config correction      |
+| Medium     | 1h             | Logic error, edge case handling  |
+| Complex    | 2h             | Race condition, data migration   |
+| V.Complex  | 3h             | Architecture fix, security patch |
 
 Format: `_Bugfix ref: BUG-XXX_ | _Effort: 1h_`
 
@@ -61,8 +61,8 @@ Format: `_Bugfix ref: BUG-XXX_ | _Effort: 1h_`
 
 ## Progress Tracking
 
-| Phase                  | Status      | Completion Date | Notes |
-| ---------------------- | ----------- | --------------- | ----- |
-| Root Cause Verification| Not Started | -               | -     |
-| Fix Implementation     | Not Started | -               | -     |
-| Regression Verification| Not Started | -               | -     |
+| Phase                   | Status      | Completion Date | Notes |
+| ----------------------- | ----------- | --------------- | ----- |
+| Root Cause Verification | Not Started | -               | -     |
+| Fix Implementation      | Not Started | -               | -     |
+| Regression Verification | Not Started | -               | -     |

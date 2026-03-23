@@ -14,15 +14,15 @@ What to document, how to format it, and where it lives.
 
 ## What Must Be Documented
 
-| Artefact              | Location                    | Format          |
-| --------------------- | --------------------------- | --------------- |
-| Project overview      | `README.md`                 | Markdown        |
-| API endpoints         | `docs/API.md`               | Markdown + examples |
-| Architecture          | `docs/ARCHITECTURE.md`      | Markdown + diagrams |
-| Deployment            | `docs/DEPLOYMENT.md`        | Step-by-step    |
-| Contributing guide    | `docs/CONTRIBUTING.md`      | Markdown        |
-| ADRs                  | `docs/ADR/NNN-title.md`     | ADR template    |
-| Changelog             | `CHANGELOG.md`              | Keep a Changelog format |
+| Artefact           | Location                | Format                  |
+| ------------------ | ----------------------- | ----------------------- |
+| Project overview   | `README.md`             | Markdown                |
+| API endpoints      | `docs/API.md`           | Markdown + examples     |
+| Architecture       | `docs/ARCHITECTURE.md`  | Markdown + diagrams     |
+| Deployment         | `docs/DEPLOYMENT.md`    | Step-by-step            |
+| Contributing guide | `docs/CONTRIBUTING.md`  | Markdown                |
+| ADRs               | `docs/ADR/NNN-title.md` | ADR template            |
+| Changelog          | `CHANGELOG.md`          | Keep a Changelog format |
 
 ## Code Documentation
 
@@ -43,13 +43,13 @@ export function calculateTotal(items: LineItem[], taxRate: number): number {
 }
 ```
 
-| Rule                              | Implementation                        |
-| --------------------------------- | ------------------------------------- |
-| Document all exports              | JSDoc on every public function/type   |
-| Describe parameters               | `@param` with type and purpose        |
-| Describe return values             | `@returns` with what and when         |
-| Document exceptions                | `@throws` for expected error cases    |
-| Skip obvious getters/setters       | Don't document trivial accessors      |
+| Rule                         | Implementation                      |
+| ---------------------------- | ----------------------------------- |
+| Document all exports         | JSDoc on every public function/type |
+| Describe parameters          | `@param` with type and purpose      |
+| Describe return values       | `@returns` with what and when       |
+| Document exceptions          | `@throws` for expected error cases  |
+| Skip obvious getters/setters | Don't document trivial accessors    |
 
 ## README Structure
 

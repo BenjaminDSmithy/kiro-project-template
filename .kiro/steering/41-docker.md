@@ -11,14 +11,14 @@ fileMatchPattern:
 
 ## Image Building
 
-| Rule                        | Implementation                                    |
-| --------------------------- | ------------------------------------------------- |
-| Use multi-stage builds      | Separate build and runtime stages                 |
-| Pin base image digests      | `node:22-alpine@sha256:...` not `node:latest`     |
-| Minimise layers             | Combine related `RUN` commands with `&&`          |
-| Use `.dockerignore`         | Exclude `node_modules`, `.git`, `.env*`, `dist`   |
-| Run as non-root             | `USER node` or create dedicated user              |
-| Use `COPY` not `ADD`        | `ADD` has implicit tar extraction and URL fetching |
+| Rule                   | Implementation                                     |
+| ---------------------- | -------------------------------------------------- |
+| Use multi-stage builds | Separate build and runtime stages                  |
+| Pin base image digests | `node:22-alpine@sha256:...` not `node:latest`      |
+| Minimise layers        | Combine related `RUN` commands with `&&`           |
+| Use `.dockerignore`    | Exclude `node_modules`, `.git`, `.env*`, `dist`    |
+| Run as non-root        | `USER node` or create dedicated user               |
+| Use `COPY` not `ADD`   | `ADD` has implicit tar extraction and URL fetching |
 
 ## Layer Ordering (Cache Optimisation)
 

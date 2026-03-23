@@ -13,12 +13,12 @@ Structured logging patterns for consistent, searchable, and actionable logs.
 
 ## Log Levels
 
-| Level   | When to use                                    | Example                          |
-| ------- | ---------------------------------------------- | -------------------------------- |
-| `error` | Unrecoverable failures requiring attention     | DB connection lost, auth failure |
-| `warn`  | Recoverable issues or degraded behaviour       | Rate limit approaching, retry    |
-| `info`  | Significant business events                    | User created, order placed       |
-| `debug` | Development-only detail                        | Query params, intermediate state |
+| Level   | When to use                                | Example                          |
+| ------- | ------------------------------------------ | -------------------------------- |
+| `error` | Unrecoverable failures requiring attention | DB connection lost, auth failure |
+| `warn`  | Recoverable issues or degraded behaviour   | Rate limit approaching, retry    |
+| `info`  | Significant business events                | User created, order placed       |
+| `debug` | Development-only detail                    | Query params, intermediate state |
 
 ## Structured Log Format
 
@@ -38,24 +38,24 @@ logger.info("Order created", {
 
 Every log entry must include:
 
-| Field        | Purpose                              |
-| ------------ | ------------------------------------ |
-| `timestamp`  | UTC ISO 8601                         |
-| `level`      | error, warn, info, debug             |
-| `message`    | Human-readable description           |
-| `requestId`  | Correlation ID for request tracing   |
-| `service`    | Service or module name               |
+| Field       | Purpose                            |
+| ----------- | ---------------------------------- |
+| `timestamp` | UTC ISO 8601                       |
+| `level`     | error, warn, info, debug           |
+| `message`   | Human-readable description         |
+| `requestId` | Correlation ID for request tracing |
+| `service`   | Service or module name             |
 
 ## Rules
 
-| Rule                              | Implementation                              |
-| --------------------------------- | ------------------------------------------- |
-| Never log secrets                 | Redact tokens, passwords, API keys          |
-| Never log PII in production       | Mask email, phone, names                    |
-| Use correlation IDs               | Pass `requestId` through all service calls  |
-| Log at boundaries                 | API entry/exit, external service calls       |
-| Include error context             | Stack trace, input that caused failure       |
-| Keep debug logs out of production | Use environment-based log level filtering    |
+| Rule                              | Implementation                             |
+| --------------------------------- | ------------------------------------------ |
+| Never log secrets                 | Redact tokens, passwords, API keys         |
+| Never log PII in production       | Mask email, phone, names                   |
+| Use correlation IDs               | Pass `requestId` through all service calls |
+| Log at boundaries                 | API entry/exit, external service calls     |
+| Include error context             | Stack trace, input that caused failure     |
+| Keep debug logs out of production | Use environment-based log level filtering  |
 
 ## Error Logging
 

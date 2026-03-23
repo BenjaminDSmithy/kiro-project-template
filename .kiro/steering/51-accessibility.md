@@ -13,14 +13,14 @@ WCAG 2.2 AA compliance guidelines for all user-facing components.
 
 ## Semantic HTML
 
-| Use                    | Instead of                          |
-| ---------------------- | ----------------------------------- |
-| `<button>`             | `<div onClick>`                     |
-| `<a href>`             | `<span onClick>` for navigation     |
-| `<nav>`                | `<div class="nav">`                 |
-| `<main>`               | `<div class="main">`                |
-| `<section>` + heading  | `<div>` without structure           |
-| `<ul>/<ol>` for lists  | `<div>` with visual-only formatting |
+| Use                   | Instead of                          |
+| --------------------- | ----------------------------------- |
+| `<button>`            | `<div onClick>`                     |
+| `<a href>`            | `<span onClick>` for navigation     |
+| `<nav>`               | `<div class="nav">`                 |
+| `<main>`              | `<div class="main">`                |
+| `<section>` + heading | `<div>` without structure           |
+| `<ul>/<ol>` for lists | `<div>` with visual-only formatting |
 
 ## ARIA Guidelines
 
@@ -41,11 +41,11 @@ WCAG 2.2 AA compliance guidelines for all user-facing components.
 
 ## Colour and Contrast
 
-| Requirement                  | Minimum ratio |
-| ---------------------------- | ------------- |
-| Normal text (< 18px)         | 4.5:1         |
-| Large text (≥ 18px or bold)  | 3:1           |
-| UI components and graphics   | 3:1           |
+| Requirement                 | Minimum ratio |
+| --------------------------- | ------------- |
+| Normal text (< 18px)        | 4.5:1         |
+| Large text (≥ 18px or bold) | 3:1           |
+| UI components and graphics  | 3:1           |
 
 - Never convey information through colour alone — use icons, text, or patterns as well
 - Test with colour blindness simulators
@@ -59,12 +59,12 @@ WCAG 2.2 AA compliance guidelines for all user-facing components.
 
 ## Images and Media
 
-| Content type     | Requirement                                |
-| ---------------- | ------------------------------------------ |
-| Informative image| Descriptive `alt` text                     |
-| Decorative image | `alt=""` or CSS background                 |
-| Complex diagram  | `alt` + detailed text description nearby   |
-| Video            | Captions and transcript                    |
+| Content type      | Requirement                              |
+| ----------------- | ---------------------------------------- |
+| Informative image | Descriptive `alt` text                   |
+| Decorative image  | `alt=""` or CSS background               |
+| Complex diagram   | `alt` + detailed text description nearby |
+| Video             | Captions and transcript                  |
 
 ## Testing
 

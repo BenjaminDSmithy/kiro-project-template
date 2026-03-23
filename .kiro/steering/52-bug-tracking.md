@@ -37,10 +37,12 @@ Each spec has its own bug tracker: `.kiro/specs/{feature-name}/bugs.md`
 Exact error message if applicable
 
 **Location**:
+
 - File: `path/to/file.ts`
 - Line: XXX (in `functionName()`)
 
 **Reproduction**:
+
 1. Step-by-step instructions to reproduce
 2. Include minimal code example if helpful
 3. Note any specific conditions required
@@ -48,28 +50,31 @@ Exact error message if applicable
 **Root Cause**: Analysis of why the bug occurs (if known).
 
 **Impact**:
+
 - What functionality is blocked or broken
 - Which tasks are affected
 - User-facing impact (if any)
 
 **Related Tests**:
+
 - List of tests that fail due to this bug
 
 **Proposed Fix**: Suggested approach to resolve the bug.
 
 **Related Tasks**:
+
 - Tasks that introduced the bug
 - Tasks that are blocked by the bug
 ```
 
 ## Severity Guidelines
 
-| Severity | Criteria                                                    |
-| -------- | ----------------------------------------------------------- |
-| Critical | Blocks major tasks, data corruption, core unusable, security|
-| High     | Blocks specific tasks, incorrect important behaviour        |
-| Medium   | Edge case issues, minor performance, non-critical features  |
-| Low      | Cosmetic, minor inconvenience, rarely-used features         |
+| Severity | Criteria                                                     |
+| -------- | ------------------------------------------------------------ |
+| Critical | Blocks major tasks, data corruption, core unusable, security |
+| High     | Blocks specific tasks, incorrect important behaviour         |
+| Medium   | Edge case issues, minor performance, non-critical features   |
+| Low      | Cosmetic, minor inconvenience, rarely-used features          |
 
 ## Bug Status Lifecycle
 
@@ -127,11 +132,11 @@ Maintain at the bottom of `bugs.md`:
 
 ## Rules
 
-| Rule                                    | Rationale                                    |
-| --------------------------------------- | -------------------------------------------- |
-| Always defer bug fixes during tasks     | Maintains agent focus on current work        |
-| Document bugs immediately when found    | Details are freshest at discovery time        |
-| Never skip documentation for small bugs | Small bugs compound into big problems        |
-| Never mark bugs resolved without tests  | Untested fixes often reintroduce the bug     |
-| Never delete resolved bug entries       | Move to "Resolved Bugs" section for history  |
-| Update statistics on every status change| Keeps the overview accurate                  |
+| Rule                                     | Rationale                                   |
+| ---------------------------------------- | ------------------------------------------- |
+| Always defer bug fixes during tasks      | Maintains agent focus on current work       |
+| Document bugs immediately when found     | Details are freshest at discovery time      |
+| Never skip documentation for small bugs  | Small bugs compound into big problems       |
+| Never mark bugs resolved without tests   | Untested fixes often reintroduce the bug    |
+| Never delete resolved bug entries        | Move to "Resolved Bugs" section for history |
+| Update statistics on every status change | Keeps the overview accurate                 |

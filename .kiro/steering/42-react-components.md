@@ -9,13 +9,13 @@ fileMatchPattern:
 
 ## Component Structure
 
-| Rule                       | Implementation                                  |
-| -------------------------- | ----------------------------------------------- |
+| Rule                       | Implementation                                          |
+| -------------------------- | ------------------------------------------------------- |
 | Server Components default  | Only add `'use client'` when hooks/interactivity needed |
-| Functional components only | No class components                             |
-| Single responsibility      | One component per file, one concern per component |
-| Named exports              | `export function Button()` not `export default`  |
-| Props via type aliases     | `type ButtonProps = { ... }` with destructuring  |
+| Functional components only | No class components                                     |
+| Single responsibility      | One component per file, one concern per component       |
+| Named exports              | `export function Button()` not `export default`         |
+| Props via type aliases     | `type ButtonProps = { ... }` with destructuring         |
 
 ## Hooks
 

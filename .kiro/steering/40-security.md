@@ -8,13 +8,13 @@ Proactive security practices for all code in this repository.
 
 ## Secrets Management
 
-| Rule                          | Implementation                              |
-| ----------------------------- | ------------------------------------------- |
-| No hardcoded secrets          | Use `.env` or secret manager                |
-| No secrets in steering/specs  | Use `CHANGE_ME` placeholders                |
-| No secrets in logs            | Redact before logging                       |
-| No secrets in error messages  | Return generic messages to clients          |
-| Rotate compromised keys       | Immediately revoke and regenerate           |
+| Rule                         | Implementation                     |
+| ---------------------------- | ---------------------------------- |
+| No hardcoded secrets         | Use `.env` or secret manager       |
+| No secrets in steering/specs | Use `CHANGE_ME` placeholders       |
+| No secrets in logs           | Redact before logging              |
+| No secrets in error messages | Return generic messages to clients |
+| Rotate compromised keys      | Immediately revoke and regenerate  |
 
 ## Input Validation
 
@@ -36,14 +36,14 @@ Proactive security practices for all code in this repository.
 
 Required headers for all responses:
 
-| Header                    | Value                                      |
-| ------------------------- | ------------------------------------------ |
-| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains`    |
-| `Content-Security-Policy` | Restrict to trusted sources                |
-| `X-Content-Type-Options`  | `nosniff`                                  |
-| `X-Frame-Options`         | `DENY` or `SAMEORIGIN`                    |
-| `Referrer-Policy`         | `strict-origin-when-cross-origin`          |
-| `Permissions-Policy`      | Disable unused browser features            |
+| Header                      | Value                                 |
+| --------------------------- | ------------------------------------- |
+| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains` |
+| `Content-Security-Policy`   | Restrict to trusted sources           |
+| `X-Content-Type-Options`    | `nosniff`                             |
+| `X-Frame-Options`           | `DENY` or `SAMEORIGIN`                |
+| `Referrer-Policy`           | `strict-origin-when-cross-origin`     |
+| `Permissions-Policy`        | Disable unused browser features       |
 
 ## Dependency Security
 

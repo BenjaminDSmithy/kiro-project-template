@@ -25,12 +25,12 @@ Patterns specific to Next.js 15+ App Router. For general React patterns, see `42
 
 ## Data Fetching
 
-| Pattern              | When to use                                    |
-| -------------------- | ---------------------------------------------- |
-| Server Components    | Default for data fetching — fetch directly     |
-| Server Actions       | Form submissions, mutations                    |
-| Route Handlers       | External API consumers, webhooks               |
-| Client-side (SWR)    | Real-time data, user-specific polling          |
+| Pattern           | When to use                                |
+| ----------------- | ------------------------------------------ |
+| Server Components | Default for data fetching — fetch directly |
+| Server Actions    | Form submissions, mutations                |
+| Route Handlers    | External API consumers, webhooks           |
+| Client-side (SWR) | Real-time data, user-specific polling      |
 
 ### Server Component Fetching
 
@@ -47,35 +47,35 @@ export default async function OrdersPage() {
 ### Server Actions
 
 ```typescript
-'use server';
+"use server";
 
 export async function createOrder(formData: FormData) {
   const validated = orderSchema.parse(Object.fromEntries(formData));
   const order = await db.insert(orders).values(validated).returning();
-  revalidatePath('/orders');
+  revalidatePath("/orders");
   return order;
 }
 ```
 
 ## Caching and Revalidation
 
-| Strategy              | When to use                              |
-| --------------------- | ---------------------------------------- |
-| `revalidatePath()`    | After mutations that affect a page       |
-| `revalidateTag()`     | After mutations that affect tagged data  |
-| `unstable_cache()`    | Expensive computations with TTL          |
-| No cache              | User-specific data, real-time data       |
+| Strategy           | When to use                             |
+| ------------------ | --------------------------------------- |
+| `revalidatePath()` | After mutations that affect a page      |
+| `revalidateTag()`  | After mutations that affect tagged data |
+| `unstable_cache()` | Expensive computations with TTL         |
+| No cache           | User-specific data, real-time data      |
 
 ## Route Organisation
 
-| Pattern                          | File                              |
-| -------------------------------- | --------------------------------- |
-| Page                             | `page.tsx`                        |
-| Layout (shared UI)               | `layout.tsx`                      |
-| Loading state                    | `loading.tsx`                     |
-| Error boundary                   | `error.tsx` (must be Client)      |
-| Not found                        | `not-found.tsx`                   |
-| API route                        | `route.ts`                        |
+| Pattern            | File                         |
+| ------------------ | ---------------------------- |
+| Page               | `page.tsx`                   |
+| Layout (shared UI) | `layout.tsx`                 |
+| Loading state      | `loading.tsx`                |
+| Error boundary     | `error.tsx` (must be Client) |
+| Not found          | `not-found.tsx`              |
+| API route          | `route.ts`                   |
 
 ## Middleware
 
@@ -88,8 +88,8 @@ export async function createOrder(formData: FormData) {
 
 ```typescript
 export const metadata: Metadata = {
-  title: 'Page Title',
-  description: 'Page description',
+  title: "Page Title",
+  description: "Page description",
 };
 
 // Dynamic metadata
@@ -107,11 +107,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 ## Rules
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| Server Components by default            | Smaller bundles, direct backend access   |
-| `'use client'` only at leaf components  | Push client boundary as low as possible  |
-| No `useEffect` for data fetching        | Use Server Components or Server Actions  |
-| No `fetch()` in Client Components       | Use SWR/React Query for client fetching  |
-| Always handle `error.tsx`               | Graceful error recovery per route        |
-| Always handle `loading.tsx`             | Perceived performance                    |
+| Rule                                   | Rationale                               |
+| -------------------------------------- | --------------------------------------- |
+| Server Components by default           | Smaller bundles, direct backend access  |
+| `'use client'` only at leaf components | Push client boundary as low as possible |
+| No `useEffect` for data fetching       | Use Server Components or Server Actions |
+| No `fetch()` in Client Components      | Use SWR/React Query for client fetching |
+| Always handle `error.tsx`              | Graceful error recovery per route       |
+| Always handle `loading.tsx`            | Perceived performance                   |

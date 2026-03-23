@@ -28,25 +28,25 @@ Use a layered approach combining role-based and policy-based authorisation:
 
 ## Core Principles
 
-| Principle                    | Implementation                                          |
-| ---------------------------- | ------------------------------------------------------- |
-| Least privilege              | Grant minimum permissions needed for each role          |
-| Permission-based checks      | Check `can('orders.update')` not `role === 'admin'`     |
-| Server-side enforcement      | Never trust client-side role/permission checks          |
-| Defence in depth             | RLS + middleware + application logic, not just one layer |
-| Fail closed                  | Deny by default — explicitly grant, never explicitly deny |
+| Principle               | Implementation                                            |
+| ----------------------- | --------------------------------------------------------- |
+| Least privilege         | Grant minimum permissions needed for each role            |
+| Permission-based checks | Check `can('orders.update')` not `role === 'admin'`       |
+| Server-side enforcement | Never trust client-side role/permission checks            |
+| Defence in depth        | RLS + middleware + application logic, not just one layer  |
+| Fail closed             | Deny by default — explicitly grant, never explicitly deny |
 
 ## Permission Granularity
 
 Group permissions by module with CRUD granularity:
 
-| Pattern                  | Example                                          |
-| ------------------------ | ------------------------------------------------ |
-| `{module}.create`        | `users.create`, `orders.create`                  |
-| `{module}.read`          | `users.read`, `reports.read`                     |
-| `{module}.update`        | `orders.update`, `settings.update`               |
-| `{module}.delete`        | `users.delete`, `orders.delete`                  |
-| `{module}.{action}`      | `orders.approve`, `reports.export`               |
+| Pattern             | Example                            |
+| ------------------- | ---------------------------------- |
+| `{module}.create`   | `users.create`, `orders.create`    |
+| `{module}.read`     | `users.read`, `reports.read`       |
+| `{module}.update`   | `orders.update`, `settings.update` |
+| `{module}.delete`   | `users.delete`, `orders.delete`    |
+| `{module}.{action}` | `orders.approve`, `reports.export` |
 
 Never use generic permissions like `manage` or `edit` — be specific.
 
@@ -54,39 +54,55 @@ Never use generic permissions like `manage` or `edit` — be specific.
 
 ```typescript
 // Roles
-export const roles = pgTable('roles', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull().unique(),
-  description: text('description'),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+export const roles = pgTable("roles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 // Permissions (module-scoped)
-export const permissions = pgTable('permissions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  module: text('module').notNull(),
-  action: text('action').notNull(),
-  description: text('description'),
+export const permissions = pgTable("permissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  module: text("module").notNull(),
+  action: text("action").notNull(),
+  description: text("description"),
 });
 
 // Role ↔ Permission pivot
-export const rolePermissions = pgTable('role_permissions', {
-  roleId: uuid('role_id').references(() => roles.id, { onDelete: 'cascade' }),
-  permissionId: uuid('permission_id').references(() => permissions.id, { onDelete: 'cascade' }),
-}, (t) => [primaryKey({ columns: [t.roleId, t.permissionId] })]);
+export const rolePermissions = pgTable(
+  "role_permissions",
+  {
+    roleId: uuid("role_id").references(() => roles.id, { onDelete: "cascade" }),
+    permissionId: uuid("permission_id").references(() => permissions.id, {
+      onDelete: "cascade",
+    }),
+  },
+  (t) => [primaryKey({ columns: [t.roleId, t.permissionId] })],
+);
 
 // User ↔ Role pivot (multi-role support)
-export const userRoles = pgTable('user_roles', {
-  userId: uuid('user_id').notNull(),
-  roleId: uuid('role_id').references(() => roles.id, { onDelete: 'cascade' }),
-}, (t) => [primaryKey({ columns: [t.userId, t.roleId] })]);
+export const userRoles = pgTable(
+  "user_roles",
+  {
+    userId: uuid("user_id").notNull(),
+    roleId: uuid("role_id").references(() => roles.id, { onDelete: "cascade" }),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.roleId] })],
+);
 
 // User-specific permission overrides (Hybrid RBAC)
-export const userPermissions = pgTable('user_permissions', {
-  userId: uuid('user_id').notNull(),
-  permissionId: uuid('permission_id').references(() => permissions.id, { onDelete: 'cascade' }),
-  granted: boolean('granted').notNull().default(true),
-}, (t) => [primaryKey({ columns: [t.userId, t.permissionId] })]);
+export const userPermissions = pgTable(
+  "user_permissions",
+  {
+    userId: uuid("user_id").notNull(),
+    permissionId: uuid("permission_id").references(() => permissions.id, {
+      onDelete: "cascade",
+    }),
+    granted: boolean("granted").notNull().default(true),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.permissionId] })],
+);
 ```
 
 ## Supabase RLS Integration
@@ -109,31 +125,31 @@ CREATE POLICY "orders_update" ON orders
   );
 ```
 
-| Rule                              | Implementation                              |
-| --------------------------------- | ------------------------------------------- |
-| Enable RLS on all tables          | `ALTER TABLE x ENABLE ROW LEVEL SECURITY`   |
-| No public access by default       | Only grant via explicit policies            |
-| Use views for permission lookups  | Materialise effective permissions per user   |
-| Test RLS policies                 | Verify with different user roles in tests   |
+| Rule                             | Implementation                             |
+| -------------------------------- | ------------------------------------------ |
+| Enable RLS on all tables         | `ALTER TABLE x ENABLE ROW LEVEL SECURITY`  |
+| No public access by default      | Only grant via explicit policies           |
+| Use views for permission lookups | Materialise effective permissions per user |
+| Test RLS policies                | Verify with different user roles in tests  |
 
 ## Policy-Based Authorisation
 
 Beyond role checks, apply contextual policies:
 
-| Policy Type     | Example                                              |
-| --------------- | ---------------------------------------------------- |
-| Ownership       | User can only edit their own profile                 |
-| Resource state  | Orders can only be cancelled while status is pending |
-| Department      | Managers can only view their department's reports     |
-| Time-based      | Submissions locked after deadline                    |
+| Policy Type    | Example                                              |
+| -------------- | ---------------------------------------------------- |
+| Ownership      | User can only edit their own profile                 |
+| Resource state | Orders can only be cancelled while status is pending |
+| Department     | Managers can only view their department's reports    |
+| Time-based     | Submissions locked after deadline                    |
 
 ## Caching Strategy
 
-| What to cache                  | Where          | TTL        |
-| ------------------------------ | -------------- | ---------- |
-| User effective permissions     | Redis / memory | 5 minutes  |
-| Role-permission mappings       | Redis / memory | 15 minutes |
-| Tenant configuration           | Redis / memory | 30 minutes |
+| What to cache              | Where          | TTL        |
+| -------------------------- | -------------- | ---------- |
+| User effective permissions | Redis / memory | 5 minutes  |
+| Role-permission mappings   | Redis / memory | 15 minutes |
+| Tenant configuration       | Redis / memory | 30 minutes |
 
 Invalidate cache on: role assignment change, permission update, user deactivation.
 
@@ -144,28 +160,28 @@ Log all authorisation-sensitive actions:
 ```typescript
 type AuditLog = {
   userId: string;
-  action: string;       // e.g. 'orders.approve'
+  action: string; // e.g. 'orders.approve'
   resourceType: string; // e.g. 'orders'
   resourceId: string;
-  result: 'granted' | 'denied';
+  result: "granted" | "denied";
   metadata: Record<string, unknown>;
-  timestamp: string;    // UTC ISO 8601
+  timestamp: string; // UTC ISO 8601
 };
 ```
 
-| Rule                          | Implementation                          |
-| ----------------------------- | --------------------------------------- |
-| Log all permission denials    | Critical for security monitoring        |
-| Log sensitive data access     | Required for compliance                 |
-| Store audit logs immutably    | Append-only table, no updates/deletes   |
-| Include request context       | IP, user agent, request ID              |
+| Rule                       | Implementation                        |
+| -------------------------- | ------------------------------------- |
+| Log all permission denials | Critical for security monitoring      |
+| Log sensitive data access  | Required for compliance               |
+| Store audit logs immutably | Append-only table, no updates/deletes |
+| Include request context    | IP, user agent, request ID            |
 
 ## Anti-Patterns
 
-| Avoid                                    | Instead                                      |
-| ---------------------------------------- | -------------------------------------------- |
-| `if (user.role === 'admin')`             | `if (can(user, 'users.delete'))`             |
-| Hardcoded role names in components       | Permission-based UI rendering                |
-| Checking permissions only in middleware   | RLS + middleware + application logic          |
-| Storing permissions in JWT               | Fetch fresh permissions server-side          |
-| Single role per user                     | Multi-role with permission merging           |
+| Avoid                                   | Instead                              |
+| --------------------------------------- | ------------------------------------ |
+| `if (user.role === 'admin')`            | `if (can(user, 'users.delete'))`     |
+| Hardcoded role names in components      | Permission-based UI rendering        |
+| Checking permissions only in middleware | RLS + middleware + application logic |
+| Storing permissions in JWT              | Fetch fresh permissions server-side  |
+| Single role per user                    | Multi-role with permission merging   |

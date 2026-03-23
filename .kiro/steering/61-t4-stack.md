@@ -67,7 +67,7 @@ export function OrderList() {
 | Rule                                    | Rationale                                |
 | --------------------------------------- | ---------------------------------------- |
 | Use `solito/router` for navigation      | Works on both Expo and Next.js           |
-| Use `solito/link` for links             | Renders `<a>` on web, `Pressable` native|
+| Use `solito/link` for links             | Renders `<a>` on web, `Pressable` native |
 | Keep navigation logic in `packages/app` | Shared across platforms                  |
 | Use platform files for exceptions       | `.native.tsx` / `.web.tsx` when needed   |
 
@@ -104,13 +104,13 @@ const Card = styled(YStack, {
 });
 ```
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| Use Tamagui tokens (`$4`, `$background`)| Consistent theming across platforms      |
-| Use `YStack`/`XStack` over `View`       | Built-in flex layout with Tamagui tokens |
-| Define variants with `styled()`         | Compile-time optimisation                |
-| Keep UI components in `packages/ui`     | Shared across all apps                   |
-| Use `tamagui.config.ts` for tokens      | Single source of truth for design tokens |
+| Rule                                     | Rationale                                |
+| ---------------------------------------- | ---------------------------------------- |
+| Use Tamagui tokens (`$4`, `$background`) | Consistent theming across platforms      |
+| Use `YStack`/`XStack` over `View`        | Built-in flex layout with Tamagui tokens |
+| Define variants with `styled()`          | Compile-time optimisation                |
+| Keep UI components in `packages/ui`      | Shared across all apps                   |
+| Use `tamagui.config.ts` for tokens       | Single source of truth for design tokens |
 
 ## Platform-Specific Code
 
@@ -118,40 +118,44 @@ When behaviour must differ between platforms:
 
 ```typescript
 // button.tsx — shared default
-export { Button } from './button.shared';
+export { Button } from "./button.shared";
 
 // button.native.tsx — React Native specific
-export function Button(props: ButtonProps) { /* native impl */ }
+export function Button(props: ButtonProps) {
+  /* native impl */
+}
 
 // button.web.tsx — Web specific
-export function Button(props: ButtonProps) { /* web impl */ }
+export function Button(props: ButtonProps) {
+  /* web impl */
+}
 ```
 
-| Pattern              | When to use                              |
-| -------------------- | ---------------------------------------- |
-| `.native.tsx`        | React Native only (iOS + Android)        |
-| `.web.tsx`           | Web only (Next.js)                       |
-| `.ios.tsx`           | iOS only                                 |
-| `.android.tsx`       | Android only                             |
-| No suffix            | Shared across all platforms (default)    |
+| Pattern        | When to use                           |
+| -------------- | ------------------------------------- |
+| `.native.tsx`  | React Native only (iOS + Android)     |
+| `.web.tsx`     | Web only (Next.js)                    |
+| `.ios.tsx`     | iOS only                              |
+| `.android.tsx` | Android only                          |
+| No suffix      | Shared across all platforms (default) |
 
 ## Cloudflare Workers Deployment
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| Keep server functions edge-compatible   | No Node.js APIs in Workers               |
-| Use D1 for database                     | Cloudflare's edge SQL database           |
-| Use KV for caching                      | Low-latency key-value at the edge        |
-| Use R2 for file storage                 | S3-compatible object storage             |
-| Test with `wrangler dev` locally        | Matches production environment           |
+| Rule                                  | Rationale                         |
+| ------------------------------------- | --------------------------------- |
+| Keep server functions edge-compatible | No Node.js APIs in Workers        |
+| Use D1 for database                   | Cloudflare's edge SQL database    |
+| Use KV for caching                    | Low-latency key-value at the edge |
+| Use R2 for file storage               | S3-compatible object storage      |
+| Test with `wrangler dev` locally      | Matches production environment    |
 
 ## Rules
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| Shared code lives in `packages/`        | Maximum code reuse across platforms      |
-| Platform code lives in `apps/`          | Platform-specific entry points only      |
-| Use Bun as package manager              | Faster installs, native TypeScript       |
-| Test on both platforms regularly         | Catch platform-specific issues early     |
-| Use Expo EAS for native builds          | Managed build infrastructure             |
-| Keep tRPC routers in `packages/api`     | Shared between web and native clients    |
+| Rule                                | Rationale                             |
+| ----------------------------------- | ------------------------------------- |
+| Shared code lives in `packages/`    | Maximum code reuse across platforms   |
+| Platform code lives in `apps/`      | Platform-specific entry points only   |
+| Use Bun as package manager          | Faster installs, native TypeScript    |
+| Test on both platforms regularly    | Catch platform-specific issues early  |
+| Use Expo EAS for native builds      | Managed build infrastructure          |
+| Keep tRPC routers in `packages/api` | Shared between web and native clients |

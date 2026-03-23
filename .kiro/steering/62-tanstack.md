@@ -26,16 +26,16 @@ Patterns for TanStack Start (full-stack framework) and the broader TanStack ecos
 
 ## TanStack Ecosystem Maturity
 
-| Library        | Maturity       | Use case                          |
-| -------------- | -------------- | --------------------------------- |
-| Query          | Battle-tested  | Server state, caching, mutations  |
-| Router         | Production     | Type-safe file-based routing      |
-| Table          | Battle-tested  | Headless data tables              |
-| Form           | Stable         | Form state + validation           |
-| Virtual        | Battle-tested  | Virtualised lists and grids       |
-| Store          | Newer          | Reactive client state             |
-| Start          | v1 RC / Stable | Full-stack React framework        |
-| DB             | Alpha          | Reactive client database          |
+| Library | Maturity       | Use case                         |
+| ------- | -------------- | -------------------------------- |
+| Query   | Battle-tested  | Server state, caching, mutations |
+| Router  | Production     | Type-safe file-based routing     |
+| Table   | Battle-tested  | Headless data tables             |
+| Form    | Stable         | Form state + validation          |
+| Virtual | Battle-tested  | Virtualised lists and grids      |
+| Store   | Newer          | Reactive client state            |
+| Start   | v1 RC / Stable | Full-stack React framework       |
+| DB      | Alpha          | Reactive client database         |
 
 ## TanStack Start Architecture
 
@@ -63,18 +63,18 @@ src/
 
 ```typescript
 // utils/orders.functions.ts
-import { createServerFn } from '@tanstack/react-start';
-import { z } from 'zod';
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 const OrderInput = z.object({ id: z.string().uuid() });
 
-export const getOrder = createServerFn({ method: 'GET' })
+export const getOrder = createServerFn({ method: "GET" })
   .inputValidator(OrderInput)
   .handler(async ({ data }) => {
     return findOrderById(data.id);
   });
 
-export const createOrder = createServerFn({ method: 'POST' })
+export const createOrder = createServerFn({ method: "POST" })
   .inputValidator(CreateOrderSchema)
   .handler(async ({ data }) => {
     return insertOrder(data);
@@ -83,11 +83,11 @@ export const createOrder = createServerFn({ method: 'POST' })
 
 ### File Organisation Convention
 
-| Suffix             | Purpose                              | Safe to import on client |
-| ------------------ | ------------------------------------ | ------------------------ |
-| `.functions.ts`    | `createServerFn` wrappers            | Yes (RPC stubs)          |
-| `.server.ts`       | Server-only helpers (DB, secrets)    | No — server only         |
-| `.ts` (no suffix)  | Shared code (types, schemas, utils)  | Yes                      |
+| Suffix            | Purpose                             | Safe to import on client |
+| ----------------- | ----------------------------------- | ------------------------ |
+| `.functions.ts`   | `createServerFn` wrappers           | Yes (RPC stubs)          |
+| `.server.ts`      | Server-only helpers (DB, secrets)   | No — server only         |
+| `.ts` (no suffix) | Shared code (types, schemas, utils) | Yes                      |
 
 ### Route Loaders
 
@@ -119,17 +119,16 @@ function OrderDetail() {
 ### Middleware
 
 ```typescript
-import { createMiddleware } from '@tanstack/react-start';
+import { createMiddleware } from "@tanstack/react-start";
 
-const authMiddleware = createMiddleware()
-  .server(async ({ next }) => {
-    const session = await getSession();
-    if (!session) throw new Error('Unauthorised');
-    return next({ context: { user: session.user } });
-  });
+const authMiddleware = createMiddleware().server(async ({ next }) => {
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorised");
+  return next({ context: { user: session.user } });
+});
 
 // Apply to server functions
-export const getProtectedData = createServerFn({ method: 'GET' })
+export const getProtectedData = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     // context.user is typed and available
@@ -140,12 +139,12 @@ export const getProtectedData = createServerFn({ method: 'GET' })
 ## TanStack Query Patterns
 
 ```typescript
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Query with typed key
 export function useOrders(userId: string) {
   return useQuery({
-    queryKey: ['orders', userId],
+    queryKey: ["orders", userId],
     queryFn: () => fetchOrders(userId),
     staleTime: 5 * 60 * 1000,
   });
@@ -158,46 +157,50 @@ export function useUpdateOrder() {
   return useMutation({
     mutationFn: updateOrder,
     onMutate: async (newOrder) => {
-      await queryClient.cancelQueries({ queryKey: ['orders'] });
-      const previous = queryClient.getQueryData(['orders']);
-      queryClient.setQueryData(['orders'], (old: Order[]) =>
+      await queryClient.cancelQueries({ queryKey: ["orders"] });
+      const previous = queryClient.getQueryData(["orders"]);
+      queryClient.setQueryData(["orders"], (old: Order[]) =>
         old.map((o) => (o.id === newOrder.id ? { ...o, ...newOrder } : o)),
       );
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      queryClient.setQueryData(['orders'], context?.previous);
+      queryClient.setQueryData(["orders"], context?.previous);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
   });
 }
 ```
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| Structure query keys hierarchically     | Enables granular invalidation            |
-| Set `staleTime` based on data freshness | Don't refetch data that rarely changes   |
-| Use optimistic updates for mutations    | Instant UI feedback                      |
-| Always handle `onError` rollback        | Revert optimistic state on failure       |
-| Invalidate related queries on success   | Keep cache consistent                    |
+| Rule                                    | Rationale                              |
+| --------------------------------------- | -------------------------------------- |
+| Structure query keys hierarchically     | Enables granular invalidation          |
+| Set `staleTime` based on data freshness | Don't refetch data that rarely changes |
+| Use optimistic updates for mutations    | Instant UI feedback                    |
+| Always handle `onError` rollback        | Revert optimistic state on failure     |
+| Invalidate related queries on success   | Keep cache consistent                  |
 
 ## TanStack Router Rules
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| Use `createFileRoute` for all routes    | Type-safe params and search params       |
-| Use `beforeLoad` for auth guards        | Runs before loader, can redirect         |
-| Use `loader` for data fetching          | SSR-compatible, typed return value       |
-| Use `$paramName` for dynamic segments   | Fully typed route params                 |
-| Use `Route.useLoaderData()` in components| Type-safe access to loaded data         |
-| Validate search params with Zod         | Runtime safety for URL state             |
+| Rule                                      | Rationale                          |
+| ----------------------------------------- | ---------------------------------- |
+| Use `createFileRoute` for all routes      | Type-safe params and search params |
+| Use `beforeLoad` for auth guards          | Runs before loader, can redirect   |
+| Use `loader` for data fetching            | SSR-compatible, typed return value |
+| Use `$paramName` for dynamic segments     | Fully typed route params           |
+| Use `Route.useLoaderData()` in components | Type-safe access to loaded data    |
+| Validate search params with Zod           | Runtime safety for URL state       |
 
 ## TanStack Table Patterns
 
 ```typescript
-import { useReactTable, getCoreRowModel, getSortedRowModel } from '@tanstack/react-table';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+} from "@tanstack/react-table";
 
 const table = useReactTable({
   data: orders,
@@ -209,20 +212,20 @@ const table = useReactTable({
 });
 ```
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| TanStack Table is headless              | You control all markup and styling       |
-| Define columns outside the component    | Prevents unnecessary re-renders          |
-| Use server-side pagination for large data| Don't load 10k rows into the browser   |
-| Combine with TanStack Virtual for perf  | Virtualise rows for large datasets       |
+| Rule                                      | Rationale                            |
+| ----------------------------------------- | ------------------------------------ |
+| TanStack Table is headless                | You control all markup and styling   |
+| Define columns outside the component      | Prevents unnecessary re-renders      |
+| Use server-side pagination for large data | Don't load 10k rows into the browser |
+| Combine with TanStack Virtual for perf    | Virtualise rows for large datasets   |
 
 ## Rules (General)
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| Use static imports for server functions | Build process handles environment shaking|
-| Never use dynamic imports for server fns| Can cause bundler issues                 |
-| Keep `.server.ts` files server-only     | Never import in client components        |
-| Validate all inputs with Zod            | Runtime safety at network boundary       |
-| Use Vite for builds (TanStack Start)    | Native ESM, fast HMR                     |
-| Deploy via Nitro presets                | Universal deployment (Node, CF, Vercel)  |
+| Rule                                     | Rationale                                 |
+| ---------------------------------------- | ----------------------------------------- |
+| Use static imports for server functions  | Build process handles environment shaking |
+| Never use dynamic imports for server fns | Can cause bundler issues                  |
+| Keep `.server.ts` files server-only      | Never import in client components         |
+| Validate all inputs with Zod             | Runtime safety at network boundary        |
+| Use Vite for builds (TanStack Start)     | Native ESM, fast HMR                      |
+| Deploy via Nitro presets                 | Universal deployment (Node, CF, Vercel)   |

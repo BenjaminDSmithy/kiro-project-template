@@ -12,22 +12,22 @@ REST conventions for all API routes in this project.
 
 ## Endpoint Naming
 
-| Rule                    | Correct                    | Incorrect                |
-| ----------------------- | -------------------------- | ------------------------ |
-| Plural resource names   | `/api/users`               | `/api/user`              |
-| Kebab-case paths        | `/api/user-profiles`       | `/api/userProfiles`      |
-| No verbs in URLs        | `POST /api/orders`         | `POST /api/create-order` |
-| Nested for relationships| `/api/users/{id}/orders`   | `/api/user-orders`       |
+| Rule                     | Correct                  | Incorrect                |
+| ------------------------ | ------------------------ | ------------------------ |
+| Plural resource names    | `/api/users`             | `/api/user`              |
+| Kebab-case paths         | `/api/user-profiles`     | `/api/userProfiles`      |
+| No verbs in URLs         | `POST /api/orders`       | `POST /api/create-order` |
+| Nested for relationships | `/api/users/{id}/orders` | `/api/user-orders`       |
 
 ## HTTP Methods
 
-| Method   | Purpose                | Idempotent | Response Code |
-| -------- | ---------------------- | ---------- | ------------- |
-| `GET`    | Retrieve resource(s)   | Yes        | 200           |
-| `POST`   | Create new resource    | No         | 201           |
-| `PUT`    | Replace entire resource| Yes        | 200           |
-| `PATCH`  | Partial update         | Yes        | 200           |
-| `DELETE` | Remove resource        | Yes        | 204           |
+| Method   | Purpose                 | Idempotent | Response Code |
+| -------- | ----------------------- | ---------- | ------------- |
+| `GET`    | Retrieve resource(s)    | Yes        | 200           |
+| `POST`   | Create new resource     | No         | 201           |
+| `PUT`    | Replace entire resource | Yes        | 200           |
+| `PATCH`  | Partial update          | Yes        | 200           |
+| `DELETE` | Remove resource         | Yes        | 204           |
 
 ## Response Format
 
@@ -52,19 +52,19 @@ All responses use a consistent envelope:
 
 ## Status Codes
 
-| Code | Meaning                    | When to use                          |
-| ---- | -------------------------- | ------------------------------------ |
-| 200  | OK                         | Successful GET, PUT, PATCH           |
-| 201  | Created                    | Successful POST                      |
-| 204  | No Content                 | Successful DELETE                    |
-| 400  | Bad Request                | Validation errors, malformed input   |
-| 401  | Unauthorised               | Missing or invalid authentication    |
-| 403  | Forbidden                  | Authenticated but insufficient perms |
-| 404  | Not Found                  | Resource does not exist              |
-| 409  | Conflict                   | Duplicate resource, state conflict   |
-| 422  | Unprocessable Entity       | Valid syntax but semantic errors     |
-| 429  | Too Many Requests          | Rate limit exceeded                  |
-| 500  | Internal Server Error      | Unexpected server failure            |
+| Code | Meaning               | When to use                          |
+| ---- | --------------------- | ------------------------------------ |
+| 200  | OK                    | Successful GET, PUT, PATCH           |
+| 201  | Created               | Successful POST                      |
+| 204  | No Content            | Successful DELETE                    |
+| 400  | Bad Request           | Validation errors, malformed input   |
+| 401  | Unauthorised          | Missing or invalid authentication    |
+| 403  | Forbidden             | Authenticated but insufficient perms |
+| 404  | Not Found             | Resource does not exist              |
+| 409  | Conflict              | Duplicate resource, state conflict   |
+| 422  | Unprocessable Entity  | Valid syntax but semantic errors     |
+| 429  | Too Many Requests     | Rate limit exceeded                  |
+| 500  | Internal Server Error | Unexpected server failure            |
 
 ## Validation
 

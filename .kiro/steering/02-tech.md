@@ -64,28 +64,28 @@ Use MCP tools instead of bash for:
 
 <!-- TODO: List your approved technologies. Anything not listed requires user approval. -->
 
-| Category       | Approved                                          |
-| -------------- | ------------------------------------------------- |
-| Framework      | Next.js, React, TanStack Start, Expo              |
-| API Layer      | tRPC, TanStack Query, REST (Next.js Route Handlers)|
-| Database       | Supabase (PostgreSQL), Drizzle ORM                |
-| Auth           | Supabase Auth                                     |
-| Testing        | Vitest, Playwright                                |
-| Styling        | TailwindCSS, shadcn/ui, Radix UI, Tamagui        |
-| Navigation     | Solito (cross-platform), Expo Router              |
-| Infrastructure | Docker, Cloudflare Workers                        |
-| Icons          | Lucide React                                      |
+| Category       | Approved                                            |
+| -------------- | --------------------------------------------------- |
+| Framework      | Next.js, React, TanStack Start, Expo                |
+| API Layer      | tRPC, TanStack Query, REST (Next.js Route Handlers) |
+| Database       | Supabase (PostgreSQL), Drizzle ORM                  |
+| Auth           | Supabase Auth                                       |
+| Testing        | Vitest, Playwright                                  |
+| Styling        | TailwindCSS, shadcn/ui, Radix UI, Tamagui           |
+| Navigation     | Solito (cross-platform), Expo Router                |
+| Infrastructure | Docker, Cloudflare Workers                          |
+| Icons          | Lucide React                                        |
 
 ### Stack Presets
 
 This template supports multiple stack configurations. See the relevant steering doc:
 
-| Stack          | Steering doc       | Key technologies                          |
-| -------------- | ------------------ | ----------------------------------------- |
-| Default        | `53-nextjs.md`     | Next.js + Supabase + Drizzle + Tailwind   |
-| T3             | `60-t3-stack.md`   | Next.js + tRPC + Tailwind + TypeScript    |
-| T4             | `61-t4-stack.md`   | Expo + Next.js + Tamagui + tRPC + Solito  |
-| TanStack/T5    | `62-tanstack.md`   | TanStack Start + Router + Query + Vite    |
+| Stack       | Steering doc     | Key technologies                         |
+| ----------- | ---------------- | ---------------------------------------- |
+| Default     | `53-nextjs.md`   | Next.js + Supabase + Drizzle + Tailwind  |
+| T3          | `60-t3-stack.md` | Next.js + tRPC + Tailwind + TypeScript   |
+| T4          | `61-t4-stack.md` | Expo + Next.js + Tamagui + tRPC + Solito |
+| TanStack/T5 | `62-tanstack.md` | TanStack Start + Router + Query + Vite   |
 
 **Not approved** (require explicit user approval):
 

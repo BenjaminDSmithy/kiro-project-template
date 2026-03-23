@@ -14,11 +14,11 @@ Patterns for the T3 Stack: Next.js + tRPC + Tailwind CSS + TypeScript. Optionall
 
 ## T3 Axioms
 
-| Axiom                    | Meaning                                          |
-| ------------------------ | ------------------------------------------------ |
-| Solve problems           | Only add what solves a specific problem           |
-| Bleed responsibly        | Bleeding edge in low-risk areas, stable for data  |
-| Typesafety isn't optional| End-to-end type safety from DB to UI             |
+| Axiom                     | Meaning                                          |
+| ------------------------- | ------------------------------------------------ |
+| Solve problems            | Only add what solves a specific problem          |
+| Bleed responsibly         | Bleeding edge in low-risk areas, stable for data |
+| Typesafety isn't optional | End-to-end type safety from DB to UI             |
 
 ## tRPC Architecture
 
@@ -47,8 +47,8 @@ src/
 ### Router Pattern
 
 ```typescript
-import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
   getById: publicProcedure
@@ -60,12 +60,15 @@ export const userRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(z.object({
-      id: z.string().uuid(),
-      name: z.string().min(1).max(100),
-    }))
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string().min(1).max(100),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.update(users)
+      return ctx.db
+        .update(users)
         .set({ name: input.name })
         .where(eq(users.id, input.id))
         .returning();
@@ -77,14 +80,18 @@ export const userRouter = createTRPCRouter({
 
 ```typescript
 // server/api/trpc.ts
-import { initTRPC, TRPCError } from '@trpc/server';
+import { initTRPC, TRPCError } from "@trpc/server";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
     return {
       ...shape,
-      data: { ...shape.data, zodError: error.cause instanceof ZodError ? error.cause.flatten() : null },
+      data: {
+        ...shape.data,
+        zodError:
+          error.cause instanceof ZodError ? error.cause.flatten() : null,
+      },
     };
   },
 });
@@ -92,7 +99,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 // Middleware: enforce authentication
 const enforceAuth = t.middleware(({ ctx, next }) => {
   if (!ctx.session?.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({ ctx: { session: { ...ctx.session, user: ctx.session.user } } });
 });
@@ -127,23 +134,23 @@ export function UserList() {
 
 ## Rules
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| One router per domain/resource          | Clean separation of concerns             |
-| Always validate input with Zod          | Runtime safety at the network boundary   |
-| Use `protectedProcedure` for auth       | Never check auth inside procedure body   |
-| Use `superjson` transformer             | Handles Date, Map, Set serialisation     |
-| Prefer server caller in Server Components| Avoids unnecessary HTTP round-trip      |
-| Use React Query hooks in Client Components| Automatic caching and revalidation     |
-| Never import server code on the client  | tRPC handles the boundary automatically  |
-| Keep procedures thin                    | Extract business logic to service layer  |
+| Rule                                       | Rationale                               |
+| ------------------------------------------ | --------------------------------------- |
+| One router per domain/resource             | Clean separation of concerns            |
+| Always validate input with Zod             | Runtime safety at the network boundary  |
+| Use `protectedProcedure` for auth          | Never check auth inside procedure body  |
+| Use `superjson` transformer                | Handles Date, Map, Set serialisation    |
+| Prefer server caller in Server Components  | Avoids unnecessary HTTP round-trip      |
+| Use React Query hooks in Client Components | Automatic caching and revalidation      |
+| Never import server code on the client     | tRPC handles the boundary automatically |
+| Keep procedures thin                       | Extract business logic to service layer |
 
 ## Anti-Patterns
 
-| Avoid                                    | Instead                                  |
-| ---------------------------------------- | ---------------------------------------- |
-| Fat procedures with business logic       | Extract to `src/lib/{domain}/` services  |
-| Returning entire DB rows                 | Select specific fields, use output types |
-| Catching errors inside procedures        | Let tRPC error formatter handle it       |
-| Using `any` in input/output              | Always define Zod schemas                |
-| Mixing REST routes with tRPC             | Pick one per resource — don't duplicate  |
+| Avoid                              | Instead                                  |
+| ---------------------------------- | ---------------------------------------- |
+| Fat procedures with business logic | Extract to `src/lib/{domain}/` services  |
+| Returning entire DB rows           | Select specific fields, use output types |
+| Catching errors inside procedures  | Let tRPC error formatter handle it       |
+| Using `any` in input/output        | Always define Zod schemas                |
+| Mixing REST routes with tRPC       | Pick one per resource — don't duplicate  |

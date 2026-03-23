@@ -58,8 +58,8 @@ Set up Supabase Auth with email/password and OAuth providers. All tasks complete
 
 ## Progress Tracking
 
-| Phase           | Status   | Completion Date | Notes                    |
-| --------------- | -------- | --------------- | ------------------------ |
-| Infrastructure  | Complete | 2026-03-10      | All auth utilities ready |
-| UI Components   | Complete | 2026-03-12      | Forms and OAuth buttons  |
-| Middleware       | Complete | 2026-03-14      | Route protection active  |
+| Phase          | Status   | Completion Date | Notes                    |
+| -------------- | -------- | --------------- | ------------------------ |
+| Infrastructure | Complete | 2026-03-10      | All auth utilities ready |
+| UI Components  | Complete | 2026-03-12      | Forms and OAuth buttons  |
+| Middleware     | Complete | 2026-03-14      | Route protection active  |

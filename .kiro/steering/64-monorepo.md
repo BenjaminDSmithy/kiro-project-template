@@ -77,23 +77,23 @@ packages:
 
 ## Rules
 
-| Rule                                    | Rationale                                |
-| --------------------------------------- | ---------------------------------------- |
-| Shared code lives in `packages/`        | Single source of truth, no duplication   |
-| Apps only import from `packages/`       | Clean dependency graph                   |
-| No circular dependencies                | `packages/a` cannot import `packages/b` if b imports a |
-| Use `workspace:*` for internal deps     | Always use latest local version          |
-| Each package has its own `package.json` | Independent versioning and dependencies  |
-| Each package has its own `tsconfig.json`| Independent compilation settings         |
-| Use Turborepo for task orchestration    | Parallel builds with caching             |
-| Cache build outputs                     | Faster CI and local rebuilds             |
+| Rule                                     | Rationale                                              |
+| ---------------------------------------- | ------------------------------------------------------ |
+| Shared code lives in `packages/`         | Single source of truth, no duplication                 |
+| Apps only import from `packages/`        | Clean dependency graph                                 |
+| No circular dependencies                 | `packages/a` cannot import `packages/b` if b imports a |
+| Use `workspace:*` for internal deps      | Always use latest local version                        |
+| Each package has its own `package.json`  | Independent versioning and dependencies                |
+| Each package has its own `tsconfig.json` | Independent compilation settings                       |
+| Use Turborepo for task orchestration     | Parallel builds with caching                           |
+| Cache build outputs                      | Faster CI and local rebuilds                           |
 
 ## Anti-Patterns
 
-| Avoid                                    | Instead                                  |
-| ---------------------------------------- | ---------------------------------------- |
-| Importing across apps directly           | Extract to a shared package              |
-| Duplicating types across packages        | Single `@repo/types` package             |
-| Running tasks without Turborepo          | Always use `turbo run build/test/lint`   |
-| Hoisting all deps to root               | Keep deps in the package that uses them  |
-| Shared `node_modules` assumptions        | Each package declares its own deps       |
+| Avoid                             | Instead                                 |
+| --------------------------------- | --------------------------------------- |
+| Importing across apps directly    | Extract to a shared package             |
+| Duplicating types across packages | Single `@repo/types` package            |
+| Running tasks without Turborepo   | Always use `turbo run build/test/lint`  |
+| Hoisting all deps to root         | Keep deps in the package that uses them |
+| Shared `node_modules` assumptions | Each package declares its own deps      |

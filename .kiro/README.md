@@ -45,31 +45,31 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 
 ## Steering File Numbering
 
-| Range | Category                                    | Inclusion   |
-| ----- | ------------------------------------------- | ----------- |
-| 00–03 | Core (rules, product, tech, structure)      | Always      |
-| 10–12 | Development (code style, errors, testing)   | Always/fileMatch |
-| 20–21 | Workflow (git, task completion)              | Always      |
-| 30–31 | Reference guides (hooks, best practices)    | Manual      |
-| 40–52 | Domain (security, auth, API, DB, docs, CI)  | Always/fileMatch |
-| 53–59 | Framework & tooling (Next.js, Tailwind, i18n, perf, env, realtime) | fileMatch |
-| 60–62 | Stack presets (T3, T4, TanStack)            | fileMatch   |
-| 63    | Stack selection decision tree               | Manual      |
-| 64–65 | Advanced patterns (monorepo, error boundaries) | fileMatch |
-| 70–71 | Design & review (frontend design, agent review) | fileMatch/Manual |
+| Range | Category                                                           | Inclusion        |
+| ----- | ------------------------------------------------------------------ | ---------------- |
+| 00–03 | Core (rules, product, tech, structure)                             | Always           |
+| 10–12 | Development (code style, errors, testing)                          | Always/fileMatch |
+| 20–21 | Workflow (git, task completion)                                    | Always           |
+| 30–31 | Reference guides (hooks, best practices)                           | Manual           |
+| 40–52 | Domain (security, auth, API, DB, docs, CI)                         | Always/fileMatch |
+| 53–59 | Framework & tooling (Next.js, Tailwind, i18n, perf, env, realtime) | fileMatch        |
+| 60–62 | Stack presets (T3, T4, TanStack)                                   | fileMatch        |
+| 63    | Stack selection decision tree                                      | Manual           |
+| 64–65 | Advanced patterns (monorepo, error boundaries)                     | fileMatch        |
+| 70–71 | Design & review (frontend design, agent review)                    | fileMatch/Manual |
 
 ## Hook Numbering
 
-| Range  | Category           | Trigger                                          |
-| ------ | ------------------ | ------------------------------------------------ |
-| 01–09  | Quality gates      | fileEdited / agentStop                           |
-| 10–17e | Manual tasks       | userTriggered                                    |
-| 17–19  | Task lifecycle     | pre/postTaskExecution                            |
-| 20–22  | File automation    | fileCreated / fileDeleted / agentStop            |
-| 23–26  | Sync & automation  | fileEdited / fileCreated / postToolUse           |
-| 27–28  | Safety gates       | preToolUse (migration safety, context injection) |
-| 29–30  | Task quality       | preTaskExecution / postTaskExecution              |
-| 31–34  | Stack-specific     | fileEdited / fileCreated / postTaskExecution      |
+| Range  | Category          | Trigger                                          |
+| ------ | ----------------- | ------------------------------------------------ |
+| 01–09  | Quality gates     | fileEdited / agentStop                           |
+| 10–17e | Manual tasks      | userTriggered                                    |
+| 17–19  | Task lifecycle    | pre/postTaskExecution                            |
+| 20–22  | File automation   | fileCreated / fileDeleted / agentStop            |
+| 23–26  | Sync & automation | fileEdited / fileCreated / postToolUse           |
+| 27–28  | Safety gates      | preToolUse (migration safety, context injection) |
+| 29–30  | Task quality      | preTaskExecution / postTaskExecution             |
+| 31–34  | Stack-specific    | fileEdited / fileCreated / postTaskExecution     |
 
 > **Note:** Hooks `01` and `22` both use `agentStop` — `01` runs quality checks on code changes while `22` provides a brief summary. Both fire on every agent stop; this is intentional.
 
@@ -77,61 +77,69 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 
 Specs follow a folder naming convention with emoji status prefixes:
 
-| Prefix | Status      | Meaning                              |
-| ------ | ----------- | ------------------------------------ |
-| `📋_`  | Planned     | Spec complete, implementation TBD    |
-| `🚧_`  | In Progress | Active development                   |
-| `⏸️_`  | On Hold     | Paused, awaiting dependencies        |
-| `✅_`  | Complete    | Fully implemented                    |
+| Prefix | Status      | Meaning                           |
+| ------ | ----------- | --------------------------------- |
+| `📋_`  | Planned     | Spec complete, implementation TBD |
+| `🚧_`  | In Progress | Active development                |
+| `⏸️_`  | On Hold     | Paused, awaiting dependencies     |
+| `✅_`  | Complete    | Fully implemented                 |
 
 Each spec folder contains:
 
-| File               | Purpose                                         |
-| ------------------ | ----------------------------------------------- |
-| `.config.kiro`     | Spec type and workflow configuration             |
-| `requirements.md`  | User stories with EARS acceptance criteria       |
-| `design.md`        | Architecture, interfaces, correctness properties |
-| `tasks.md`         | Implementation checklist with effort estimates   |
+| File              | Purpose                                          |
+| ----------------- | ------------------------------------------------ |
+| `.config.kiro`    | Spec type and workflow configuration             |
+| `requirements.md` | User stories with EARS acceptance criteria       |
+| `design.md`       | Architecture, interfaces, correctness properties |
+| `tasks.md`        | Implementation checklist with effort estimates   |
 
 ### `.config.kiro` Reference
 
 Each spec folder contains a `.config.kiro` JSON file with the following fields:
 
-| Field          | Required | Valid Values                                          |
-| -------------- | -------- | ----------------------------------------------------- |
-| `specId`       | Yes      | UUID v4 — unique identifier for the spec              |
-| `workflowType` | Yes      | `requirements-first` — the standard spec workflow     |
-| `specType`     | Yes      | `feature` (standard spec) or `bugfix` (bugfix spec)   |
+| Field          | Required | Valid Values                                        |
+| -------------- | -------- | --------------------------------------------------- |
+| `specId`       | Yes      | UUID v4 — unique identifier for the spec            |
+| `workflowType` | Yes      | `requirements-first` — the standard spec workflow   |
+| `specType`     | Yes      | `feature` (standard spec) or `bugfix` (bugfix spec) |
 
 Example for a feature spec:
 
 ```json
-{"specId": "a1b2c3d4-...", "workflowType": "requirements-first", "specType": "feature"}
+{
+  "specId": "a1b2c3d4-...",
+  "workflowType": "requirements-first",
+  "specType": "feature"
+}
 ```
 
 Example for a bugfix spec:
 
 ```json
-{"specId": "e5f6g7h8-...", "workflowType": "requirements-first", "specType": "bugfix"}
+{
+  "specId": "e5f6g7h8-...",
+  "workflowType": "requirements-first",
+  "specType": "bugfix"
+}
 ```
 
 ## Example Specs
 
-| Spec | Demonstrates |
-| ---- | ------------ |
-| `✅_00_sample-auth-setup` | Complete spec — all tasks checked, progress table filled |
-| `📋_01_sample-user-notifications` | Planned spec — requirements and tasks, not yet started |
-| `🚧_02_sample-dashboard` | In-progress spec — Phase 1 done, Phase 2 partial |
-| `⏸️_03_sample-payments` | On-hold spec — blocked by dashboard dependency |
+| Spec                              | Demonstrates                                             |
+| --------------------------------- | -------------------------------------------------------- |
+| `✅_00_sample-auth-setup`         | Complete spec — all tasks checked, progress table filled |
+| `📋_01_sample-user-notifications` | Planned spec — requirements and tasks, not yet started   |
+| `🚧_02_sample-dashboard`          | In-progress spec — Phase 1 done, Phase 2 partial         |
+| `⏸️_03_sample-payments`           | On-hold spec — blocked by dashboard dependency           |
 
 ## Stack Presets
 
-| Stack       | Steering Doc    | Key Technologies                         |
-| ----------- | --------------- | ---------------------------------------- |
-| Default     | `53-nextjs.md`  | Next.js + Supabase + Drizzle + Tailwind  |
-| T3          | `60-t3-stack.md`| Next.js + tRPC + Tailwind + TypeScript   |
-| T4          | `61-t4-stack.md`| Expo + Next.js + Tamagui + tRPC + Solito |
-| TanStack/T5 | `62-tanstack.md`| TanStack Start + Router + Query + Vite   |
+| Stack       | Steering Doc     | Key Technologies                         |
+| ----------- | ---------------- | ---------------------------------------- |
+| Default     | `53-nextjs.md`   | Next.js + Supabase + Drizzle + Tailwind  |
+| T3          | `60-t3-stack.md` | Next.js + tRPC + Tailwind + TypeScript   |
+| T4          | `61-t4-stack.md` | Expo + Next.js + Tamagui + tRPC + Solito |
+| TanStack/T5 | `62-tanstack.md` | TanStack Start + Router + Query + Vite   |
 
 Use `#stack-selection` in chat to reference the stack selection decision tree (`63-stack-selection.md`).
 

@@ -6,10 +6,10 @@ inclusion: always
 
 ## Configuration Locations
 
-| Level     | Path                             | Precedence |
-| --------- | -------------------------------- | ---------- |
-| User      | `~/.kiro/settings/mcp.json`     | Lowest     |
-| Workspace | `.kiro/settings/mcp.json`       | Highest    |
+| Level     | Path                        | Precedence |
+| --------- | --------------------------- | ---------- |
+| User      | `~/.kiro/settings/mcp.json` | Lowest     |
+| Workspace | `.kiro/settings/mcp.json`   | Highest    |
 
 Workspace config overrides user config for server name conflicts.
 
@@ -43,12 +43,12 @@ Workspace config overrides user config for server name conflicts.
 
 ## Preferred MCP Servers
 
-| Domain   | Server     | Use Case                          |
-| -------- | ---------- | --------------------------------- |
-| Database | supabase   | Schema management, queries        |
-| Git      | git        | Commits, diffs, history           |
-| Browser  | chrome     | Visual testing, screenshots       |
-| Docker   | docker     | Container management              |
+| Domain   | Server   | Use Case                    |
+| -------- | -------- | --------------------------- |
+| Database | supabase | Schema management, queries  |
+| Git      | git      | Commits, diffs, history     |
+| Browser  | chrome   | Visual testing, screenshots |
+| Docker   | docker   | Container management        |
 
 ## Troubleshooting
 
