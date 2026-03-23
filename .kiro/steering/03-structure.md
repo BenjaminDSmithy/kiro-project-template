@@ -77,4 +77,4 @@ import { UserCard } from "./user-card";
 
 Location: `.kiro/specs/`
 
-Each spec contains: `requirements.md`, `design.md`, `tasks.md`.
+Each spec contains: `requirements.md` (or `bugfix.md` for bugfix specs), `design.md`, `tasks.md`.
