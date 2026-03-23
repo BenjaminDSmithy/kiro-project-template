@@ -1,0 +1,12 @@
+{
+  "name": "TODO/FIXME Tracker",
+  "version": "1.0.0",
+  "description": "Scan for TODO, FIXME, and HACK comments — flag stale ones and suggest actions",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Scan all source files in `src/` for TODO, FIXME, HACK, and XXX comments.\n\nFor each one found:\n1. File path and line number\n2. The comment text\n3. Age estimate (check git blame if possible)\n4. Severity: FIXME/HACK = high, TODO = medium\n5. Suggested action: resolve, create issue, or remove if obsolete\n\n## Output Format\n\n| Severity | File | Line | Comment | Age | Action |\n|----------|------|------|---------|-----|--------|\n\nFlag any that appear stale (> 30 days old). Summarise total count by severity."
+  }
+}

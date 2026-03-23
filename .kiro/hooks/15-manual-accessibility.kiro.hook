@@ -1,0 +1,12 @@
+{
+  "name": "Accessibility Audit",
+  "version": "1.0.0",
+  "description": "Audit React components for accessibility issues (disabled by default — enable when needed)",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Audit all React components (src/**/*.tsx) for accessibility issues:\n\n1. Missing alt text on images\n2. Missing aria-label on interactive elements without visible text\n3. Non-semantic HTML (div with onClick instead of button)\n4. Missing keyboard navigation support\n5. Colour contrast concerns (check Tailwind classes)\n6. Missing form labels and fieldset/legend grouping\n7. Missing skip navigation links\n8. Incorrect heading hierarchy (h1 → h3 skipping h2)\n\n## Output Format\n\n| Severity | File | Line | Issue | Fix |\n|----------|------|------|-------|-----|\n\nPrioritise by WCAG AA impact. Only flag actionable issues with specific file paths."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Stale Branch Cleanup",
+  "version": "1.0.0",
+  "description": "List merged branches that can be safely deleted",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Identify stale git branches that can be cleaned up:\n\n1. Run `git branch --merged main` to find branches already merged into main\n2. Exclude `main`, `develop`, and any release branches\n3. For each candidate, show:\n   - Branch name\n   - Last commit date\n   - Last commit author\n4. Present the list and ask the user which branches to delete\n5. Only delete after explicit confirmation\n\nNever delete `main`, `develop`, or branches with unmerged commits."
+  }
+}

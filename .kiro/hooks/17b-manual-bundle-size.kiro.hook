@@ -1,0 +1,12 @@
+{
+  "name": "Bundle Size Monitor",
+  "version": "1.0.0",
+  "description": "Analyse bundle size and identify heavy dependencies before PRs or releases",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyse the project's bundle size and dependency weight:\n\n1. Check `package.json` for heavy dependencies (known large packages)\n2. Look for imports that pull in entire libraries instead of specific modules\n3. Check for duplicate dependencies or packages that overlap in functionality\n4. Identify client-side imports that could be server-only\n5. Flag any `'use client'` components importing heavy libraries\n\n## Output Format\n\n| Package | Est. Size | Used In | Suggestion |\n|---------|-----------|---------|------------|\n\nSuggest tree-shaking improvements, lighter alternatives, or dynamic imports where applicable."
+  }
+}

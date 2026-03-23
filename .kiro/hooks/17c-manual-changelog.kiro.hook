@@ -1,0 +1,12 @@
+{
+  "name": "Changelog Generator",
+  "version": "1.0.0",
+  "description": "Generate changelog entries from conventional commits since last release",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Generate a changelog entry from recent git commits.\n\n1. Read commits since the last tag (or last 50 commits if no tags)\n2. Group by conventional commit type:\n   - **Added** (feat)\n   - **Fixed** (fix)\n   - **Changed** (refactor, perf)\n   - **Documentation** (docs)\n   - **Other** (chore, style, test, build, ci)\n3. Format each entry as: `- {scope}: {description}`\n4. Include date header in format: `## [Unreleased] - YYYY-MM-DD`\n5. Follow Keep a Changelog format (https://keepachangelog.com)\n\nPresent the generated entry and ask if the user wants to prepend it to CHANGELOG.md."
+  }
+}

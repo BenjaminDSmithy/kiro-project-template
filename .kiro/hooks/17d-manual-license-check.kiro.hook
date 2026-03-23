@@ -1,0 +1,12 @@
+{
+  "name": "Dependency License Check",
+  "version": "1.0.0",
+  "description": "Scan dependencies for license compatibility issues",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Scan `package.json` dependencies for license compatibility:\n\n1. Read all dependencies and devDependencies\n2. Check for known problematic licences:\n   - GPL/AGPL in an MIT/Apache project (copyleft contamination)\n   - SSPL (Server Side Public License) — restrictive for SaaS\n   - Unlicensed packages (no licence field)\n   - Custom/proprietary licences\n3. Flag any issues found\n\n## Output Format\n\n| Package | Licence | Risk | Action |\n|---------|---------|------|--------|\n\nNote: devDependencies with GPL are generally safe (not bundled in production). Focus on production dependencies."
+  }
+}

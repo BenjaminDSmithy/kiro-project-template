@@ -1,0 +1,12 @@
+{
+  "name": "Dead Code Detector",
+  "version": "1.0.0",
+  "description": "Identify unused exports, functions, variables, and imports across the codebase",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Scan the codebase for dead code:\n\n1. Unused exports — functions, types, or constants exported but never imported elsewhere\n2. Unused imports — imported symbols not referenced in the file\n3. Unused variables — declared but never read\n4. Unreachable code — code after return/throw statements\n5. Unused files — modules with no imports from other files\n\n## Output Format\n\n| Type | File | Symbol | Action |\n|------|------|--------|--------|\n\nFocus on `src/` directory. Skip test files and type declaration files. Prioritise by impact on bundle size."
+  }
+}
