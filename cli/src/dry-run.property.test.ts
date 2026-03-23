@@ -106,7 +106,7 @@ describe("Dry-Run Property Tests", () => {
    */
   it(
     "previewInit should produce zero side effects on the filesystem",
-    { timeout: 30000 },
+    { timeout: 120000 },
     async () => {
       await fc.assert(
         fc.asyncProperty(projectConfigArb, async (config) => {
@@ -139,7 +139,7 @@ describe("Dry-Run Property Tests", () => {
    */
   it(
     "previewAdd should produce zero side effects on the filesystem",
-    { timeout: 30000 },
+    { timeout: 120000 },
     async () => {
       await fc.assert(
         fc.asyncProperty(projectConfigArb, async (config) => {

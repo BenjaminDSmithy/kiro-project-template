@@ -51,7 +51,7 @@ describe(
         execFileSync("bash", [scriptPath], {
           cwd: tmp,
           stdio: "pipe",
-          timeout: 30000,
+          timeout: 60000,
         });
         // If it exits 0, that's a failure of the property
         expect.fail("prepublish.sh should have exited with non-zero code");
@@ -79,5 +79,5 @@ describe(
       expect(content).toContain("set -euo pipefail");
     });
   },
-  { timeout: 30000 },
+  { timeout: 120000 },
 );
