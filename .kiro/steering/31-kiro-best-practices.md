@@ -33,7 +33,7 @@ You MUST follow these rules across all interactions in this repo:
 
 - **10.** Use requirements-first for net-new features where the "what" is clear but the "how" is open.
 - **11.** Use design-first when the architecture is already decided.
-- **12.** Use bugfix for surgical fixes with explicit Current/Expected/Unchanged behavior sections.
+- **12.** Use bugfix specs for surgical fixes with explicit Current/Expected/Unchanged behavior sections in `bugfix.md`.
 - **13.** For bugfix specs, always document what must NOT change — this prevents regressions.
 
 ## Steering Files
@@ -42,6 +42,7 @@ You MUST follow these rules across all interactions in this repo:
 - **15.** Use `inclusion: always` only for core standards that apply to every interaction.
 - **16.** Use `inclusion: fileMatch` for domain-specific guidance triggered by file patterns.
 - **17.** Use `inclusion: manual` for reference material pulled in on demand with `#filename`.
+- **17a.** Use `inclusion: auto` with `name` and `description` for context-heavy guidance that loads automatically when the request matches the description.
 - **18.** Frontmatter must be the very first thing in the file — no blank lines before `---`.
 - **19.** Always explain the _why_ behind conventions, not just the _what_.
 - **20.** Include concrete examples in steering files — show, don't just tell.
