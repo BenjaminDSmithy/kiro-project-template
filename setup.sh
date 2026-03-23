@@ -17,6 +17,19 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
+# Cross-platform sed in-place helper
+# ---------------------------------------------------------------------------
+# macOS sed requires -i '' while GNU/Linux sed requires -i (no argument).
+# This function abstracts the difference.
+sed_inplace() {
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
+
+# ---------------------------------------------------------------------------
 # Colours
 # ---------------------------------------------------------------------------
 RED='\033[0;31m'
@@ -111,6 +124,11 @@ case "${STACK_CHOICE}" in
   1)  STACK_NAME="T3 Stack" ;;
   2)  STACK_NAME="T4 Stack" ;;
   3)  STACK_NAME="Supabase + Next.js" ;;
+  # NOTE: Stacks 4-11 do not have dedicated steering docs in .kiro/steering/.
+  # Only stacks 1 (T3), 2 (T4), 3 (Default Next.js), and 12 (TanStack) have
+  # corresponding steering files (60-t3-stack.md, 61-t4-stack.md, 53-nextjs.md,
+  # 62-tanstack.md). For stacks 4-11, create custom steering docs or rely on
+  # the general steering docs (10-dev-code-style.md, etc.).
   4)  STACK_NAME="Vite + React" ;;
   5)  STACK_NAME="SvelteKit" ;;
   6)  STACK_NAME="Nuxt 3" ;;
@@ -352,6 +370,9 @@ TARGET_FILES=(
   "docs/DEPLOYMENT.md"
   "docs/ADR/000-template.md"
   "docs/examples/TECH-STACK-example.md"
+  "bugs.md"
+  "package.json"
+  "LICENSE"
 )
 
 CHANGED_FILES=()
@@ -365,18 +386,27 @@ for file in "${TARGET_FILES[@]}"; do
 
   changed=false
 
+  # Escape sed special characters in replacement strings (&, \, /)
+  SAFE_PROJECT_NAME="${PROJECT_NAME//\\/\\\\}"
+  SAFE_PROJECT_NAME="${SAFE_PROJECT_NAME//&/\\&}"
+  SAFE_PROJECT_NAME="${SAFE_PROJECT_NAME//\//\\/}"
+
+  SAFE_COPYRIGHT="${COPYRIGHT_HOLDER//\\/\\\\}"
+  SAFE_COPYRIGHT="${SAFE_COPYRIGHT//&/\\&}"
+  SAFE_COPYRIGHT="${SAFE_COPYRIGHT//\//\\/}"
+
   if grep -q '{{PROJECT_NAME}}' "${filepath}" 2>/dev/null; then
-    sed -i '' "s/{{PROJECT_NAME}}/${PROJECT_NAME//\//\\/}/g" "${filepath}"
+    sed_inplace "s/{{PROJECT_NAME}}/${SAFE_PROJECT_NAME}/g" "${filepath}"
     changed=true
   fi
 
   if grep -q '{{COPYRIGHT_HOLDER}}' "${filepath}" 2>/dev/null; then
-    sed -i '' "s/{{COPYRIGHT_HOLDER}}/${COPYRIGHT_HOLDER//\//\\/}/g" "${filepath}"
+    sed_inplace "s/{{COPYRIGHT_HOLDER}}/${SAFE_COPYRIGHT}/g" "${filepath}"
     changed=true
   fi
 
   if grep -q '{{YEAR}}' "${filepath}" 2>/dev/null; then
-    sed -i '' "s/{{YEAR}}/${YEAR}/g" "${filepath}"
+    sed_inplace "s/{{YEAR}}/${YEAR}/g" "${filepath}"
     changed=true
   fi
 
