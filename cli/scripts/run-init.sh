@@ -10,11 +10,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${SCRIPT_DIR}"
 
 # Build if dist doesn't exist or source is newer
-if [[ ! -f dist/index.cjs ]] || [[ src/index.ts -nt dist/index.cjs ]]; then
-  echo "Building first..."
-  pnpm build
+if [[ ! -f dist/index.js ]] || [[ src/index.ts -nt dist/index.js ]]; then
+	echo "Building first..."
+	pnpm build
 fi
 
 echo "Running: create-kiro-project (init mode)"
 echo "─────────────────────────────────────────"
-node dist/index.cjs "$@"
+node dist/index.js "$@"

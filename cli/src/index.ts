@@ -7,7 +7,6 @@
  * create-kiro-project CLI entry point
  */
 
-import { createRequire } from "node:module";
 import path from "node:path";
 
 import { loadConfig } from "./config.js";
@@ -167,7 +166,6 @@ Options:
 }
 
 function printVersion(): void {
-  const require = createRequire(import.meta.url);
   const pkg = require("../package.json") as { version: string };
   console.log(pkg.version);
 }
