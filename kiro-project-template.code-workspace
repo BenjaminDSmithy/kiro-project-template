@@ -5,7 +5,7 @@
     }
   ],
   "settings": {
-    "kiroAgent.configureMCP": "Disabled"
+    "kiroAgent.configureMCP": "Enabled"
   },
   "launch": {
     "version": "0.2.0",
