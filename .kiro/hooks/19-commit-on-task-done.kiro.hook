@@ -1,7 +1,7 @@
 {
   "name": "Commit on Task Complete",
   "version": "1.0.0",
-  "description": "After a spec task is marked complete, commit all changed files with a conventional commit message.",
+  "description": "After a spec task is marked complete, commit all changed files with a conventional commit message. NOTE: This hook runs alongside hook 17 (trunk check) and hook 30 (a11y audit) on the same postTaskExecution event. Hooks execute in filename order, so trunk check (17) runs first, then this commit (19), then a11y audit (30). Ensure trunk check passes before this hook commits.",
   "when": {
     "type": "postTaskExecution"
   },

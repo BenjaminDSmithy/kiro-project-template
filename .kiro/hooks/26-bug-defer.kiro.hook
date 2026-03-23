@@ -8,6 +8,6 @@
   },
   "then": {
     "type": "askAgent",
-    "prompt": "If the command output shows a test failure or unexpected error during task execution:\n\n1. Check if a `bugs.md` exists in the current spec directory (`.kiro/specs/{feature-name}/bugs.md`). If not, create one using the template from `.kiro/specs/_BUGFIX_TEMPLATE/bugs.md`.\n2. Document the bug following the format in steering doc `52-bug-tracking.md` with status Open.\n3. Add a bug fix sub-task to `tasks.md` under a 'Bug Fixes' phase.\n4. Update the statistics section in `bugs.md`.\n5. Continue with the current task — do NOT stop to fix the bug.\n\nIf the command output shows success or is unrelated to testing, do nothing."
+    "prompt": "Only act if the command was a test runner (vitest, jest, playwright, pytest, pnpm test, npm test, bun test) AND its output shows a test failure or unexpected error.\n\nIf the command was NOT a test runner (e.g. git, trunk, mkdir, ls, cat, sed, cp, rm, echo, curl), do nothing.\n\nIf a test failure IS detected:\n\n1. Check if a `bugs.md` exists in the current spec directory (`.kiro/specs/{feature-name}/bugs.md`). If not, create one using the template from `.kiro/specs/_BUGFIX_TEMPLATE/bugs.md`.\n2. Document the bug following the format in steering doc `52-bug-tracking.md` with status Open.\n3. Add a bug fix sub-task to `tasks.md` under a 'Bug Fixes' phase.\n4. Update the statistics section in `bugs.md`.\n5. Continue with the current task — do NOT stop to fix the bug.\n\nIf the test output shows success, do nothing."
   }
 }

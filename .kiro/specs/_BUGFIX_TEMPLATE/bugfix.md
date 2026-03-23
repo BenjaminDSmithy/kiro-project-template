@@ -52,5 +52,5 @@ How to verify the fix works:
 ---
 
 ```text
-Copyright (C) 2026 {{COPYRIGHT_HOLDER}}. All rights reserved.
+Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 ```

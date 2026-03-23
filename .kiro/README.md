@@ -24,7 +24,7 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 │   ├── 📋_01_sample-user-notifications/  # Example: planned spec
 │   ├── 🚧_02_sample-dashboard/     # Example: in-progress spec
 │   └── ⏸️_03_sample-payments/      # Example: on-hold spec (blocked)
-└── steering/                 # AI guidance documents (38 files)
+└── steering/                 # AI guidance documents (40 files)
     ├── 00–03                 # Core rules, product, tech, structure
     ├── 10–12                 # Development standards (code, errors, testing)
     ├── 20–21                 # Workflow standards (git, task completion)
@@ -48,14 +48,15 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 | Range | Category                                    | Inclusion   |
 | ----- | ------------------------------------------- | ----------- |
 | 00–03 | Core (rules, product, tech, structure)      | Always      |
-| 10–12 | Development (code style, errors, testing)   | Always      |
+| 10–12 | Development (code style, errors, testing)   | Always/fileMatch |
 | 20–21 | Workflow (git, task completion)              | Always      |
 | 30–31 | Reference guides (hooks, best practices)    | Manual      |
-| 40–52 | Domain (security, auth, API, DB, docs, CI)  | Always      |
+| 40–52 | Domain (security, auth, API, DB, docs, CI)  | Always/fileMatch |
 | 53–59 | Framework & tooling (Next.js, Tailwind, i18n, perf, env, realtime) | fileMatch |
 | 60–62 | Stack presets (T3, T4, TanStack)            | fileMatch   |
 | 63    | Stack selection decision tree               | Manual      |
 | 64–65 | Advanced patterns (monorepo, error boundaries) | fileMatch |
+| 70–71 | Design & review (frontend design, agent review) | fileMatch/Manual |
 
 ## Hook Numbering
 
@@ -91,6 +92,28 @@ Each spec folder contains:
 | `requirements.md`  | User stories with EARS acceptance criteria       |
 | `design.md`        | Architecture, interfaces, correctness properties |
 | `tasks.md`         | Implementation checklist with effort estimates   |
+
+### `.config.kiro` Reference
+
+Each spec folder contains a `.config.kiro` JSON file with the following fields:
+
+| Field          | Required | Valid Values                                          |
+| -------------- | -------- | ----------------------------------------------------- |
+| `specId`       | Yes      | UUID v4 — unique identifier for the spec              |
+| `workflowType` | Yes      | `requirements-first` — the standard spec workflow     |
+| `specType`     | Yes      | `feature` (standard spec) or `bugfix` (bugfix spec)   |
+
+Example for a feature spec:
+
+```json
+{"specId": "a1b2c3d4-...", "workflowType": "requirements-first", "specType": "feature"}
+```
+
+Example for a bugfix spec:
+
+```json
+{"specId": "e5f6g7h8-...", "workflowType": "requirements-first", "specType": "bugfix"}
+```
 
 ## Example Specs
 
