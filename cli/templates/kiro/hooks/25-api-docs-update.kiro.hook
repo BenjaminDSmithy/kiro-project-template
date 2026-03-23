@@ -1,0 +1,16 @@
+{
+  "name": "API Documentation Updater",
+  "version": "1.0.0",
+  "description": "When API route files are modified, check if API documentation needs updating",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/app/api/**/*.ts",
+      "src/app/api/**/*.tsx"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "An API route file was modified. Check if `docs/API.md` needs updating:\n\n1. Compare the route's current endpoints, methods, and response shapes against what's documented\n2. Flag any new endpoints not yet documented\n3. Flag any changed request/response schemas\n4. Flag any removed endpoints still in docs\n\nIf updates are needed, apply them to `docs/API.md` following the existing format. Include request/response examples."
+  }
+}
