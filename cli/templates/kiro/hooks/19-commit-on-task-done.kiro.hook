@@ -1,0 +1,12 @@
+{
+  "name": "Commit on Task Complete",
+  "version": "1.0.0",
+  "description": "After a spec task is marked complete, commit all changed files with a conventional commit message. NOTE: This hook runs alongside hook 17 (trunk check) and hook 30 (a11y audit) on the same postTaskExecution event. Hooks execute in filename order, so trunk check (17) runs first, then this commit (19), then a11y audit (30). Ensure trunk check passes before this hook commits.",
+  "when": {
+    "type": "postTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A spec task was just marked complete. You MUST commit all changed files now. Steps: (1) Run git add -A. (2) Run git diff --cached --stat to get file change stats. (3) Compose a conventional commit message: title format is <type>(<scope>): <subject> where type is one of feat/fix/refactor/test/docs/chore, scope is the relevant module or feature area, subject is imperative mood, lowercase, no trailing period, title <=72 chars. Use the spec name and task number to inform the subject. (4) Include a brief body (2-4 lines) summarising what changed. Body lines <=72 chars. (5) Run git commit with the full message. If git status shows no changes to commit, skip silently."
+  }
+}

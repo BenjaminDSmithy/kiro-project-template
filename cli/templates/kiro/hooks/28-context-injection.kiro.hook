@@ -1,0 +1,12 @@
+{
+  "name": "Spec Context Reminder",
+  "version": "1.0.0",
+  "description": "On every new message, remind the agent of the active spec context to prevent drift",
+  "when": {
+    "type": "promptSubmit"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before responding, check if there is an active spec in context:\n\n1. Look for any `.kiro/specs/` files recently read or referenced in this session\n2. If a spec is active, silently note:\n   - Which spec (feature name)\n   - Current phase (requirements, design, or tasks)\n   - Last task status (if tasks.md is in context)\n3. Use this context to inform your response — stay aligned with the spec's scope\n4. If the user's message is unrelated to the active spec, respond normally without forcing spec context\n\nThis is a background context check — do NOT mention this process to the user."
+  }
+}
