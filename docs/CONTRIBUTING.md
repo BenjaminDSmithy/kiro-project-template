@@ -27,7 +27,7 @@ git clone <!-- TODO: repo URL -->
 <!-- TODO: install command -->
 
 # Copy environment variables
-cp .env.example .env.local
+cp .env.example .env
 
 # Start development
 <!-- TODO: dev command -->

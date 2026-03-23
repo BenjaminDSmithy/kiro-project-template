@@ -10,7 +10,7 @@ Proactive security practices for all code in this repository.
 
 | Rule                          | Implementation                              |
 | ----------------------------- | ------------------------------------------- |
-| No hardcoded secrets          | Use `.env.local` or secret manager          |
+| No hardcoded secrets          | Use `.env` or secret manager                |
 | No secrets in steering/specs  | Use `CHANGE_ME` placeholders                |
 | No secrets in logs            | Redact before logging                       |
 | No secrets in error messages  | Return generic messages to clients          |

@@ -57,7 +57,7 @@ Use MCP tools instead of bash for:
 
 ## Environment
 
-- Never commit secrets — use `.env.local`
+- Never commit secrets — use `.env`
 - Reference `.env.example` for required variables: #[[file:.env.example]]
 
 ## Approved Integrations

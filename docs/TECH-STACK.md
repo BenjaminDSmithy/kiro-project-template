@@ -60,7 +60,7 @@
 | `DATABASE_URL` | Yes      | <!-- TODO --> |
 | `AUTH_SECRET`  | Yes      | <!-- TODO --> |
 
-Never commit secrets. Use `.env.local` for local development, `.env.example` for documentation.
+Never commit secrets. Use `.env` for local development, `.env.example` for documentation.
 
 ## Approved Integrations
 

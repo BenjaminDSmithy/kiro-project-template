@@ -64,7 +64,7 @@ TaskFlow is a collaborative project management SaaS built with Next.js and Supab
 | `SUPABASE_SERVICE_ROLE_KEY`     | Yes      | Server-side Supabase admin access |
 | `AUTH_SECRET`                   | Yes      | Session signing secret            |
 
-Never commit secrets. Use `.env.local` for local development, `.env.example` for documentation.
+Never commit secrets. Use `.env` for local development, `.env.example` for documentation.
 
 ## Approved Integrations
 

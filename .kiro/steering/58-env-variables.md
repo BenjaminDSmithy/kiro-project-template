@@ -28,7 +28,7 @@ Naming, validation, and management of environment variables.
 | File              | Purpose                    | Committed |
 | ----------------- | -------------------------- | --------- |
 | `.env.example`    | Template with placeholders | Yes       |
-| `.env.local`      | Local development secrets  | No        |
+| `.env`            | Local development secrets  | No        |
 | `.env.development`| Dev defaults (non-secret)  | Yes       |
 | `.env.production` | Prod defaults (non-secret) | Yes       |
 | `.env.test`       | Test environment overrides | Yes       |
@@ -71,6 +71,6 @@ NODE_ENV=development
 | --------------------------------------- | ---------------------------------------- |
 | `.env.example` is the source of truth   | New devs know exactly what's needed      |
 | Validate at startup, not at usage       | Fail fast with clear error messages      |
-| Never commit `.env.local`               | Contains real secrets                    |
+| Never commit `.env`                     | Contains real secrets                    |
 | Use `CHANGE_ME` as placeholder value    | Obvious that it needs replacing          |
 | Document each var with a comment        | Purpose is clear without searching code  |
