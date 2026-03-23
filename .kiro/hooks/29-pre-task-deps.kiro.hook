@@ -1,0 +1,12 @@
+{
+  "name": "Pre-Task Dependency Check",
+  "version": "1.0.0",
+  "description": "Verify pnpm install is up to date before starting a spec task",
+  "when": {
+    "type": "preTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before starting this task, verify dependencies are up to date:\n\n1. Check if `node_modules/` exists\n2. If it exists, compare `pnpm-lock.yaml` modification time against `node_modules/.pnpm/lock.yaml` (or equivalent marker)\n3. If dependencies appear stale or `node_modules/` is missing, run `pnpm install` before proceeding\n4. If `pnpm install` fails, report the error and do not start the task\n\nThis is a silent check — only mention it to the user if action is needed."
+  }
+}

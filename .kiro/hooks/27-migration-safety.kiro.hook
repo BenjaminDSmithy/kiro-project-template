@@ -1,0 +1,13 @@
+{
+  "name": "Migration Safety Check",
+  "version": "1.0.0",
+  "description": "Check migration files for destructive operations before they are written",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": ["write"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "If the file being written is a database migration (in `supabase/migrations/` or `src/lib/db/migrations/`):\n\n1. Check for destructive operations: DROP TABLE, DROP COLUMN, ALTER COLUMN (type change), TRUNCATE\n2. If destructive operations found, warn the user and suggest:\n   - Adding a down migration\n   - Using a multi-step migration (add new → migrate data → drop old)\n   - Backing up affected data first\n3. Verify the migration is wrapped in a transaction\n4. Check that column renames use a safe pattern (add new, copy, drop old)\n\nIf the file is NOT a migration file, do nothing — allow the write to proceed."
+  }
+}

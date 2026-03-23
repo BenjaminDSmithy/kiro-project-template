@@ -1,0 +1,12 @@
+{
+  "name": "Post-Task Accessibility Audit",
+  "version": "1.0.0",
+  "description": "Remind agent to check accessibility after tasks that create or modify TSX components",
+  "when": {
+    "type": "postTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "After completing this task, check if any `.tsx` or `.jsx` files were created or modified.\n\nIf yes, perform a quick accessibility review:\n\n1. Verify semantic HTML is used (button, nav, main, section — not div with onClick)\n2. Check that interactive elements have accessible names (aria-label or visible text)\n3. Verify images have appropriate alt text (descriptive for informative, empty for decorative)\n4. Check that form inputs have associated labels\n5. Verify colour is not the sole means of conveying information\n6. Check keyboard navigation is possible for new interactive elements\n\nReport any issues found. If no .tsx/.jsx files were changed, do nothing."
+  }
+}
