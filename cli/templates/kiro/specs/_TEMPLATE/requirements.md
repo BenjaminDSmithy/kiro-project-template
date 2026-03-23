@@ -68,11 +68,11 @@
 
 ## Constraints
 
-- [Constraint 1]: [Description]
+- `Constraint 1` — Description
 
 ## Assumptions
 
-- [Assumption 1]: [Description]
+- `Assumption 1` — Description
 
 ## Notes
 

@@ -32,13 +32,13 @@
 
 ## Alternatives Considered
 
-### <!-- TODO: Alternative 1 -->
+### Alternative 1 <!-- TODO: rename -->
 
 - Pros: <!-- TODO -->
 - Cons: <!-- TODO -->
 - Why rejected: <!-- TODO -->
 
-### <!-- TODO: Alternative 2 -->
+### Alternative 2 <!-- TODO: rename -->
 
 - Pros: <!-- TODO -->
 - Cons: <!-- TODO -->
