@@ -1,0 +1,16 @@
+{
+  "name": "Dependency Change Audit",
+  "version": "1.0.0",
+  "description": "When package.json is edited, prompts to check for vulnerabilities",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "package.json",
+      "packages/*/package.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Dependencies modified. Consider:\n\n1. Run audit for known vulnerabilities\n2. Check for outdated critical packages\n3. Regenerate lockfile if needed\n4. Review new dependencies for security and bundle size impact"
+  }
+}

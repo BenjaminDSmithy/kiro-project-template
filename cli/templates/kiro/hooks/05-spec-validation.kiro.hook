@@ -1,0 +1,15 @@
+{
+  "name": "Spec Validation",
+  "version": "1.0.0",
+  "description": "When spec documents are edited, prompts to validate structure and references",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      ".kiro/specs/**/*.md"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Spec file modified. Validate:\n\n1. All file references (#[[file:...]]) resolve correctly\n2. Required sections are present per template\n3. Task numbering is sequential and consistent\n4. Requirement cross-references (R1, R2, etc.) are valid\n5. EARS patterns used in acceptance criteria"
+  }
+}
