@@ -1,0 +1,17 @@
+{
+  "name": "Test File Sync",
+  "version": "1.0.0",
+  "description": "When source files are created, check if corresponding test files exist",
+  "when": {
+    "type": "fileCreated",
+    "patterns": [
+      "src/lib/**/*.ts",
+      "src/components/**/*.tsx",
+      "src/hooks/**/*.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A new source file was created. Check if a corresponding test file exists:\n\n1. For `src/lib/foo/bar.ts` → expect `src/lib/foo/bar.test.ts`\n2. For `src/components/foo/bar.tsx` → expect `src/components/foo/bar.test.tsx`\n3. For `src/hooks/use-foo.ts` → expect `src/hooks/use-foo.test.ts`\n\nIf the test file doesn't exist, notify the user that a test file should be created. Do NOT auto-create the test file — just flag it as missing."
+  }
+}
