@@ -1,0 +1,12 @@
+{
+  "name": "Commit Message Helper",
+  "version": "1.0.0",
+  "description": "Generate conventional commit messages from current git diff following project Git standards",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Generate a conventional commit message from the current git diff.\n\n1. Analyse staged changes (or working tree if nothing staged)\n2. Determine commit type: feat, fix, docs, style, refactor, test, chore, perf, build, ci\n3. Identify scope from affected files\n4. Write title: lowercase, imperative mood, ≤50 chars, no trailing period\n5. Write body with sections: 📝 Summary, 📦 Files Modified (with change magnitude), 📊 Code Changes\n6. Add optional sections if applicable: ⚠️ Breaking Changes, 🔧 Technical Improvements, 🗄 Database, 🔒 Security, ➕ Files Added\n7. If multiple logical changes exist, suggest splitting into separate commits\n8. Present the message and ask for confirmation before committing"
+  }
+}

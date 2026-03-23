@@ -1,0 +1,12 @@
+{
+  "name": "Performance Analysis",
+  "version": "1.0.0",
+  "description": "Analyse codebase for performance issues and optimisation opportunities",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Run a performance analysis on the codebase.\n\n## Check For\n\n1. **Bundle size** — Large imports, missing tree-shaking, unnecessary dependencies\n2. **React rendering** — Missing memoisation where needed, unnecessary re-renders, missing Suspense boundaries\n3. **Data fetching** — N+1 queries, missing caching, waterfall requests\n4. **Images/assets** — Unoptimised images, missing lazy loading, missing next/image usage\n5. **Server vs Client** — Components marked 'use client' that could be Server Components\n\n## Output Format\n\n| Area | Severity | File | Issue | Suggestion |\n|------|----------|------|-------|------------|\n\nPrioritise by impact. Only flag actionable issues with specific file paths and line references."
+  }
+}

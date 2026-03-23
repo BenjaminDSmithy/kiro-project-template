@@ -1,0 +1,12 @@
+{
+  "name": "Full Project Health Check",
+  "version": "1.0.0",
+  "description": "Manual hook to run comprehensive project health checks",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Run comprehensive project health check.\n\n## Checks to Perform\n\n### 1. Code Quality\n- Run `trunk check` on entire codebase\n- Run type checking (`pnpm tsc --noEmit`)\n- Check for TODO/FIXME comments\n\n### 2. Tests\n- Run `pnpm test -- --run` for unit tests\n- Report coverage summary\n- Flag any failing tests\n\n### 3. Dependencies\n- Run `pnpm audit` for vulnerabilities\n- Check for outdated critical packages\n\n### 4. Build\n- Run `pnpm build` to verify production build\n- Report any build warnings/errors\n\n## Output Format\n\n| Category | Status | Issues |\n|----------|--------|--------|\n| Lint     | pass/fail | count |\n| Types    | pass/fail | count |\n| Tests    | pass/fail | count |\n| Security | pass/warn/fail | count |\n| Build    | pass/fail | count |\n\nProvide actionable summary of any blockers."
+  }
+}
