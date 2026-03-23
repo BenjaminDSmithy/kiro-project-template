@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2026 Benjamin D. Smith. All rights reserved. -->
+<!-- Copyright (c) 2026 Binary Sword Pty Ltd. All rights reserved. -->
 <!-- Licensed under the MIT License. See LICENSE file in the project root. -->
 
 # Contributing Guide
@@ -213,6 +213,6 @@ Open an issue on the repository for bugs, feature requests, or questions.
 ---
 
 ```text
-Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+Copyright (c) 2026 Binary Sword Pty Ltd. All rights reserved.
 Licensed under the MIT License.
 ```

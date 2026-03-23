@@ -204,10 +204,6 @@ If you find this template useful, consider buying me a coffee:
 
 ## Licence
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT Licence](cli/templates/root/LICENSE).
 
----
-
-```text
-Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
-```
+Copyright (c) 2026 Binary Sword Pty Ltd

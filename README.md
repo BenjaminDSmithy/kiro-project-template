@@ -128,4 +128,4 @@ If you find this template useful, consider buying me a coffee:
 
 This project is licensed under the [MIT Licence](cli/templates/root/LICENSE).
 
-Copyright (c) 2026 Benjamin D. Smith
+Copyright (c) 2026 Binary Sword Pty Ltd
