@@ -1,0 +1,28 @@
+{
+  "version": "0.2",
+  "language": "en-AU",
+  "words": [
+    "asyncio",
+    "customisation",
+    "inplace",
+    "isort",
+    "kiro",
+    "nextjs",
+    "nuxt",
+    "Pydantic",
+    "pytest",
+    "shadcn",
+    "supabase",
+    "tanstack",
+    "TECHEOF",
+    "Vite",
+    "Vitest"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    ".git",
+    ".trunk",
+    "dist",
+    "pnpm-lock.yaml"
+  ]
+}
