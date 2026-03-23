@@ -1,0 +1,12 @@
+{
+  "name": "Post-Task Trunk Check",
+  "version": "1.0.0",
+  "description": "Automatically runs trunk check after a spec task is marked complete",
+  "when": {
+    "type": "postTaskExecution"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "trunk check --fix --all"
+  }
+}
