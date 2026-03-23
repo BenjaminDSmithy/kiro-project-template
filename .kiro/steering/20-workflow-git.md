@@ -45,7 +45,7 @@ inclusion: always
 | ---------------------------- | -------------------------------------- |
 | `⚠️ Breaking Changes:`       | API changes requiring consumer updates |
 | `🔧 Technical Improvements:` | Implementation details worth noting    |
-| `🗄 Database:`               | Schema or migration changes            |
+| `📁 Database:`               | Schema or migration changes            |
 | `🔒 Security:`               | Security-related fixes                 |
 | `➕ Files Added:`            | New files created                      |
 
