@@ -1,0 +1,12 @@
+{
+  "name": "README Spell Check",
+  "version": "1.0.0",
+  "description": "Check README and documentation files for spelling, grammar, and clarity issues",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review all markdown documentation files (README.md, docs/**/*.md) for:\n\n1. Spelling errors\n2. Grammar issues\n3. Inconsistent terminology\n4. Broken links or references\n5. Australian English compliance (optimise, behaviour, colour, analyse, licence)\n\nFor each issue found, provide the file path, line, current text, and suggested fix. Apply fixes directly."
+  }
+}
