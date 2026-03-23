@@ -5,17 +5,121 @@
     }
   ],
   "settings": {
-    "kiroAgent.configureMCP": "Enabled"
+    "kiroAgent.configureMCP": "Enabled",
+    "editor.formatOnSave": true,
+    "editor.trimAutoWhitespace": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "[typescript]": { "editor.tabSize": 2 },
+    "[typescriptreact]": { "editor.tabSize": 2 },
+    "[javascript]": { "editor.tabSize": 2 },
+    "[html]": { "editor.tabSize": 2 },
+    "[css]": { "editor.tabSize": 2 },
+    "[json]": { "editor.tabSize": 2 },
+    "[jsonc]": { "editor.tabSize": 2 },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/dist": true,
+      "**/.trunk": true,
+      "**/.hypothesis": true,
+      "**/playwright-report": true,
+      "**/test-results": true
+    },
+    "files.watcherExclude": {
+      "**/.git/**": true,
+      "**/node_modules/**": true,
+      "**/.next/**": true,
+      "**/dist/**": true,
+      "**/.trunk/**": true,
+      "**/.hypothesis/**": true,
+      "**/playwright-report/**": true,
+      "**/test-results/**": true
+    }
   },
   "launch": {
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "🚀 Run Setup Script",
         "type": "node-terminal",
         "request": "launch",
-        "command": "bash ${workspaceFolder}/setup.sh",
-        "cwd": "${workspaceFolder}"
+        "name": "── Setup ──────────────────────",
+        "command": "echo"
+      },
+      {
+        "name": "🚀 Run Setup Script",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/setup.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
+      },
+      {
+        "type": "node-terminal",
+        "request": "launch",
+        "name": "── CLI ────────────────────────",
+        "command": "echo"
+      },
+      {
+        "name": "🔨 CLI: Build",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/cli/scripts/build.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
+      },
+      {
+        "name": "🧪 CLI: Test",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/cli/scripts/test.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
+      },
+      {
+        "name": "▶️ CLI: Init (interactive)",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/cli/scripts/run-init.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
+      },
+      {
+        "name": "▶️ CLI: Add (interactive)",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/cli/scripts/run-add.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
+      },
+      {
+        "type": "node-terminal",
+        "request": "launch",
+        "name": "── Publishing ─────────────────",
+        "command": "echo"
+      },
+      {
+        "name": "📋 CLI: Changelog",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/cli/scripts/changelog.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
+      },
+      {
+        "name": "✅ CLI: Pre-publish Checks",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/cli/scripts/prepublish.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
       }
     ]
   },
@@ -23,30 +127,69 @@
     "version": "2.0.0",
     "tasks": [
       {
+        "label": "🚀 Run Setup Script",
+        "type": "shell",
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/setup.sh"],
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "focus": true, "group": "setup" }
+      },
+      {
         "label": "🔨 CLI: Build",
         "type": "shell",
-        "command": "bash ${workspaceFolder}/cli/scripts/build.sh",
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/cli/scripts/build.sh"],
+        "options": { "cwd": "${workspaceFolder}/cli" },
         "group": "build",
-        "problemMatcher": []
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "group": "cli" }
       },
       {
         "label": "🧪 CLI: Test",
         "type": "shell",
-        "command": "bash ${workspaceFolder}/cli/scripts/test.sh",
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/cli/scripts/test.sh"],
+        "options": { "cwd": "${workspaceFolder}/cli" },
         "group": "test",
-        "problemMatcher": []
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "group": "cli" }
       },
       {
         "label": "▶️ CLI: Init (interactive)",
         "type": "shell",
-        "command": "bash ${workspaceFolder}/cli/scripts/run-init.sh",
-        "problemMatcher": []
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/cli/scripts/run-init.sh"],
+        "options": { "cwd": "${workspaceFolder}/cli" },
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "focus": true, "group": "cli" }
       },
       {
         "label": "▶️ CLI: Add (interactive)",
         "type": "shell",
-        "command": "bash ${workspaceFolder}/cli/scripts/run-add.sh",
-        "problemMatcher": []
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/cli/scripts/run-add.sh"],
+        "options": { "cwd": "${workspaceFolder}/cli" },
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "focus": true, "group": "cli" }
+      },
+      {
+        "label": "📋 CLI: Changelog",
+        "type": "shell",
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/cli/scripts/changelog.sh"],
+        "options": { "cwd": "${workspaceFolder}/cli" },
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "group": "publish" }
+      },
+      {
+        "label": "✅ CLI: Pre-publish Checks",
+        "type": "shell",
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/cli/scripts/prepublish.sh"],
+        "options": { "cwd": "${workspaceFolder}/cli" },
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "group": "publish" }
       }
     ]
   },
@@ -55,7 +198,9 @@
       "trunk.io",
       "bradlc.vscode-tailwindcss",
       "dbaeumer.vscode-eslint",
-      "esbenp.prettier-vscode"
+      "esbenp.prettier-vscode",
+      "mikestead.dotenv",
+      "eamodio.gitlens"
     ]
   },
   "mcpServers": {
