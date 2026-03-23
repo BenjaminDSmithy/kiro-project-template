@@ -1,0 +1,8 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Project scaffolded from kiro-project-template",
+  "scripts": {}
+}
