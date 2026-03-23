@@ -1,0 +1,12 @@
+{
+  "name": "Code Quality Check",
+  "version": "1.0.0",
+  "description": "After agent completes code changes, prompts to run quality checks",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Task complete. If source code was modified:\n\n1. Run `trunk check --fix <modified-files>` for lint/format issues\n2. Run type checking (e.g. `pnpm tsc --noEmit`)\n3. Run affected tests (e.g. `pnpm test -- --run`)\n\nIf only markdown or config files were changed, skip this check."
+  }
+}
