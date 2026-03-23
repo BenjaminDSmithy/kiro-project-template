@@ -1,9 +1,3 @@
----
-id: spec-name
-title: Spec Title
-status: draft
----
-
 # Design Document
 
 ## Overview
