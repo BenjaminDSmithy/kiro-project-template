@@ -1,0 +1,12 @@
+{
+  "name": "Spec Status Emoji Update",
+  "version": "1.0.0",
+  "description": "After a spec task completes, check if all tasks are done and suggest updating the folder emoji prefix",
+  "when": {
+    "type": "postTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "After completing this task, check the spec's `tasks.md` for overall progress:\n\n1. Count total tasks (lines matching `- [ ]` or `- [x]`) excluding phase headers and checkpoints\n2. Count completed tasks (lines matching `- [x]`)\n3. If ALL tasks are complete (100%), suggest renaming the spec folder:\n   - From `🚧_XX_name/` to `✅_XX_name/`\n   - Ask the user for confirmation before renaming\n4. If the spec folder still uses `📋_` (planned) and tasks are being worked on, suggest:\n   - Renaming from `📋_XX_name/` to `🚧_XX_name/`\n   - Ask the user for confirmation before renaming\n\nDo NOT rename without user confirmation. Only suggest the rename if the status prefix doesn't match the actual progress."
+  }
+}
