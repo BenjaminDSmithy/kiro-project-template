@@ -99,11 +99,12 @@ echo "    8)  Astro             (Astro + Tailwind)"
 echo "    9)  Flutter + Supa    (Flutter + Supabase)"
 echo "   10)  Electron          (Electron + React + Tailwind)"
 echo "   11)  Python FastAPI    (FastAPI + SQLAlchemy + Alembic)"
-echo "   12)  Custom            (skip tech stack pre-fill)"
+echo "   12)  TanStack Start   (TanStack Start + Router + Query + Vite)"
+echo "   13)  Custom            (skip tech stack pre-fill)"
 echo ""
 
 if [[ -z "${STACK_CHOICE:-}" ]]; then
-  ask "Stack [1-12]" "12" STACK_CHOICE
+  ask "Stack [1-13]" "13" STACK_CHOICE
 fi
 
 case "${STACK_CHOICE}" in
@@ -118,8 +119,9 @@ case "${STACK_CHOICE}" in
   9)  STACK_NAME="Flutter + Supabase" ;;
   10) STACK_NAME="Electron" ;;
   11) STACK_NAME="Python FastAPI" ;;
-  12) STACK_NAME="Custom" ;;
-  *)  warn "Invalid choice, defaulting to Custom."; STACK_CHOICE="12"; STACK_NAME="Custom" ;;
+  12) STACK_NAME="TanStack Start" ;;
+  13) STACK_NAME="Custom" ;;
+  *)  warn "Invalid choice, defaulting to Custom."; STACK_CHOICE="13"; STACK_NAME="Custom" ;;
 esac
 
 success "Stack: ${STACK_NAME}"
@@ -308,6 +310,21 @@ define_stack_preset() {
       )
       STACK_APPROVED="FastAPI, SQLAlchemy, Alembic, Pydantic, pytest, Ruff"
       ;;
+    12) # TanStack Start
+      STACK_ROWS=(
+        "Language    | TypeScript    | 5.5+  | Strict mode, no \`any\`"
+        "Framework   | TanStack Start| 1.x   | Full-stack React with Vite + Nitro"
+        "Routing     | TanStack Router| 1.x  | Type-safe file-based routing"
+        "Data        | TanStack Query| 5.x   | Server state management"
+        "Styling     | Tailwind CSS  | 4.x   | Utility-first, no custom CSS files"
+        "Database    | PostgreSQL    | 16    | Via Drizzle ORM"
+        "Auth        | —             | —     | Flexible (Supabase Auth or custom)"
+        "Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+        "Linting     | Trunk         | 1.25+ | Single tool for lint + format"
+        "Package Mgr | ${PKG_MGR}    | —     | —"
+      )
+      STACK_APPROVED="TanStack Start, TanStack Router, TanStack Query, React, Drizzle ORM, Tailwind CSS, Vitest, Playwright"
+      ;;
     *) # Custom — no preset
       STACK_ROWS=()
       STACK_APPROVED=""
@@ -373,7 +390,7 @@ done
 # ═══════════════════════════════════════════════════════════════════════════
 # Optional: Generate pre-filled TECH-STACK.md
 # ═══════════════════════════════════════════════════════════════════════════
-if [[ "${STACK_CHOICE}" != "12" ]] && [[ ${#STACK_ROWS[@]} -gt 0 ]]; then
+if [[ "${STACK_CHOICE}" != "13" ]] && [[ ${#STACK_ROWS[@]} -gt 0 ]]; then
   header "Generating TECH-STACK.md"
 
   TECH_STACK_FILE="${SCRIPT_DIR}/docs/TECH-STACK.md"
@@ -467,6 +484,99 @@ TECHEOF
 
   success "Generated: docs/TECH-STACK.md (${STACK_NAME} preset)"
   CHANGED_FILES+=("docs/TECH-STACK.md (generated)")
+fi
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Step 4: Clean Up Irrelevant Steering Docs
+# ═══════════════════════════════════════════════════════════════════════════
+header "Step 4 · Steering Cleanup"
+
+echo ""
+echo "  Your chosen stack may not need all steering docs."
+echo "  Remove irrelevant stack-specific steering files?"
+echo ""
+echo "    1)  Yes — remove steering docs for other stacks"
+echo "    2)  No  — keep all steering docs"
+echo ""
+
+if [[ -z "${CLEANUP_CHOICE:-}" ]]; then
+  ask "Clean up? [1-2]" "2" CLEANUP_CHOICE
+fi
+
+if [[ "${CLEANUP_CHOICE}" == "1" ]]; then
+  STEERING_DIR="${SCRIPT_DIR}/.kiro/steering"
+  REMOVED_STEERING=()
+
+  # Stack-specific steering docs to conditionally remove
+  # Only remove docs for stacks the user did NOT choose
+  case "${STACK_CHOICE}" in
+    1) # T3 — keep 60, remove 53 (default Next.js patterns overlap with T3), 61, 62
+      for f in "53-nextjs.md" "61-t4-stack.md" "62-tanstack.md"; do
+        [[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+      done
+      ;;
+    2) # T4 — keep 61, remove 53, 60, 62
+      for f in "53-nextjs.md" "60-t3-stack.md" "62-tanstack.md"; do
+        [[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+      done
+      ;;
+    3) # Supabase + Next.js (Default) — keep 53, remove 60, 61, 62
+      for f in "60-t3-stack.md" "61-t4-stack.md" "62-tanstack.md"; do
+        [[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+      done
+      ;;
+    12) # TanStack Start — keep 62, remove 53, 60, 61
+      for f in "53-nextjs.md" "60-t3-stack.md" "61-t4-stack.md"; do
+        [[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+      done
+      ;;
+    *) # Other stacks (Vite, Svelte, Nuxt, etc.) — remove all 4 stack-specific docs
+      for f in "53-nextjs.md" "60-t3-stack.md" "61-t4-stack.md" "62-tanstack.md"; do
+        [[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+      done
+      ;;
+  esac
+
+  if [[ ${#REMOVED_STEERING[@]} -gt 0 ]]; then
+    for f in "${REMOVED_STEERING[@]}"; do
+      success "Removed: .kiro/steering/${f}"
+    done
+  else
+    info "No irrelevant steering docs found to remove."
+  fi
+else
+  info "Kept all steering docs."
+fi
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Step 5: Remove Example Specs
+# ═══════════════════════════════════════════════════════════════════════════
+header "Step 5 · Example Specs"
+
+echo ""
+echo "  The template includes 4 example specs demonstrating the spec lifecycle."
+echo "  Remove them to start fresh?"
+echo ""
+echo "    1)  Yes — remove example specs (keep templates)"
+echo "    2)  No  — keep example specs for reference"
+echo ""
+
+if [[ -z "${EXAMPLES_CHOICE:-}" ]]; then
+  ask "Remove examples? [1-2]" "2" EXAMPLES_CHOICE
+fi
+
+if [[ "${EXAMPLES_CHOICE}" == "1" ]]; then
+  SPECS_DIR="${SCRIPT_DIR}/.kiro/specs"
+  for spec_dir in "${SPECS_DIR}"/✅_* "${SPECS_DIR}"/📋_* "${SPECS_DIR}"/🚧_* "${SPECS_DIR}"/⏸️_*; do
+    if [[ -d "${spec_dir}" ]]; then
+      rm -rf "${spec_dir}"
+      success "Removed: $(basename "${spec_dir}")"
+    fi
+  done
+else
+  info "Kept example specs for reference."
 fi
 
 
