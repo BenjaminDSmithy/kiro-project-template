@@ -1,2 +1,8 @@
 # Prettier friendly markdownlint config (all formatting rules disabled)
 extends: markdownlint/style/prettier
+
+# Allow common GitHub Flavored Markdown HTML elements
+MD033:
+  allowed_elements:
+    - details
+    - summary
