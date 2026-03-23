@@ -78,7 +78,7 @@ Exact error message if applicable
 
 ## Bug Status Lifecycle
 
-```
+```text
 Open → In Progress → Resolved → Closed
   ↓         ↓
 Deferred  Won't Fix
@@ -107,7 +107,7 @@ When bugs are found in completed tasks:
 
 ## Commit Message Format
 
-```
+```text
 fix({scope}): resolve BUG-XXX - brief description
 
 - What was fixed

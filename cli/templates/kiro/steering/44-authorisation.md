@@ -16,7 +16,7 @@ Enterprise role and permission architecture patterns for this project. Built on 
 
 Use a layered approach combining role-based and policy-based authorisation:
 
-```
+```text
 1. Authenticate user (Supabase Auth)
 2. Load user roles
 3. Load role permissions

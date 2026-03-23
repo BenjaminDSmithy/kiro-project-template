@@ -50,6 +50,6 @@
 
 ---
 
-```
+```text
 Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 ```

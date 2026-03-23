@@ -132,6 +132,6 @@ Project conventions are documented in `.kiro/steering/`. Update these when conve
 
 ---
 
-```
+```text
 Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 ```

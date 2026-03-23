@@ -25,7 +25,7 @@ Pipeline stages, deployment strategies, and rollback procedures.
 
 ## Environment Promotion
 
-```
+```text
 feature branch → PR → staging → production
 ```
 

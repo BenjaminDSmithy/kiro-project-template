@@ -13,7 +13,7 @@ Choose the right state tool for the job. Over-using any single approach leads to
 
 ## Decision Tree
 
-```
+```text
 1. Is it server data (DB, API)?          → Server state (fetch in Server Component)
 2. Is it URL-representable (filters)?    → URL state (searchParams)
 3. Is it form input?                     → Local state (useState)

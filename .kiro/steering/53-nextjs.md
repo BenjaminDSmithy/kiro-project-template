@@ -13,7 +13,7 @@ Patterns specific to Next.js 15+ App Router. For general React patterns, see `42
 
 ## Server vs Client Decision Tree
 
-```
+```text
 1. Does it need browser APIs (window, document)?     → Client Component
 2. Does it need React hooks (useState, useEffect)?   → Client Component
 3. Does it need event handlers (onClick, onChange)?   → Client Component

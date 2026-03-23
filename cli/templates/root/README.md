@@ -208,6 +208,6 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-```
+```text
 Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 ```

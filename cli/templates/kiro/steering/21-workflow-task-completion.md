@@ -10,7 +10,7 @@ Complete every task fully. Never skip, defer, or leave placeholders without expl
 
 Execute in order — stop at first "No":
 
-```
+```text
 1. Does code compile without errors?           → No = Incomplete
 2. Are all imports present and correct?        → No = Incomplete
 3. Are barrel exports (index.ts) updated?      → No = Incomplete

@@ -143,6 +143,6 @@ X-RateLimit-Reset: 1710000000
 
 ---
 
-```
+```text
 Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 ```

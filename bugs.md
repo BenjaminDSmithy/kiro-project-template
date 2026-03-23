@@ -37,6 +37,6 @@ See steering doc `52-bug-tracking.md` for the full bug entry format, severity gu
 
 ---
 
-```
+```text
 Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 ```

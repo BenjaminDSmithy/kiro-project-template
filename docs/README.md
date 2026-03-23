@@ -33,6 +33,6 @@ This directory contains project documentation templates and examples. Each templ
 
 ---
 
-```
+```text
 Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 ```

@@ -84,6 +84,6 @@ Never commit secrets. Use `.env` for local development, `.env.example` for docum
 
 ---
 
-```
+```text
 Copyright (C) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 ```

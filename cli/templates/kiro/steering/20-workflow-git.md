@@ -6,7 +6,7 @@ inclusion: always
 
 ## Commit Message Format
 
-```
+```text
 <type>(<scope>): <subject>
 ```
 

@@ -10,7 +10,7 @@ inclusion: always
 
 Execute in order until you find a match:
 
-```
+```text
 1. Is it a page or API route?
    → src/app/
 
