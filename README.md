@@ -34,20 +34,21 @@ The setup wizard replaces `{{PLACEHOLDER}}` tokens, pre-fills `docs/TECH-STACK.m
 
 ## What's Included
 
-### Steering Docs (38 files)
+### Steering Docs (40 files)
 
 AI guidance documents that keep Kiro aligned with your project conventions. Organised by category:
 
 | Range | Category            | Files | Inclusion   |
 | ----- | ------------------- | ----- | ----------- |
 | 00–03 | Core rules          | 4     | Always      |
-| 10–12 | Development         | 3     | Always      |
+| 10–12 | Development         | 3     | Always/fileMatch |
 | 20–21 | Workflow            | 2     | Always      |
 | 30–31 | Kiro guides         | 2     | Manual      |
-| 40–52 | Domain standards    | 13    | Always      |
+| 40–52 | Domain standards    | 13    | Always/fileMatch |
 | 53–59 | Framework & tooling | 7     | fileMatch   |
 | 60–62 | Stack presets       | 3     | fileMatch   |
 | 63–65 | Advanced patterns   | 3     | Manual/fileMatch |
+| 70–71 | Design & review     | 2     | fileMatch/Manual |
 
 <details>
 <summary>Full steering doc list</summary>
@@ -59,25 +60,25 @@ AI guidance documents that keep Kiro aligned with your project conventions. Orga
 | `02-tech.md` | Tech stack and approved integrations | Always |
 | `03-structure.md` | Project structure and naming | Always |
 | `10-dev-code-style.md` | Code style and quality gates | Always |
-| `11-dev-error-handling.md` | Error handling patterns | Always |
-| `12-dev-testing.md` | Testing standards | Always |
+| `11-dev-error-handling.md` | Error handling patterns | fileMatch |
+| `12-dev-testing.md` | Testing standards | fileMatch |
 | `20-workflow-git.md` | Git workflow and commit format | Always |
 | `21-workflow-task-completion.md` | Task completion standards | Always |
 | `30-hooks-guide.md` | Hook authoring reference | Manual |
 | `31-kiro-best-practices.md` | Kiro best practices | Manual |
 | `40-security.md` | Security standards | Always |
-| `41-docker.md` | Docker and containerisation | Always |
-| `42-react-components.md` | React component patterns | Always |
+| `41-docker.md` | Docker and containerisation | fileMatch |
+| `42-react-components.md` | React component patterns | fileMatch |
 | `43-mcp.md` | MCP server configuration | Always |
-| `44-authorisation.md` | RBAC and RLS patterns | Always |
-| `45-api-standards.md` | API design standards | Always |
-| `46-logging.md` | Logging standards | Always |
-| `47-database.md` | Database conventions | Always |
+| `44-authorisation.md` | RBAC and RLS patterns | fileMatch |
+| `45-api-standards.md` | API design standards | fileMatch |
+| `46-logging.md` | Logging standards | fileMatch |
+| `47-database.md` | Database conventions | fileMatch |
 | `48-documentation.md` | Documentation standards | Always |
-| `49-cicd.md` | CI/CD pipeline standards | Always |
-| `50-code-review.md` | Code review checklist | Always |
-| `50-spec-creation.md` | Spec creation standards | fileMatch |
-| `51-accessibility.md` | Accessibility standards | Always |
+| `49-cicd.md` | CI/CD pipeline standards | fileMatch |
+| `50-code-review.md` | Code review checklist | Manual |
+| `50a-spec-creation.md` | Spec creation standards | fileMatch |
+| `51-accessibility.md` | Accessibility standards | fileMatch |
 | `52-bug-tracking.md` | Bug deferral workflow | Always |
 | `53-nextjs.md` | Next.js App Router patterns | fileMatch |
 | `54-state-management.md` | State management patterns | fileMatch |
@@ -92,6 +93,8 @@ AI guidance documents that keep Kiro aligned with your project conventions. Orga
 | `63-stack-selection.md` | Stack selection decision tree | Manual |
 | `64-monorepo.md` | Monorepo patterns | fileMatch |
 | `65-error-boundaries.md` | Error boundary patterns | fileMatch |
+| `70-frontend-design.md` | Frontend design standards | fileMatch |
+| `71-agent-code-review.md` | Agent-driven code review | Manual |
 
 </details>
 
@@ -146,7 +149,7 @@ Four example specs demonstrating the spec lifecycle:
 ├── hooks/                # 34 automation hooks
 ├── settings/mcp.json     # MCP server configuration
 ├── specs/                # Feature specifications + templates
-└── steering/             # 38 AI guidance documents
+└── steering/             # 40 AI guidance documents
 docs/                     # Project documentation templates
 ├── ADR/                  # Architecture Decision Records
 ├── API.md                # API reference
@@ -169,6 +172,18 @@ After running `setup.sh`:
 5. Review hooks and disable any that don't suit your workflow
 6. Delete example specs when you're ready to create your own
 
+### Topics Not Yet Covered
+
+The following advanced topics do not have dedicated steering docs. Create your own in `.kiro/steering/` as needed:
+
+- Caching strategies (Redis, CDN, ISR)
+- File upload handling (S3, Supabase Storage)
+- Background jobs and queues
+- Email / transactional notifications
+- Database seeding and fixtures
+- Rate limiting and throttling
+- WebSocket patterns (beyond Supabase Realtime)
+
 See [`.kiro/README.md`](.kiro/README.md) for detailed configuration guidance.
 
 ## Documentation
@@ -183,7 +198,7 @@ See [`.kiro/README.md`](.kiro/README.md) for detailed configuration guidance.
 
 ## Licence
 
-<!-- TODO: Add your licence -->
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
