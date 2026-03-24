@@ -14,18 +14,7 @@ This project uses the Gitflow branching model for release management. Gitflow pr
 
 ## Branch Structure
 
-```text
-main ─────────●────────────●────────────●──────── (production)
-             /            /            /
-release/1.0 ●────●       /            /
-           /      \     /            /
-develop ──●────●───●───●────●───●───●────●─────── (integration)
-              / \       \       /   /
-    feat/auth ●  ●       \     /   /
-              feat/ui     \   /   /
-                     fix/login   /
-                          hotfix/security
-```
+![Gitflow Branching Model](assets/diagrams/gitflow-branching.svg)
 
 | Branch      | Purpose                 | Created From | Merges Into        |
 | ----------- | ----------------------- | ------------ | ------------------ |
