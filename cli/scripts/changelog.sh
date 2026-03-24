@@ -12,6 +12,7 @@
 # Options:
 #   --dry-run     Preview to stdout without updating CHANGELOG.md
 #   --model NAME  Override the AI model (default: auto per provider)
+#   --yes, -y     Accept the first result without interactive review
 #   --help        Show this help message
 #
 # Environment:
@@ -31,6 +32,8 @@ cd "${SCRIPT_DIR}"
 WRITE_MODE=true
 MODEL_OVERRIDE=""
 CHANGELOG="CHANGELOG.md"
+AUTO_ACCEPT=false
+DETAIL_LEVEL="normal"
 
 # ── Parse flags ───────────────────────────────────────────────────────────────
 POSITIONAL=()
@@ -38,6 +41,10 @@ while [[ $# -gt 0 ]]; do
 	case "$1" in
 	--dry-run)
 		WRITE_MODE=false
+		shift
+		;;
+	--yes | -y)
+		AUTO_ACCEPT=true
 		shift
 		;;
 	--model)
@@ -117,9 +124,27 @@ if [[ -f ${CHANGELOG} ]]; then
 	EXISTING_ENTRIES=$(sed -n '/^## \[/,$ p' "${CHANGELOG}" | head -100)
 fi
 
-# ── System prompt ─────────────────────────────────────────────────────────────
-# Adjust this prompt to match your project's release notes style.
-read -r -d '' SYSTEM_PROMPT <<'PROMPT_EOF' || true
+# ── Detail level instructions ─────────────────────────────────────────────────
+detail_instruction() {
+	case "${DETAIL_LEVEL}" in
+	concise)
+		echo "Be very concise: maximum 1 bullet per heading. Merge aggressively. Summary should be 1 sentence."
+		;;
+	detailed)
+		echo "Be thorough: include individual bullets for each distinct change. Do not merge commits. Summary can be 3-4 sentences."
+		;;
+	*)
+		echo ""
+		;;
+	esac
+}
+
+# ── Build system prompt ───────────────────────────────────────────────────────
+build_system_prompt() {
+	local detail_extra
+	detail_extra=$(detail_instruction)
+
+	cat <<PROMPT_EOF
 You are a release notes writer for an npm package called create-kiro-project.
 You receive a list of git commits and produce user-facing release notes in two
 sections. You MUST match the exact style, tone, and formatting of the existing
@@ -148,7 +173,7 @@ Formatting rules (CRITICAL — match existing style exactly):
 - NO nested bullets or indented sub-items.
 - NO "### Testing" section — fold test-related items into ### Added or omit.
 - NO bold text, no inline code blocks in bullets unless naming a specific flag
-  or command (e.g. `--dry-run`).
+  or command (e.g. \`--dry-run\`).
 - Keep bullets short: one line each, no wrapping into multi-line paragraphs.
 
 Content rules:
@@ -164,31 +189,37 @@ Content rules:
   sections.
 - Separate the summary paragraph from the first ### heading with a blank line.
 - Output raw markdown only — no code fences, no preamble, no commentary.
+${detail_extra}
 PROMPT_EOF
+}
 
-# Build user prompt with optional style reference
-if [[ -n ${EXISTING_ENTRIES} ]]; then
-	USER_PROMPT="Generate changelog entries for version ${VERSION} from these commits:
+# ── Build user prompt ─────────────────────────────────────────────────────────
+build_user_prompt() {
+	local prompt="Generate changelog entries for version ${VERSION} from these commits:
 
-${RAW_COMMITS}
+${RAW_COMMITS}"
+
+	if [[ -n ${EXISTING_ENTRIES} ]]; then
+		prompt="${prompt}
 
 Here are the existing changelog entries for style reference — match this format exactly:
 
 ${EXISTING_ENTRIES}"
-else
-	USER_PROMPT="Generate changelog entries for version ${VERSION} from these commits:
+	fi
 
-${RAW_COMMITS}"
-fi
+	echo "${prompt}"
+}
 
 # ── API call: Anthropic (Claude) ──────────────────────────────────────────────
 call_anthropic() {
+	local system_prompt="$1"
+	local user_prompt="$2"
 	local model="${MODEL_OVERRIDE:-claude-sonnet-4-20250514}"
 	local payload
 	payload=$(jq -n \
 		--arg model "${model}" \
-		--arg system "${SYSTEM_PROMPT}" \
-		--arg user "${USER_PROMPT}" \
+		--arg system "${system_prompt}" \
+		--arg user "${user_prompt}" \
 		'{
       model: $model,
       max_tokens: 2048,
@@ -218,12 +249,14 @@ call_anthropic() {
 
 # ── API call: OpenAI (ChatGPT) ───────────────────────────────────────────────
 call_openai() {
+	local system_prompt="$1"
+	local user_prompt="$2"
 	local model="${MODEL_OVERRIDE:-gpt-4o}"
 	local payload
 	payload=$(jq -n \
 		--arg model "${model}" \
-		--arg system "${SYSTEM_PROMPT}" \
-		--arg user "${USER_PROMPT}" \
+		--arg system "${system_prompt}" \
+		--arg user "${user_prompt}" \
 		'{
       model: $model,
       max_tokens: 2048,
@@ -262,23 +295,103 @@ if ! command -v curl &>/dev/null; then
 	exit 1
 fi
 
-# ── Call the AI ───────────────────────────────────────────────────────────────
-echo "Generating changelog with ${PROVIDER}..." >&2
+# ── Generate AI output ───────────────────────────────────────────────────────
+generate() {
+	local sys usr
+	sys=$(build_system_prompt)
+	usr=$(build_user_prompt)
+
+	case "${PROVIDER}" in
+	anthropic) call_anthropic "${sys}" "${usr}" ;;
+	openai) call_openai "${sys}" "${usr}" ;;
+	*)
+		echo "Error: Unknown provider '${PROVIDER}'" >&2
+		exit 1
+		;;
+	esac
+}
+
+# ── Interactive review loop ───────────────────────────────────────────────────
+# Determine if we can prompt interactively
+IS_TTY=false
+if [[ -t 0 && -t 2 ]]; then
+	IS_TTY=true
+fi
 
 AI_OUTPUT=""
-case "${PROVIDER}" in
-anthropic) AI_OUTPUT=$(call_anthropic) ;;
-openai) AI_OUTPUT=$(call_openai) ;;
-*)
-	echo "Error: Unknown provider '${PROVIDER}'" >&2
-	exit 1
-	;;
-esac
+while true; do
+	echo "" >&2
+	echo "Generating changelog with ${PROVIDER} (detail: ${DETAIL_LEVEL})..." >&2
 
-if [[ -z ${AI_OUTPUT} ]]; then
-	echo "Error: AI returned empty response." >&2
-	exit 1
-fi
+	AI_OUTPUT=$(generate)
+
+	if [[ -z ${AI_OUTPUT} ]]; then
+		echo "Error: AI returned empty response." >&2
+		exit 1
+	fi
+
+	# Always show the preview
+	TERM_WIDTH=$(tput cols 2>/dev/null || echo 80)
+	# Reserve 4 chars for "│ " prefix and trailing space
+	WRAP_WIDTH=$((TERM_WIDTH - 4))
+	if [[ ${WRAP_WIDTH} -lt 40 ]]; then
+		WRAP_WIDTH=40
+	fi
+
+	BORDER=$(printf '─%.0s' $(seq 1 $((TERM_WIDTH - 2))) || true)
+
+	echo "" >&2
+	echo "┌${BORDER}" >&2
+	echo "│ Preview: v${VERSION} (${DATE})" >&2
+	echo "├${BORDER}" >&2
+	echo "${AI_OUTPUT}" | fold -s -w "${WRAP_WIDTH}" | while IFS= read -r _preview_line; do
+		echo "│ ${_preview_line}" >&2
+	done
+	echo "└${BORDER}" >&2
+	echo "" >&2
+
+	# Skip interactive prompt if --yes, --dry-run, or non-TTY
+	if ${AUTO_ACCEPT} || [[ ${WRITE_MODE} == false ]] || ! ${IS_TTY}; then
+		break
+	fi
+
+	echo "  1) Accept and write to ${CHANGELOG}" >&2
+	echo "  2) Regenerate (same settings)" >&2
+	echo "  3) Regenerate more concise" >&2
+	echo "  4) Regenerate more detailed" >&2
+	echo "  5) Regenerate normal detail" >&2
+	echo "  6) Quit without saving" >&2
+	echo "" >&2
+	read -r -p "  Choice [1-6]: " choice </dev/tty
+
+	case "${choice}" in
+	1 | "")
+		break
+		;;
+	2)
+		echo "Regenerating..." >&2
+		;;
+	3)
+		DETAIL_LEVEL="concise"
+		echo "Switching to concise mode..." >&2
+		;;
+	4)
+		DETAIL_LEVEL="detailed"
+		echo "Switching to detailed mode..." >&2
+		;;
+	5)
+		DETAIL_LEVEL="normal"
+		echo "Switching to normal mode..." >&2
+		;;
+	6)
+		echo "Aborted — no changes written." >&2
+		exit 0
+		;;
+	*)
+		echo "Invalid choice, try again." >&2
+		;;
+	esac
+done
 
 # ── Build the version entry ──────────────────────────────────────────────────
 ENTRY="## [${VERSION}] - ${DATE}
