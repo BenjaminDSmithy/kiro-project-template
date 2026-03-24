@@ -54,7 +54,10 @@ Reference this with `#stack-selection` when choosing a stack for a new project.
 
 After choosing a stack:
 
-1. Run `./setup.sh` and select the matching preset
-2. The relevant steering doc activates automatically via `fileMatch`
-3. Irrelevant stack steering docs won't trigger (different file patterns)
-4. Update `02-tech.md` approved integrations if needed
+1. Run `./setup.sh` and select the matching preset (use `--dry-run` to preview first)
+2. The setup wizard handles scaffolding, package manager selection, and steering doc cleanup
+3. The relevant steering doc activates automatically via `fileMatch`
+4. Irrelevant stack steering docs won't trigger (different file patterns)
+5. Update `02-tech.md` approved integrations if needed
+
+See the [Setup Script](../../README.md#setup-script) section in the README for full usage details, flags, and headless environment variables.

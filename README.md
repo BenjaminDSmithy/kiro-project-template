@@ -107,13 +107,88 @@ After scaffolding:
 
 See [`.kiro/README.md`](.kiro/README.md) for detailed configuration guidance.
 
+## Setup Script
+
+The `setup.sh` script is an interactive wizard that configures the template for your project. It walks through five steps:
+
+1. **Project Identity** — project name, copyright holder, and year
+2. **Tech Stack** — choose from 13 presets (or Custom)
+3. **Package Manager** — npm, pnpm, yarn, bun, or N/A
+3b. **Stack Scaffolder** — optionally run the official `create-*` scaffolder for your chosen stack
+4. **Steering Cleanup** — remove steering docs for stacks you didn't choose
+5. **Example Specs** — remove the 4 example specs or keep them for reference
+
+### Usage
+
+```bash
+# Interactive (default)
+./setup.sh
+
+# Preview what would happen without modifying any files
+./setup.sh --dry-run
+
+# Non-interactive (CI / automation)
+PROJECT_NAME="My App" COPYRIGHT_HOLDER="Acme Inc" YEAR="2026" \
+  STACK_CHOICE=1 PKG_CHOICE=2 SCAFFOLD_CHOICE=2 \
+  ./setup.sh --headless
+```
+
+### Flags
+
+| Flag         | Description                                              |
+| ------------ | -------------------------------------------------------- |
+| `--headless` | Skip interactive prompts; requires env vars to be set    |
+| `--dry-run`  | Show what would happen without modifying files or running commands |
+
+### Headless Environment Variables
+
+All prompts can be pre-set via environment variables. If a variable is set, the corresponding prompt is skipped.
+
+| Variable             | Default        | Description                                      |
+| -------------------- | -------------- | ------------------------------------------------ |
+| `PROJECT_NAME`       | Folder name    | Project name                                     |
+| `COPYRIGHT_HOLDER`   | _(required)_   | Copyright holder (company or person)             |
+| `YEAR`               | Current year   | Copyright year (`YYYY` or `YYYY-YYYY`)           |
+| `STACK_CHOICE`       | `13`           | Stack preset (1–13)                              |
+| `PKG_CHOICE`         | `2`            | Package manager (1=npm, 2=pnpm, 3=yarn, 4=bun, 5=N/A) |
+| `DLX_CHOICE`         | `1`            | Runner preference (1=npx everywhere, 2=pkg manager equivalent) |
+| `SCAFFOLD_CHOICE`    | `1`            | Run scaffolder (1=yes, 2=skip)                   |
+| `SCAFFOLD_DIR_CHOICE`| `2`            | Scaffold location (1=current dir, 2=new subdirectory) |
+| `CLEANUP_CHOICE`     | `2`            | Remove other stack steering docs (1=yes, 2=no)   |
+| `EXAMPLES_CHOICE`    | `2`            | Remove example specs (1=yes, 2=no)               |
+| `REMOVE_SELF`        | `y`            | Delete setup.sh after completion (y/n)           |
+
+### Stack Scaffolders
+
+When a stack preset is selected (other than Custom or Python FastAPI), the script offers to run the official scaffolder. It shows the exact command and its source URL before asking for confirmation.
+
+| Preset           | Scaffolder Command                          | Source                          |
+| ---------------- | ------------------------------------------- | ------------------------------- |
+| T3               | `{pkg} create t3-app@latest`                | create.t3.gg                    |
+| T4               | `bun create t4-app@latest`                  | t4stack.com                     |
+| Supabase+Next.js | `{pkg} create next-app@latest`              | nextjs.org                      |
+| Vite+React       | `{pkg} create vite@latest --template react-ts` | vite.dev                     |
+| SvelteKit        | `{dlx} sv create`                           | svelte.dev                      |
+| Nuxt 3           | `{dlx} nuxi@latest init`                    | nuxt.com                        |
+| Remix            | `{dlx} create-remix@latest`                 | remix.run                       |
+| Astro            | `{pkg} create astro@latest`                 | astro.build                     |
+| Flutter+Supabase | `flutter create`                            | flutter.dev                     |
+| Electron         | `{dlx} create-electron-app@latest`          | electronforge.io                |
+| Python FastAPI   | _(no official scaffolder)_                  | —                               |
+| TanStack Start   | `{dlx} @tanstack/create-router@latest`      | tanstack.com                    |
+| Custom           | _(no scaffolding)_                          | —                               |
+
+`{pkg}` = your package manager's `create` command (e.g. `pnpm create`). `{dlx}` = your chosen runner (`npx`, `pnpm dlx`, `yarn dlx`, or `bunx`).
+
+Non-npm users are asked whether to use `npx` everywhere (default) or their package manager's native equivalent (`pnpm dlx`, `yarn dlx`, `bunx`).
+
 ## Tasks
 
 The workspace includes pre-configured tasks accessible via the command palette (`Tasks: Run Task`) or the Run and Debug panel. Each task delegates to a shell script in `cli/scripts/`.
 
 | Task                       | Script                      | Description                                                                                                                                                                                                                     |
 | -------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🚀 Run Setup Script        | `setup.sh`                  | Interactive setup wizard — replaces `{{PLACEHOLDER}}` tokens with your project name, copyright holder, and year. Optionally pre-fills `TECH-STACK.md` based on your chosen stack preset and cleans up irrelevant steering docs. |
+| 🚀 Run Setup Script        | `setup.sh`                  | Interactive setup wizard — replaces `{{PLACEHOLDER}}` tokens with your project name, copyright holder, and year. Optionally runs the official stack scaffolder, pre-fills `TECH-STACK.md` based on your chosen stack preset, and cleans up irrelevant steering docs. Supports `--dry-run` to preview changes without modifying files and `--headless` for non-interactive CI usage. |
 | 🔨 CLI: Build              | `cli/scripts/build.sh`      | Copies templates from the repo root into `cli/templates/`, then bundles the CLI with tsup.                                                                                                                                      |
 | 🧪 CLI: Test               | `cli/scripts/test.sh`       | Runs the full Vitest test suite in single-run mode (`--run`).                                                                                                                                                                   |
 | ▶️ CLI: Init (interactive) | `cli/scripts/run-init.sh`   | Builds if needed, then runs the CLI in init mode — scaffolds a new project interactively.                                                                                                                                       |
