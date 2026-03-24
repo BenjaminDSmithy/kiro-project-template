@@ -3,7 +3,8 @@
 # validation.sh — Input validation and .env file validation helpers
 #
 # Provides:
-#   validate_non_empty, validate_numeric, validate_path_exists,
+#   validate_non_empty, validate_numeric, validate_copyright_year,
+#   validate_choice, validate_project_name, validate_path_exists,
 #   validate_env_file
 #
 # Requires: utils.sh to be sourced first (for log_info, log_warn, log_error)
@@ -69,6 +70,66 @@ validate_copyright_year() {
 	# Must contain only digits and optionally one dash
 	if ! [[ ${value} =~ ^[0-9]{4}(-[0-9]{4})?$ ]]; then
 		log_error "Copyright year must be a 4-digit year (e.g. 2026) or range (e.g. 2022-2026), got: '${value}'"
+		return 1
+	fi
+
+	# If range, ensure end year >= start year
+	if [[ ${value} == *-* ]]; then
+		local start_year="${value%%-*}"
+		local end_year="${value##*-}"
+		if ((end_year < start_year)); then
+			log_error "Copyright year range end (${end_year}) must be >= start (${start_year})"
+			return 1
+		fi
+	fi
+
+	return 0
+}
+
+# ---------------------------------------------------------------------------
+# validate_choice — Validate a bounded numeric menu choice (e.g. 1-13)
+# Usage: validate_choice "$value" min max
+# Returns: 0 if value is an integer within [min, max], 1 otherwise
+# ---------------------------------------------------------------------------
+validate_choice() {
+	local value="${1-}"
+	local min="$2"
+	local max="$3"
+
+	if [[ -z ${value} ]]; then
+		log_error "Choice is required and cannot be empty"
+		return 1
+	fi
+
+	if ! [[ ${value} =~ ^[0-9]+$ ]]; then
+		log_error "Choice must be a number, got: '${value}'"
+		return 1
+	fi
+
+	if ((value < min || value > max)); then
+		log_error "Choice must be between ${min} and ${max}, got: ${value}"
+		return 1
+	fi
+
+	return 0
+}
+
+# ---------------------------------------------------------------------------
+# validate_project_name — Validate project name (alphanumeric, dashes, underscores)
+# Usage: validate_project_name "$value"
+# Returns: 0 if valid, 1 otherwise (logs error)
+# ---------------------------------------------------------------------------
+validate_project_name() {
+	local value="${1-}"
+
+	if [[ -z ${value} ]]; then
+		log_error "Project name is required and cannot be empty"
+		return 1
+	fi
+
+	# Allow alphanumeric, dashes, underscores, dots, and spaces
+	if ! [[ ${value} =~ ^[a-zA-Z0-9][a-zA-Z0-9._\ -]*$ ]]; then
+		log_error "Project name must start with a letter or number and contain only letters, numbers, dashes, underscores, dots, or spaces, got: '${value}'"
 		return 1
 	fi
 
