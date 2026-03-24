@@ -19,6 +19,37 @@
       }
     ]
   },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🔨 CLI: Build",
+        "type": "shell",
+        "command": "bash ${workspaceFolder}/cli/scripts/build.sh",
+        "group": "build",
+        "problemMatcher": []
+      },
+      {
+        "label": "🧪 CLI: Test",
+        "type": "shell",
+        "command": "bash ${workspaceFolder}/cli/scripts/test.sh",
+        "group": "test",
+        "problemMatcher": []
+      },
+      {
+        "label": "▶️ CLI: Init (interactive)",
+        "type": "shell",
+        "command": "bash ${workspaceFolder}/cli/scripts/run-init.sh",
+        "problemMatcher": []
+      },
+      {
+        "label": "▶️ CLI: Add (interactive)",
+        "type": "shell",
+        "command": "bash ${workspaceFolder}/cli/scripts/run-add.sh",
+        "problemMatcher": []
+      }
+    ]
+  },
   "extensions": {
     "recommendations": [
       "trunk.io",
