@@ -9,51 +9,59 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLI_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-REPO_ROOT="$(cd "$CLI_DIR/.." && pwd)"
-TEMPLATES_DIR="$CLI_DIR/templates"
+CLI_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${CLI_DIR}/.." && pwd)"
+TEMPLATES_DIR="${CLI_DIR}/templates"
 
-echo "Copying templates from $REPO_ROOT into $TEMPLATES_DIR ..."
+echo "Copying templates from ${REPO_ROOT} into ${TEMPLATES_DIR} ..."
 
 # --- kiro/ templates ---
-KIRO_DEST="$TEMPLATES_DIR/kiro"
-rm -rf "$KIRO_DEST/hooks" "$KIRO_DEST/settings" "$KIRO_DEST/specs" "$KIRO_DEST/steering"
+KIRO_DEST="${TEMPLATES_DIR}/kiro"
+rm -rf "${KIRO_DEST}/hooks" "${KIRO_DEST}/settings" "${KIRO_DEST}/specs" "${KIRO_DEST}/steering"
 
 for subdir in hooks settings specs steering; do
-  if [ -d "$REPO_ROOT/.kiro/$subdir" ]; then
-    cp -R "$REPO_ROOT/.kiro/$subdir" "$KIRO_DEST/$subdir"
-    echo "  ✓ .kiro/$subdir"
-  else
-    echo "  ⚠ .kiro/$subdir not found, skipping"
-  fi
+	if [[ -d "${REPO_ROOT}/.kiro/${subdir}" ]]; then
+		cp -R "${REPO_ROOT}/.kiro/${subdir}" "${KIRO_DEST}/${subdir}"
+		echo "  ok .kiro/${subdir}"
+	else
+		echo "  skip .kiro/${subdir} not found"
+	fi
 done
 
 # --- docs/ templates ---
-DOCS_DEST="$TEMPLATES_DIR/docs"
-# Remove everything except the placeholder README
-find "$DOCS_DEST" -mindepth 1 ! -name 'README.md' -exec rm -rf {} + 2>/dev/null || true
+DOCS_DEST="${TEMPLATES_DIR}/docs"
+find "${DOCS_DEST}" -mindepth 1 ! -name 'README.md' -exec rm -rf {} + 2>/dev/null || true
 
-if [ -d "$REPO_ROOT/docs" ]; then
-  # Copy contents of docs/ into templates/docs/, excluding .DS_Store
-  rsync -a --exclude='.DS_Store' "$REPO_ROOT/docs/" "$DOCS_DEST/"
-  echo "  ✓ docs/"
+if [[ -d "${REPO_ROOT}/docs" ]]; then
+	rsync -a --exclude='.DS_Store' "${REPO_ROOT}/docs/" "${DOCS_DEST}/"
+	echo "  ok docs/"
 else
-  echo "  ⚠ docs/ not found, skipping"
+	echo "  skip docs/ not found"
 fi
 
 # --- root files ---
-ROOT_DEST="$TEMPLATES_DIR/root"
-# Remove everything except the placeholder README
-find "$ROOT_DEST" -mindepth 1 ! -name 'README.md' -exec rm -rf {} + 2>/dev/null || true
+ROOT_DEST="${TEMPLATES_DIR}/root"
+find "${ROOT_DEST}" -mindepth 1 ! -name 'README.md' -exec rm -rf {} + 2>/dev/null || true
 
 ROOT_FILES=(README.md LICENSE .gitignore package.json .env.example setup.sh)
 for file in "${ROOT_FILES[@]}"; do
-  if [ -f "$REPO_ROOT/$file" ]; then
-    cp "$REPO_ROOT/$file" "$ROOT_DEST/$file"
-    echo "  ✓ $file"
-  else
-    echo "  ⚠ $file not found, skipping"
-  fi
+	if [[ -f "${REPO_ROOT}/${file}" ]]; then
+		cp "${REPO_ROOT}/${file}" "${ROOT_DEST}/${file}"
+		echo "  ok ${file}"
+	else
+		echo "  skip ${file} not found"
+	fi
 done
+
+# --- vscode/ templates ---
+VSCODE_DEST="${TEMPLATES_DIR}/vscode"
+rm -rf "${VSCODE_DEST}"
+
+if [[ -d "${REPO_ROOT}/.vscode" ]]; then
+	cp -R "${REPO_ROOT}/.vscode" "${VSCODE_DEST}"
+	echo "  ok .vscode/"
+else
+	echo "  skip .vscode/ not found"
+fi
 
 echo "Template copy complete."

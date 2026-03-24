@@ -77,6 +77,13 @@ export async function init(
   options?.logger.fileOp("copy", "docs/");
   options?.progress.tick("copied");
 
+  await copyDir(
+    path.join(TEMPLATES_DIR, "vscode"),
+    path.join(targetDir, ".vscode"),
+  );
+  options?.logger.fileOp("copy", ".vscode/");
+  options?.progress.tick("copied");
+
   // Root template contents are copied directly into the target (not into a subdirectory)
   const rootTemplateDir = path.join(TEMPLATES_DIR, "root");
   const rootEntries = await readdir(rootTemplateDir);
