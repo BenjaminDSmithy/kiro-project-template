@@ -54,6 +54,28 @@ validate_numeric() {
 }
 
 # ---------------------------------------------------------------------------
+# validate_copyright_year — Accept a single year (2026) or range (2022-2026)
+# Usage: validate_copyright_year "$value"
+# Returns: 0 if valid, 1 otherwise (logs error)
+# ---------------------------------------------------------------------------
+validate_copyright_year() {
+	local value="${1-}"
+
+	if [[ -z ${value} ]]; then
+		log_error "Copyright year is required and cannot be empty"
+		return 1
+	fi
+
+	# Must contain only digits and optionally one dash
+	if ! [[ ${value} =~ ^[0-9]{4}(-[0-9]{4})?$ ]]; then
+		log_error "Copyright year must be a 4-digit year (e.g. 2026) or range (e.g. 2022-2026), got: '${value}'"
+		return 1
+	fi
+
+	return 0
+}
+
+# ---------------------------------------------------------------------------
 # validate_path_exists — Check if a path exists; offer to create it
 # Usage: validate_path_exists "/path/to/dir"
 # In interactive mode: prompts user to create the directory

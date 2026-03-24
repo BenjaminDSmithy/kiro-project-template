@@ -24,6 +24,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/scripts/lib/utils.sh"
 # shellcheck disable=SC1091
+source "${SCRIPT_DIR}/scripts/lib/validation.sh"
+# shellcheck disable=SC1091
 source "${SCRIPT_DIR}/scripts/lib/banner.sh"
 
 # ---------------------------------------------------------------------------
@@ -44,7 +46,14 @@ header "Step 1 · Project Identity"
 
 ask "Project name" "${DEFAULT_PROJECT_NAME}" PROJECT_NAME
 ask "Copyright holder (company or person)" "" COPYRIGHT_HOLDER
-ask "Copyright year" "${DEFAULT_YEAR}" YEAR
+while true; do
+	ask "Copyright year (e.g. 2026 or 2022-2026)" "${DEFAULT_YEAR}" YEAR
+	if validate_copyright_year "${YEAR}"; then
+		break
+	fi
+	err "Invalid format. Use a 4-digit year or a range (e.g. 2022-2026)."
+	unset YEAR
+done
 
 if [[ -z ${COPYRIGHT_HOLDER} ]]; then
 	err "Copyright holder is required."
