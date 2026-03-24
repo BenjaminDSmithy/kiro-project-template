@@ -20,6 +20,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -39,8 +40,9 @@ jobs:
 
   publish:
     needs: build-and-test
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && github.event.release.target_commitish == 'main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
