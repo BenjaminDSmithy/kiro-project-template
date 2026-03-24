@@ -111,15 +111,15 @@ See [`.kiro/README.md`](.kiro/README.md) for detailed configuration guidance.
 
 The workspace includes pre-configured tasks accessible via the command palette (`Tasks: Run Task`) or the Run and Debug panel. Each task delegates to a shell script in `cli/scripts/`.
 
-| Task | Script | Description |
-| ---- | ------ | ----------- |
-| 🚀 Run Setup Script | `setup.sh` | Interactive setup wizard — replaces `{{PLACEHOLDER}}` tokens with your project name, copyright holder, and year. Optionally pre-fills `TECH-STACK.md` based on your chosen stack preset and cleans up irrelevant steering docs. |
-| 🔨 CLI: Build | `cli/scripts/build.sh` | Copies templates from the repo root into `cli/templates/`, then bundles the CLI with tsup. |
-| 🧪 CLI: Test | `cli/scripts/test.sh` | Runs the full Vitest test suite in single-run mode (`--run`). |
-| ▶️ CLI: Init (interactive) | `cli/scripts/run-init.sh` | Builds if needed, then runs the CLI in init mode — scaffolds a new project interactively. |
-| ▶️ CLI: Add (interactive) | `cli/scripts/run-add.sh` | Builds if needed, then runs the CLI with `--add` — injects `.kiro/` configuration into an existing project. |
-| 📋 CLI: Changelog | `cli/scripts/changelog.sh` | Generates `CHANGELOG.md` entries from conventional commits between git tags. |
-| ✅ CLI: Pre-publish Checks | `cli/scripts/prepublish.sh` | Safety checks before `npm publish` — verifies clean working tree, passing tests, successful build, version bump, changelog entry, and template presence. |
+| Task                       | Script                      | Description                                                                                                                                                                                                                     |
+| -------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🚀 Run Setup Script        | `setup.sh`                  | Interactive setup wizard — replaces `{{PLACEHOLDER}}` tokens with your project name, copyright holder, and year. Optionally pre-fills `TECH-STACK.md` based on your chosen stack preset and cleans up irrelevant steering docs. |
+| 🔨 CLI: Build              | `cli/scripts/build.sh`      | Copies templates from the repo root into `cli/templates/`, then bundles the CLI with tsup.                                                                                                                                      |
+| 🧪 CLI: Test               | `cli/scripts/test.sh`       | Runs the full Vitest test suite in single-run mode (`--run`).                                                                                                                                                                   |
+| ▶️ CLI: Init (interactive) | `cli/scripts/run-init.sh`   | Builds if needed, then runs the CLI in init mode — scaffolds a new project interactively.                                                                                                                                       |
+| ▶️ CLI: Add (interactive)  | `cli/scripts/run-add.sh`    | Builds if needed, then runs the CLI with `--add` — injects `.kiro/` configuration into an existing project.                                                                                                                     |
+| 📋 CLI: Changelog          | `cli/scripts/changelog.sh`  | Generates `CHANGELOG.md` entries from conventional commits between git tags.                                                                                                                                                    |
+| ✅ CLI: Pre-publish Checks | `cli/scripts/prepublish.sh` | Safety checks before `npm publish` — verifies clean working tree, passing tests, successful build, version bump, changelog entry, and template presence.                                                                        |
 
 ## CLI Development
 
@@ -140,6 +140,4 @@ If you find this template useful, consider buying me a coffee:
 
 ## Licence
 
-This project is licensed under the [MIT Licence](cli/templates/root/LICENSE).
-
-Copyright (c) 2026 Binary Sword Pty Ltd
+Copyright (c) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved. See [LICENSE](LICENSE).
