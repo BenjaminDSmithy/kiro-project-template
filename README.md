@@ -196,6 +196,12 @@ See [`.kiro/README.md`](.kiro/README.md) for detailed configuration guidance.
 | [docs/API.md](docs/API.md)                   | API reference                   |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)     | Deployment procedures           |
 
+## Support
+
+If you find this template useful, consider buying me a coffee:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/benjamindsmithy)
+
 ## Licence
 
 This project is licensed under the [MIT License](LICENSE).
