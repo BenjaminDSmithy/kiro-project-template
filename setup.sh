@@ -9,25 +9,41 @@
 # Usage:
 #   chmod +x setup.sh
 #   ./setup.sh
+#   ./setup.sh --dry-run          # Preview what would happen without changes
 #
 # Or non-interactively:
 #   PROJECT_NAME="My App" COPYRIGHT_HOLDER="Acme Inc" YEAR="2026" ./setup.sh
+#
+# Headless env vars (all optional — defaults shown):
+#   HEADLESS=false          # Skip interactive prompts
+#   PROJECT_NAME            # Defaults to folder name
+#   COPYRIGHT_HOLDER        # Required
+#   YEAR                    # Defaults to current year
+#   STACK_CHOICE=13         # 1-13 (see menu)
+#   PKG_CHOICE=2            # 1-5 (see menu)
+#   DLX_CHOICE=1            # 1=npx everywhere, 2=pkg manager equivalent
+#   SCAFFOLD_CHOICE=1       # 1=run scaffolder, 2=skip
+#   SCAFFOLD_DIR=.          # Directory to scaffold into (. or subdirectory)
+#   CLEANUP_CHOICE=2        # 1=remove other steering docs, 2=keep
+#   EXAMPLES_CHOICE=2       # 1=remove example specs, 2=keep
+#   REMOVE_SELF=y           # y=delete setup.sh, n=keep
 # ============================================================================
 
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# Headless mode — skip interactive prompts (requires env vars to be set)
-# Usage: ./setup.sh --headless
-#   or:  HEADLESS=true ./setup.sh
+# Flags — parsed from command-line arguments
+# Usage: ./setup.sh --headless --dry-run
 # ---------------------------------------------------------------------------
 for arg in "$@"; do
 	case "${arg}" in
 	--headless) HEADLESS=true ;;
+	--dry-run) DRY_RUN=true ;;
 	*) ;;
 	esac
 done
 export HEADLESS="${HEADLESS:-false}"
+export DRY_RUN="${DRY_RUN:-false}"
 
 # ---------------------------------------------------------------------------
 # Source shared libraries
@@ -51,6 +67,28 @@ DEFAULT_YEAR="$(date +%Y)"
 # Banner
 # ---------------------------------------------------------------------------
 show_project_banner "Setup Wizard"
+
+# ---------------------------------------------------------------------------
+# Dry-run mode banner
+# ---------------------------------------------------------------------------
+if [[ ${DRY_RUN} == "true" ]]; then
+	echo ""
+	warn "DRY-RUN MODE — no files will be modified, no commands will be executed."
+	echo ""
+fi
+
+# ---------------------------------------------------------------------------
+# run_cmd — Execute a command, or print it in dry-run mode
+# Usage: run_cmd <command-string>
+# ---------------------------------------------------------------------------
+run_cmd() {
+	local cmd="$1"
+	if [[ ${DRY_RUN} == "true" ]]; then
+		info "[dry-run] Would execute: ${cmd}"
+		return 0
+	fi
+	bash -c "${cmd}"
+}
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Step 1: Project Identity
@@ -631,17 +669,29 @@ for file in "${TARGET_FILES[@]}"; do
 	SAFE_COPYRIGHT="${SAFE_COPYRIGHT//\//\\/}"
 
 	if grep -q '{{PROJECT_NAME}}' "${filepath}" 2>/dev/null; then
-		sed_inplace "s/{{PROJECT_NAME}}/${SAFE_PROJECT_NAME}/g" "${filepath}"
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would replace {{PROJECT_NAME}} in ${file}"
+		else
+			sed_inplace "s/{{PROJECT_NAME}}/${SAFE_PROJECT_NAME}/g" "${filepath}"
+		fi
 		changed=true
 	fi
 
 	if grep -q '{{COPYRIGHT_HOLDER}}' "${filepath}" 2>/dev/null; then
-		sed_inplace "s/{{COPYRIGHT_HOLDER}}/${SAFE_COPYRIGHT}/g" "${filepath}"
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would replace {{COPYRIGHT_HOLDER}} in ${file}"
+		else
+			sed_inplace "s/{{COPYRIGHT_HOLDER}}/${SAFE_COPYRIGHT}/g" "${filepath}"
+		fi
 		changed=true
 	fi
 
 	if grep -q '{{YEAR}}' "${filepath}" 2>/dev/null; then
-		sed_inplace "s/{{YEAR}}/${YEAR}/g" "${filepath}"
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would replace {{YEAR}} in ${file}"
+		else
+			sed_inplace "s/{{YEAR}}/${YEAR}/g" "${filepath}"
+		fi
 		changed=true
 	fi
 
@@ -659,14 +709,19 @@ if [[ ${STACK_CHOICE} != "13" ]] && [[ ${#STACK_ROWS[@]} -gt 0 ]]; then
 
 	TECH_STACK_FILE="${SCRIPT_DIR}/docs/TECH-STACK.md"
 
-	# Build the Core Stack table rows
-	CORE_TABLE=""
-	for row in "${STACK_ROWS[@]}"; do
-		CORE_TABLE="${CORE_TABLE}| ${row} |
-"
-	done
+	if [[ ${DRY_RUN} == "true" ]]; then
+		info "[dry-run] Would generate: docs/TECH-STACK.md (${STACK_NAME} preset)"
+		CHANGED_FILES+=("docs/TECH-STACK.md (generated)")
+	else
 
-	cat >"${TECH_STACK_FILE}" <<TECHEOF
+		# Build the Core Stack table rows
+		CORE_TABLE=""
+		for row in "${STACK_ROWS[@]}"; do
+			CORE_TABLE="${CORE_TABLE}| ${row} |
+"
+		done
+
+		cat >"${TECH_STACK_FILE}" <<TECHEOF
 # Tech Stack
 
 | Field        | Value      |
@@ -746,8 +801,9 @@ Copyright (C) ${YEAR} ${COPYRIGHT_HOLDER}. All rights reserved.
 \`\`\`
 TECHEOF
 
-	success "Generated: docs/TECH-STACK.md (${STACK_NAME} preset)"
-	CHANGED_FILES+=("docs/TECH-STACK.md (generated)")
+		success "Generated: docs/TECH-STACK.md (${STACK_NAME} preset)"
+		CHANGED_FILES+=("docs/TECH-STACK.md (generated)")
+	fi # end dry-run guard
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -776,27 +832,62 @@ if [[ ${CLEANUP_CHOICE} == "1" ]]; then
 	case "${STACK_CHOICE}" in
 	1) # T3 — keep 60, remove 53 (default Next.js patterns overlap with T3), 61, 62
 		for f in "53-nextjs.md" "61-t4-stack.md" "62-tanstack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	2) # T4 — keep 61, remove 53, 60, 62
 		for f in "53-nextjs.md" "60-t3-stack.md" "62-tanstack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	3) # Supabase + Next.js (Default) — keep 53, remove 60, 61, 62
 		for f in "60-t3-stack.md" "61-t4-stack.md" "62-tanstack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	12) # TanStack Start — keep 62, remove 53, 60, 61
 		for f in "53-nextjs.md" "60-t3-stack.md" "61-t4-stack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	*) # Other stacks (Vite, Svelte, Nuxt, etc.) — remove all 4 stack-specific docs
 		for f in "53-nextjs.md" "60-t3-stack.md" "61-t4-stack.md" "62-tanstack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	esac
@@ -833,8 +924,12 @@ if [[ ${EXAMPLES_CHOICE} == "1" ]]; then
 	SPECS_DIR="${SCRIPT_DIR}/.kiro/specs"
 	for spec_dir in "${SPECS_DIR}"/✅_* "${SPECS_DIR}"/📋_* "${SPECS_DIR}"/🚧_* "${SPECS_DIR}"/⏸️_*; do
 		if [[ -d ${spec_dir} ]]; then
-			rm -rf "${spec_dir}"
-			success "Removed: $(basename "${spec_dir}")"
+			if [[ ${DRY_RUN} == "true" ]]; then
+				info "[dry-run] Would remove: $(basename "${spec_dir}")"
+			else
+				rm -rf "${spec_dir}"
+				success "Removed: $(basename "${spec_dir}")"
+			fi
 		fi
 	done
 else
@@ -873,8 +968,12 @@ if [[ -z ${REMOVE_SELF-} ]]; then
 fi
 
 if [[ ${REMOVE_SELF} == "y" || ${REMOVE_SELF} == "Y" ]]; then
-	rm -f "${SCRIPT_DIR}/setup.sh"
-	success "Removed setup.sh"
+	if [[ ${DRY_RUN} == "true" ]]; then
+		info "[dry-run] Would remove: setup.sh"
+	else
+		rm -f "${SCRIPT_DIR}/setup.sh"
+		success "Removed setup.sh"
+	fi
 else
 	info "Kept setup.sh — you can delete it manually later."
 fi
