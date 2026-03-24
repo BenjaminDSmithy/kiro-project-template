@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import prompts from "prompts";
 
-import type { CliFlags } from "../index.js";
+import type { CliFlags, CommandOptions } from "../index.js";
 import { gatherConfig } from "../prompts.js";
 import { replacePlaceholders } from "../replacer.js";
 import { copyDir, log, success, warn } from "../utils.js";
@@ -23,8 +23,12 @@ const VALID_ONLY_TARGETS = ["steering", "hooks", "specs", "settings"] as const;
  * so placeholders in the copied files can be replaced.
  *
  * @param flags - Parsed CLI flags
+ * @param options - Optional command dependencies (logger, progress, configDefaults)
  */
-export async function add(flags: CliFlags): Promise<void> {
+export async function add(
+  flags: CliFlags,
+  options?: CommandOptions,
+): Promise<void> {
   const config = await gatherConfig(flags);
 
   const kiroTemplateSrc = path.join(TEMPLATES_DIR, "kiro");
@@ -45,7 +49,13 @@ export async function add(flags: CliFlags): Promise<void> {
     const subSrc = path.join(kiroTemplateSrc, flags.only);
     const subDest = path.join(kiroTargetDir, flags.only);
 
+    options?.progress.start(`Injecting .kiro/${flags.only}/...`);
+
     await copyDir(subSrc, subDest);
+    options?.logger.fileOp("copy", `.kiro/${flags.only}/`);
+    options?.progress.tick("copied");
+
+    options?.progress.update("Replacing placeholders...");
 
     // Replace placeholders in the copied subdirectory only
     const modified = await replacePlaceholders(subDest, {
@@ -54,7 +64,14 @@ export async function add(flags: CliFlags): Promise<void> {
       "{{YEAR}}": config.year,
     });
 
-    printSummary(flags.only, modified.length);
+    for (const file of modified) {
+      options?.logger.fileOp("replace", file);
+      options?.progress.tick("replaced");
+    }
+
+    options?.progress.stop();
+
+    printSummary(flags.only, modified.length, options);
     return;
   }
 
@@ -78,7 +95,13 @@ export async function add(flags: CliFlags): Promise<void> {
     }
   }
 
+  options?.progress.start("Injecting .kiro/...");
+
   await copyDir(kiroTemplateSrc, kiroTargetDir);
+  options?.logger.fileOp("copy", ".kiro/");
+  options?.progress.tick("copied");
+
+  options?.progress.update("Replacing placeholders...");
 
   // Replace placeholders across the entire .kiro/ directory
   const modified = await replacePlaceholders(kiroTargetDir, {
@@ -87,7 +110,14 @@ export async function add(flags: CliFlags): Promise<void> {
     "{{YEAR}}": config.year,
   });
 
-  printSummary(undefined, modified.length);
+  for (const file of modified) {
+    options?.logger.fileOp("replace", file);
+    options?.progress.tick("replaced");
+  }
+
+  options?.progress.stop();
+
+  printSummary(undefined, modified.length, options);
 }
 
 /**
@@ -95,10 +125,18 @@ export async function add(flags: CliFlags): Promise<void> {
  *
  * @param only - The --only subset that was copied, or undefined for the full .kiro/
  * @param filesUpdated - Number of files with placeholders replaced
+ * @param options - Optional command dependencies for progress summary
  */
-function printSummary(only: string | undefined, filesUpdated: number): void {
+function printSummary(
+  only: string | undefined,
+  filesUpdated: number,
+  options?: CommandOptions,
+): void {
   const target = only ? `.kiro/${only}/` : ".kiro/";
   success(`\n✔ Injected ${target} successfully!\n`);
   log(`  Target:       ${target}`);
   log(`  Placeholders: ${filesUpdated} file(s) updated`);
+  if (options?.progress) {
+    log(`  Operations:   ${options.progress.summary()}`);
+  }
 }

@@ -5,7 +5,9 @@ import { mkdir, readdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import prompts from "prompts";
 
-import type { CliFlags } from "../index.js";
+import type { CliFlags, CommandOptions } from "../index.js";
+import type { VerboseLogger } from "../logger.js";
+import type { ProgressReporter } from "../progress.js";
 import { gatherConfig } from "../prompts.js";
 import { replacePlaceholders } from "../replacer.js";
 import { STACK_PRESETS } from "../stacks.js";
@@ -25,8 +27,12 @@ const PROTECTED_SPECS = ["_TEMPLATE", "_BUGFIX_TEMPLATE"];
  * replace placeholders, generate TECH-STACK.md, clean up.
  *
  * @param flags - Parsed CLI flags
+ * @param options - Optional command dependencies (logger, progress, configDefaults)
  */
-export async function init(flags: CliFlags): Promise<void> {
+export async function init(
+  flags: CliFlags,
+  options?: CommandOptions,
+): Promise<void> {
   const config = await gatherConfig(flags);
   const targetDir = path.resolve(process.cwd(), config.projectName);
 
@@ -52,12 +58,19 @@ export async function init(flags: CliFlags): Promise<void> {
 
   await mkdir(targetDir, { recursive: true });
 
+  options?.progress.start("Scaffolding project...");
+
   // Copy all template directories into the target
   await copyDir(
     path.join(TEMPLATES_DIR, "kiro"),
     path.join(targetDir, ".kiro"),
   );
+  options?.logger.fileOp("copy", ".kiro/");
+  options?.progress.tick("copied");
+
   await copyDir(path.join(TEMPLATES_DIR, "docs"), path.join(targetDir, "docs"));
+  options?.logger.fileOp("copy", "docs/");
+  options?.progress.tick("copied");
 
   // Root template contents are copied directly into the target (not into a subdirectory)
   const rootTemplateDir = path.join(TEMPLATES_DIR, "root");
@@ -67,6 +80,8 @@ export async function init(flags: CliFlags): Promise<void> {
       path.join(rootTemplateDir, entry),
       path.join(targetDir, entry),
     );
+    options?.logger.fileOp("copy", entry);
+    options?.progress.tick("copied");
   }
 
   // Replace placeholders across the entire target directory
@@ -76,21 +91,35 @@ export async function init(flags: CliFlags): Promise<void> {
     "{{YEAR}}": config.year,
   });
 
+  for (const file of modifiedFiles) {
+    options?.logger.fileOp("replace", file);
+    options?.progress.tick("replaced");
+  }
+
   // Generate TECH-STACK.md from the selected stack preset (skip for "Custom")
   const preset = STACK_PRESETS[config.stackChoice];
   if (preset && preset.name !== "Custom" && preset.rows.length > 0) {
     await generateTechStackDoc(targetDir, config.projectName, preset);
+    options?.logger.fileOp("replace", "docs/TECH-STACK.md");
+    options?.progress.tick("replaced");
   }
 
   // Steering cleanup — remove docs not in the preset's keepSteering list
   if (config.cleanupSteering && preset && preset.keepSteering.length > 0) {
-    await cleanupSteering(targetDir, preset.keepSteering);
+    await cleanupSteering(
+      targetDir,
+      preset.keepSteering,
+      options?.logger,
+      options?.progress,
+    );
   }
 
   // Example spec removal — delete directories prefixed with status emojis
   if (config.removeExamples) {
-    await removeExampleSpecs(targetDir);
+    await removeExampleSpecs(targetDir, options?.logger, options?.progress);
   }
+
+  options?.progress.stop();
 
   // Print summary
   success("\n✔ Project scaffolded successfully!\n");
@@ -141,10 +170,14 @@ ${preset.approved}
  *
  * @param targetDir - The scaffolded project root
  * @param keepSteering - Filenames to retain
+ * @param logger - Optional verbose logger for per-file logging
+ * @param progress - Optional progress reporter for tick tracking
  */
 async function cleanupSteering(
   targetDir: string,
   keepSteering: string[],
+  logger?: VerboseLogger,
+  progress?: ProgressReporter,
 ): Promise<void> {
   const steeringDir = path.join(targetDir, ".kiro", "steering");
 
@@ -158,6 +191,8 @@ async function cleanupSteering(
   for (const entry of entries) {
     if (!keepSteering.includes(entry)) {
       await unlink(path.join(steeringDir, entry));
+      logger?.steeringRemoved(entry);
+      progress?.tick("removed");
       removed++;
     }
   }
@@ -174,8 +209,14 @@ async function cleanupSteering(
  * preserving `_TEMPLATE/` and `_BUGFIX_TEMPLATE/`.
  *
  * @param targetDir - The scaffolded project root
+ * @param logger - Optional verbose logger for per-file logging
+ * @param progress - Optional progress reporter for tick tracking
  */
-async function removeExampleSpecs(targetDir: string): Promise<void> {
+async function removeExampleSpecs(
+  targetDir: string,
+  logger?: VerboseLogger,
+  progress?: ProgressReporter,
+): Promise<void> {
   const specsDir = path.join(targetDir, ".kiro", "specs");
 
   if (!existsSync(specsDir)) {
@@ -197,6 +238,8 @@ async function removeExampleSpecs(targetDir: string): Promise<void> {
     );
     if (isExample) {
       await removeDir(path.join(specsDir, entry));
+      logger?.exampleSpecRemoved(entry);
+      progress?.tick("removed");
       removed++;
     }
   }
