@@ -1,0 +1,45 @@
+# CI pipeline for create-kiro-project
+# Runs build + test on every push/PR, publishes to npm on release events.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter create-kiro-project build
+      - run: pnpm --filter create-kiro-project test -- --run
+
+  publish:
+    needs: build-and-test
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter create-kiro-project build
+      - run: npm publish --access public
+        working-directory: cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
