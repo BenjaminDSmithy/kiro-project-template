@@ -1,5 +1,7 @@
 /* create-kiro-project stack presets data module */
 
+import { readFileSync } from "node:fs";
+
 /**
  * A stack preset defines the core technology configuration for a project,
  * including TECH-STACK.md table rows, approved integrations, and which
@@ -340,3 +342,100 @@ export const STACK_PRESETS: Record<number, StackPreset> = {
     keepSteering: [],
   },
 };
+
+/**
+ * Required fields for each entry in a custom stacks JSON file.
+ */
+const CUSTOM_STACK_REQUIRED_FIELDS = [
+  "name",
+  "rows",
+  "approved",
+  "keepSteering",
+] as const;
+
+/**
+ * Loads custom stack presets from a JSON file and merges them with built-in
+ * presets. Custom presets are assigned indices starting from
+ * `Object.keys(builtIn).length` so they never overwrite built-in entries.
+ *
+ * @param filePath - Absolute or relative path to the stacks.json file
+ * @param builtIn - The built-in STACK_PRESETS record to merge with
+ * @returns A new record containing all built-in presets plus custom presets
+ * @throws If the file cannot be read, is not valid JSON, is not an array,
+ *         or any entry is missing required fields
+ */
+export function loadCustomStacks(
+  filePath: string,
+  builtIn: Record<number, StackPreset>,
+): Record<number, StackPreset> {
+  const raw = readFileSync(filePath, "utf-8");
+  const parsed: unknown = JSON.parse(raw);
+
+  if (!Array.isArray(parsed)) {
+    throw new Error(`Custom stacks file at ${filePath} must be a JSON array.`);
+  }
+
+  const merged: Record<number, StackPreset> = { ...builtIn };
+  let nextIndex = Object.keys(builtIn).length;
+
+  // Collect all preset names (built-in + custom) for duplicate detection
+  const seenNames = new Map<string, string>();
+  for (const preset of Object.values(builtIn)) {
+    seenNames.set(preset.name, "built-in");
+  }
+
+  for (let i = 0; i < parsed.length; i++) {
+    const entry = parsed[i];
+
+    // Validate required fields
+    const missing: string[] = [];
+    for (const field of CUSTOM_STACK_REQUIRED_FIELDS) {
+      if (!(field in entry) || entry[field] === undefined) {
+        missing.push(field);
+      }
+    }
+
+    // Type-level validation for present fields
+    if (missing.length === 0) {
+      if (typeof entry.name !== "string" || entry.name.trim() === "") {
+        missing.push("name (must be a non-empty string)");
+      }
+      if (!Array.isArray(entry.rows)) {
+        missing.push("rows (must be an array)");
+      }
+      if (typeof entry.approved !== "string") {
+        missing.push("approved (must be a string)");
+      }
+      if (!Array.isArray(entry.keepSteering)) {
+        missing.push("keepSteering (must be an array)");
+      }
+    }
+
+    if (missing.length > 0) {
+      throw new Error(
+        `Custom stacks entry at index ${i} is missing or has invalid fields: ${missing.join(", ")}. File: ${filePath}`,
+      );
+    }
+
+    const name = entry.name as string;
+
+    // Warn on duplicate names (including collisions with built-in presets)
+    if (seenNames.has(name)) {
+      const source = seenNames.get(name);
+      process.stderr.write(
+        `Warning: custom stack "${name}" duplicates a ${source} preset name — last definition wins.\n`,
+      );
+    }
+    seenNames.set(name, "custom");
+
+    merged[nextIndex] = {
+      name,
+      rows: entry.rows as string[],
+      approved: entry.approved as string,
+      keepSteering: entry.keepSteering as string[],
+    };
+    nextIndex++;
+  }
+
+  return merged;
+}
