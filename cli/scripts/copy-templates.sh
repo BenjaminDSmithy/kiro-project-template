@@ -64,4 +64,13 @@ else
 	echo "  skip .vscode/ not found"
 fi
 
+# --- scripts/ templates (static, not copied from repo root) ---
+# The scripts/ templates are maintained directly in cli/templates/scripts/
+# and are not copied from elsewhere. This check ensures they exist.
+if [[ -d "${TEMPLATES_DIR}/scripts" ]]; then
+	echo "  ok templates/scripts/ (static)"
+else
+	echo "  skip templates/scripts/ not found"
+fi
+
 echo "Template copy complete."

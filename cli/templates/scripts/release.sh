@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Copyright (c) 2026 Binary Sword Pty Ltd. All rights reserved.
+# Copyright (c) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root.
 #
-# Gitflow release script for create-kiro-project.
+# Gitflow release script.
 #
 # Orchestrates a full release cycle:
 #   1. Prompt for release type (major / minor / patch)
 #   2. Bump version in package.json
 #   3. Create release/X.Y.Z branch from develop
-#   4. Run tests and prepublish checks
+#   4. Run tests and build
 #   5. Generate AI-powered changelog
 #   6. Pause for user review and commit
 #   7. Verify clean tree, merge into main, tag, merge back to develop
@@ -24,8 +24,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLI_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-cd "${CLI_DIR}"
+PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${PROJECT_DIR}"
 
 # ── Colours ───────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -137,7 +137,6 @@ ok "Created and switched to ${RELEASE_BRANCH}"
 # ── Bump version in package.json ─────────────────────────────────────────────
 info "Bumping version to ${NEW_VERSION}..."
 
-# Use node to update package.json (preserves formatting better than sed)
 node -e "
 const fs = require('fs');
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
@@ -146,13 +145,13 @@ fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
 "
 ok "Updated package.json to ${NEW_VERSION}"
 
-# Verify package.json and lock file are in sync
+# Verify version
 PKG_VERSION=$(node -p "require('./package.json').version")
 if [[ ${PKG_VERSION} != "${NEW_VERSION}" ]]; then
 	fail "Version mismatch: package.json says ${PKG_VERSION} but expected ${NEW_VERSION}."
 fi
 
-# Check if pnpm-lock.yaml needs updating
+# Update lock file if pnpm is available
 if command -v pnpm &>/dev/null; then
 	info "Updating pnpm-lock.yaml..."
 	pnpm install --lockfile-only 2>/dev/null || warn "Could not update lock file. You may need to run pnpm install manually."
@@ -174,33 +173,12 @@ if ! pnpm test; then
 fi
 ok "All tests passed"
 
-# ── Run prepublish checks (skip clean-tree and test — already done) ───────────
+# ── Build ─────────────────────────────────────────────────────────────────────
 info "Running build..."
 if ! pnpm build; then
 	fail "Build failed."
 fi
 ok "Build succeeded"
-
-DIST_CONTENTS=$(ls -A dist 2>/dev/null || true)
-if [[ ! -d "dist" ]] || [[ -z ${DIST_CONTENTS} ]]; then
-	fail "dist/ is empty -- build may have failed silently."
-fi
-ok "dist/ is populated"
-
-# Version should NOT be published yet
-PUBLISHED_VERSION=$(npm view create-kiro-project version 2>/dev/null || echo "0.0.0")
-if [[ ${NEW_VERSION} == "${PUBLISHED_VERSION}" ]]; then
-	fail "Version ${NEW_VERSION} is already published on npm."
-fi
-ok "Version ${NEW_VERSION} is not yet published"
-
-# Templates present
-for dir in templates/kiro templates/docs templates/vscode templates/scripts; do
-	if [[ ! -d ${dir} ]]; then
-		fail "Missing ${dir} -- run pnpm prebuild first."
-	fi
-done
-ok "Template directories present"
 
 # ── Generate changelog ────────────────────────────────────────────────────────
 echo ""
@@ -301,5 +279,4 @@ echo "  Develop: merged back"
 echo ""
 echo "  Next steps:"
 echo "    git push origin main develop ${TAG_NAME}"
-echo "    npm publish  (or let CI handle it via the GitHub release)"
 echo ""

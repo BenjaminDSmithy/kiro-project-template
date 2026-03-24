@@ -267,7 +267,9 @@ scripts/
 templates/                # Bundled at build time (not in source control)
 ├── kiro/                 # .kiro/ hooks, settings, specs, steering
 ├── docs/                 # Documentation templates
-└── root/                 # Root project files (README, LICENSE, etc.)
+├── root/                 # Root project files (README, LICENSE, etc.)
+├── scripts/              # Release tooling (changelog, prepublish, release)
+└── vscode/               # VS Code settings template
 ```
 
 ### Dependency Injection
@@ -377,7 +379,7 @@ Seven safety checks that must all pass before publishing to npm:
 4. `dist/` directory is populated
 5. `package.json` version differs from latest npm version
 6. `CHANGELOG.md` mentions the current version
-7. `templates/kiro`, `templates/docs`, and `templates/vscode` directories exist
+7. `templates/kiro`, `templates/docs`, `templates/vscode`, and `templates/scripts` directories exist
 
 ```bash
 bash scripts/prepublish.sh

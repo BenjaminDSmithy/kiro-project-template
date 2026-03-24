@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Copyright (c) 2026 Binary Sword Pty Ltd. All rights reserved.
+# Copyright (c) {{YEAR}} {{COPYRIGHT_HOLDER}}. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root.
 #
-# Pre-publish safety checks for create-kiro-project.
+# Pre-publish safety checks.
 # Run before `npm publish` to catch common release mistakes.
 set -euo pipefail
 
@@ -44,8 +44,9 @@ fi
 echo "  ok dist/ is populated"
 
 # 5. Version check against npm registry
+PACKAGE_NAME=$(node -p "require('./package.json').name")
 CURRENT_VERSION=$(node -p "require('./package.json').version")
-PUBLISHED_VERSION=$(npm view create-kiro-project version 2>/dev/null || echo "0.0.0")
+PUBLISHED_VERSION=$(npm view "${PACKAGE_NAME}" version 2>/dev/null || echo "0.0.0")
 if [[ ${CURRENT_VERSION} == "${PUBLISHED_VERSION}" ]]; then
 	printf "  x Version %s is already published -- bump version first.\n" "${CURRENT_VERSION}"
 	exit 1
@@ -58,15 +59,6 @@ if ! grep -q "${CURRENT_VERSION}" CHANGELOG.md 2>/dev/null; then
 	exit 1
 fi
 printf "  ok CHANGELOG.md mentions version %s\n" "${CURRENT_VERSION}"
-
-# 7. Templates present
-for dir in templates/kiro templates/docs templates/vscode templates/scripts; do
-	if [[ ! -d ${dir} ]]; then
-		printf "  x Missing %s -- run pnpm prebuild first.\n" "${dir}"
-		exit 1
-	fi
-done
-echo "  ok Template directories present"
 
 echo ""
 echo "ok All pre-publish checks passed. Safe to publish."

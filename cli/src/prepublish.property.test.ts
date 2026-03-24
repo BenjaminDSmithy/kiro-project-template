@@ -73,6 +73,7 @@ describe(
       expect(content).toContain("CHANGELOG.md"); // 6. CHANGELOG updated
       expect(content).toContain("templates/kiro"); // 7. Templates present
       expect(content).toContain("templates/vscode"); // 7. Templates present (vscode)
+      expect(content).toContain("templates/scripts"); // 7. Templates present (scripts)
     });
 
     it("should use set -euo pipefail for strict error handling", () => {
