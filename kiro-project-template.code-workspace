@@ -120,6 +120,30 @@
         "runtimeArgs": ["${workspaceFolder}/cli/scripts/prepublish.sh"],
         "console": "integratedTerminal",
         "env": { "NODE_OPTIONS": "" }
+      },
+      {
+        "name": "🚢 CLI: Release (Gitflow)",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/cli/scripts/release.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
+      },
+      {
+        "type": "node-terminal",
+        "request": "launch",
+        "name": "── Templates ──────────────────",
+        "command": "echo"
+      },
+      {
+        "name": "📦 CLI: Copy Templates",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "/bin/bash",
+        "runtimeArgs": ["${workspaceFolder}/cli/scripts/copy-templates.sh"],
+        "console": "integratedTerminal",
+        "env": { "NODE_OPTIONS": "" }
       }
     ]
   },
@@ -190,6 +214,24 @@
         "options": { "cwd": "${workspaceFolder}/cli" },
         "problemMatcher": [],
         "presentation": { "reveal": "always", "panel": "dedicated", "group": "publish" }
+      },
+      {
+        "label": "🚢 CLI: Release (Gitflow)",
+        "type": "shell",
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/cli/scripts/release.sh"],
+        "options": { "cwd": "${workspaceFolder}/cli" },
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "focus": true, "group": "publish" }
+      },
+      {
+        "label": "📦 CLI: Copy Templates",
+        "type": "shell",
+        "command": "bash",
+        "args": ["-lc", "bash ${workspaceFolder}/cli/scripts/copy-templates.sh"],
+        "options": { "cwd": "${workspaceFolder}/cli" },
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated", "group": "cli" }
       }
     ]
   },
