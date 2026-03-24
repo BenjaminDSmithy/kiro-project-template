@@ -256,9 +256,10 @@ src/
 
 scripts/
 ├── build.sh              # Build wrapper
-├── changelog.sh          # CHANGELOG.md generator from conventional commits
+├── changelog.sh          # AI-powered release notes generator (Claude / ChatGPT)
 ├── copy-templates.sh     # Copies repo templates into cli/templates/ at build time
 ├── prepublish.sh         # 7-check safety gate before npm publish
+├── release.sh            # Gitflow release orchestrator
 ├── run-add.sh            # Dev helper: run add command
 ├── run-init.sh           # Dev helper: run init command
 └── test.sh               # Test runner wrapper
@@ -327,19 +328,44 @@ Runs only on GitHub release events (after build-and-test passes):
 
 ## Scripts
 
-### `scripts/changelog.sh`
+### `scripts/release.sh`
 
-Generates `CHANGELOG.md` entries from conventional commits between git tags, following the [Keep a Changelog](https://keepachangelog.com/) format.
+Gitflow release orchestrator. Walks you through a full release cycle interactively:
+
+1. Prompts for release type (major / minor / patch) and bumps `package.json` version
+2. Creates a `release/X.Y.Z` branch from `develop`
+3. Runs the full test suite and build
+4. Generates AI-powered changelog via `changelog.sh`
+5. Pauses for you to review, edit, and commit
+6. Verifies clean working tree, merges into `main`, tags `vX.Y.Z`
+7. Merges `main` back into `develop`
+8. Optionally deletes the release branch
 
 ```bash
-# Auto-detect tag range
+bash scripts/release.sh
+```
+
+Prerequisites: clean working tree on `develop`, plus `jq`/`curl` and an AI API key for changelog generation.
+
+### `scripts/changelog.sh`
+
+AI-powered release notes generator. Gathers commits between git tags, sends them to Claude or ChatGPT, and produces user-facing release notes with a friendly summary paragraph followed by a technical breakdown (Added, Changed, Fixed, etc.).
+
+```bash
+# Auto-detect tag range, write to CHANGELOG.md
 bash scripts/changelog.sh
+
+# Preview without writing
+bash scripts/changelog.sh --dry-run
 
 # Specify range explicitly
 bash scripts/changelog.sh v0.1.0 v0.2.0
+
+# Override AI model
+bash scripts/changelog.sh --model claude-sonnet-4-20250514
 ```
 
-Groups commits into Added (`feat`), Fixed (`fix`), and Changed (`refactor`) categories. Creates a new `CHANGELOG.md` if one doesn't exist.
+Provider auto-detection: uses Claude if `ANTHROPIC_API_KEY` is set in `.env`, otherwise falls back to OpenAI if `OPENAI_API_KEY` is set. Requires `jq` and `curl`.
 
 ### `scripts/prepublish.sh`
 
@@ -351,7 +377,7 @@ Seven safety checks that must all pass before publishing to npm:
 4. `dist/` directory is populated
 5. `package.json` version differs from latest npm version
 6. `CHANGELOG.md` mentions the current version
-7. `templates/kiro` and `templates/docs` directories exist
+7. `templates/kiro`, `templates/docs`, and `templates/vscode` directories exist
 
 ```bash
 bash scripts/prepublish.sh
