@@ -89,14 +89,13 @@ header() {
 ask() {
 	local prompt="$1" default="$2" var="$3"
 	if [[ -n ${!var-} ]]; then return; fi
+	local input
 	if [[ -n ${default} ]]; then
-		# shellcheck disable=SC2034 # input is used via eval on the next line
 		read -rp "$(echo -e "${COLOR_CYAN}?${COLOR_RESET}  ${prompt} ${COLOR_YELLOW}[${default}]${COLOR_RESET}: ")" input
-		eval "${var}=\"\${input:-${default}}\""
+		printf -v "${var}" '%s' "${input:-${default}}"
 	else
-		# shellcheck disable=SC2034 # input is used via eval on the next line
 		read -rp "$(echo -e "${COLOR_CYAN}?${COLOR_RESET}  ${prompt}: ")" input
-		eval "${var}=\"\${input}\""
+		printf -v "${var}" '%s' "${input}"
 	fi
 }
 
