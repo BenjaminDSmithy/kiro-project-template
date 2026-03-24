@@ -586,39 +586,101 @@ get_scaffolder_command
 if [[ -n ${SCAFFOLDER_CMD} ]]; then
 	header "Step 3b · Stack Scaffolder"
 
-	echo ""
-	echo "  The following official scaffolder will initialise your project:"
-	echo ""
-	echo -e "    ${COLOR_BOLD}Command:${COLOR_RESET}  ${SCAFFOLDER_CMD}"
-	echo -e "    ${COLOR_BOLD}Source:${COLOR_RESET}   ${SCAFFOLDER_URL}"
+	# --- Prerequisite check ---------------------------------------------------
+	# Determine which tool the scaffolder needs and verify it's installed.
+	_scaffolder_tool="${SCAFFOLDER_CMD%% *}" # first word of the command
+	case "${_scaffolder_tool}" in
+	npx | npm) _prereq="npx" ;;
+	pnpm) _prereq="pnpm" ;;
+	yarn) _prereq="yarn" ;;
+	bun | bunx) _prereq="bun" ;;
+	flutter) _prereq="flutter" ;;
+	*) _prereq="" ;;
+	esac
 
-	if [[ -n ${SCAFFOLDER_NOTE} ]]; then
-		echo ""
-		warn "${SCAFFOLDER_NOTE}"
-	fi
-
-	echo ""
-	echo "    1)  Yes — run the scaffolder now"
-	echo "    2)  No  — skip (you can run it manually later)"
-	echo ""
-
-	if [[ -z ${SCAFFOLD_CHOICE-} ]]; then
-		ask "Run scaffolder? [1-2]" "1" SCAFFOLD_CHOICE
-	fi
-
-	if [[ ${SCAFFOLD_CHOICE} == "1" ]]; then
-		info "Running: ${SCAFFOLDER_CMD}"
-		echo ""
-		if eval "${SCAFFOLDER_CMD}"; then
-			success "Scaffolder completed successfully."
-		else
-			warn "Scaffolder exited with a non-zero status. You may need to run it manually."
-			warn "Command: ${SCAFFOLDER_CMD}"
-		fi
+	if [[ -n ${_prereq} ]] && ! command -v "${_prereq}" &>/dev/null; then
+		err "${_prereq} is not installed but is required by the scaffolder."
+		warn "Install ${_prereq} first, then run the scaffolder manually:"
+		warn "  ${SCAFFOLDER_CMD}"
+		# Skip scaffolding — fall through to placeholder replacement
 	else
-		info "Skipped scaffolder. Run it manually later:"
-		info "  ${SCAFFOLDER_CMD}"
+		# --- Scaffold target directory ----------------------------------------
+		echo ""
+		echo "  The following official scaffolder will initialise your project:"
+		echo ""
+		echo -e "    ${COLOR_BOLD}Command:${COLOR_RESET}  ${SCAFFOLDER_CMD}"
+		echo -e "    ${COLOR_BOLD}Source:${COLOR_RESET}   ${SCAFFOLDER_URL}"
+
+		if [[ -n ${SCAFFOLDER_NOTE} ]]; then
+			echo ""
+			warn "${SCAFFOLDER_NOTE}"
+		fi
+
+		echo ""
+		info "Most scaffolders create a new subdirectory. You can also scaffold"
+		info "into the current directory (.) if the scaffolder supports it."
+		echo ""
+		echo "    1)  Current directory (.) — scaffold in place"
+		echo "    2)  New subdirectory   — let the scaffolder create one"
+		echo ""
+
+		if [[ -z ${SCAFFOLD_DIR_CHOICE-} ]]; then
+			ask "Scaffold location [1-2]" "2" SCAFFOLD_DIR_CHOICE
+		fi
+
+		if [[ ${SCAFFOLD_DIR_CHOICE} == "1" ]]; then
+			SCAFFOLD_DIR="."
+			info "Will scaffold into the current directory."
+		else
+			SCAFFOLD_DIR=""
+			info "Will let the scaffolder create a new subdirectory."
+		fi
+
+		echo ""
+		echo "    1)  Yes — run the scaffolder now"
+		echo "    2)  No  — skip (you can run it manually later)"
+		echo ""
+
+		if [[ -z ${SCAFFOLD_CHOICE-} ]]; then
+			ask "Run scaffolder? [1-2]" "1" SCAFFOLD_CHOICE
+		fi
+
+		if [[ ${SCAFFOLD_CHOICE} == "1" ]]; then
+			# Append target directory to command if user chose current dir
+			_full_cmd="${SCAFFOLDER_CMD}"
+			if [[ -n ${SCAFFOLD_DIR} ]]; then
+				_full_cmd="${SCAFFOLDER_CMD} ${SCAFFOLD_DIR}"
+			fi
+
+			info "Running: ${_full_cmd}"
+			echo ""
+			if run_cmd "${_full_cmd}"; then
+				success "Scaffolder completed successfully."
+
+				# --- Nested git repo warning ----------------------------------
+				# Some scaffolders run `git init` inside the new project. If we
+				# are already in a git repo, warn about the nested .git directory.
+				if [[ ${DRY_RUN} != "true" ]]; then
+					# Check for any new .git dirs that aren't the repo root's
+					_root_git="${SCRIPT_DIR}/.git"
+					while IFS= read -r -d '' _nested_git; do
+						if [[ ${_nested_git} != "${_root_git}" ]]; then
+							warn "Nested .git directory detected: ${_nested_git}"
+							warn "The scaffolder ran 'git init' inside the new project."
+							warn "You may want to remove it: rm -rf ${_nested_git}"
+						fi
+					done < <(find "${SCRIPT_DIR}" -maxdepth 3 -name ".git" -type d -print0 2>/dev/null)
+				fi
+			else
+				warn "Scaffolder exited with a non-zero status. You may need to run it manually."
+				warn "Command: ${_full_cmd}"
+			fi
+		else
+			info "Skipped scaffolder. Run it manually later:"
+			info "  ${SCAFFOLDER_CMD}"
+		fi
 	fi
+	unset _prereq _scaffolder_tool _full_cmd _root_git _nested_git
 elif [[ -n ${SCAFFOLDER_NOTE} ]]; then
 	header "Step 3b · Stack Scaffolder"
 	echo ""
