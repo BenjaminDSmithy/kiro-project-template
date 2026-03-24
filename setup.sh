@@ -72,7 +72,7 @@ DEFAULT_YEAR="$(date +%Y)"
 # ---------------------------------------------------------------------------
 echo ""
 echo -e "${BOLD}╔═══════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}║         Kiro Project Template — Setup Wizard         ║${NC}"
+echo -e "${BOLD}║         Kiro Project Template — Setup Wizard          ║${NC}"
 echo -e "${BOLD}╚═══════════════════════════════════════════════════════╝${NC}"
 echo ""
 
