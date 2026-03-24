@@ -17,6 +17,19 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
+# Headless mode — skip interactive prompts (requires env vars to be set)
+# Usage: ./setup.sh --headless
+#   or:  HEADLESS=true ./setup.sh
+# ---------------------------------------------------------------------------
+for arg in "$@"; do
+	case "${arg}" in
+	--headless) HEADLESS=true ;;
+	*) ;;
+	esac
+done
+export HEADLESS="${HEADLESS:-false}"
+
+# ---------------------------------------------------------------------------
 # Source shared libraries
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
