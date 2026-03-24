@@ -257,13 +257,13 @@ define_stack_preset() {
 	case "${STACK_CHOICE}" in
 	1) # T3 Stack
 		STACK_ROWS=(
-			"Language    | TypeScript    | 5.5+  | Strict mode, no \`any\`"
+			'Language    | TypeScript    | 5.5+  | Strict mode, no `any`'
 			"Framework   | Next.js       | 15.x  | App Router, Server Components default"
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first, no custom CSS files"
 			"Database    | PostgreSQL    | 16    | Via Drizzle ORM, type-safe queries"
 			"Auth        | NextAuth.js   | 5.x   | Credential + OAuth providers"
 			"API         | tRPC          | 11.x  | End-to-end type-safe RPC"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -271,14 +271,14 @@ define_stack_preset() {
 		;;
 	2) # T4 Stack
 		STACK_ROWS=(
-			"Language    | TypeScript    | 5.5+  | Strict mode, no \`any\`"
+			'Language    | TypeScript    | 5.5+  | Strict mode, no `any`'
 			"Framework   | Next.js       | 15.x  | App Router, Server Components default"
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first, no custom CSS files"
 			"Database    | PostgreSQL    | 16    | Via Supabase + Drizzle ORM"
 			"Auth        | Supabase Auth | 2.x   | Email + OAuth providers"
 			"API         | tRPC          | 11.x  | End-to-end type-safe RPC"
 			"Realtime    | Supabase RT   | 2.x   | WebSocket subscriptions"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -286,12 +286,12 @@ define_stack_preset() {
 		;;
 	3) # Supabase + Next.js
 		STACK_ROWS=(
-			"Language    | TypeScript    | 5.5+  | Strict mode, no \`any\`"
+			'Language    | TypeScript    | 5.5+  | Strict mode, no `any`'
 			"Framework   | Next.js       | 15.x  | App Router, Server Components default"
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first, no custom CSS files"
 			"Database    | PostgreSQL    | 16    | Via Supabase, Row Level Security on"
 			"Auth        | Supabase Auth | 2.x   | Email + OAuth providers"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -299,12 +299,12 @@ define_stack_preset() {
 		;;
 	4) # Vite + React
 		STACK_ROWS=(
-			"Language    | TypeScript    | 5.5+  | Strict mode, no \`any\`"
+			'Language    | TypeScript    | 5.5+  | Strict mode, no `any`'
 			"Framework   | React + Vite  | 19/6  | SPA, client-side rendering"
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first, no custom CSS files"
 			"Database    | —             | —     | API-driven, no direct DB access"
 			"Auth        | —             | —     | Depends on backend choice"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -317,7 +317,7 @@ define_stack_preset() {
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first"
 			"Database    | PostgreSQL    | 16    | Via Drizzle ORM"
 			"Auth        | Lucia         | 3.x   | Session-based auth"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -330,7 +330,7 @@ define_stack_preset() {
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first"
 			"Database    | PostgreSQL    | 16    | Via Drizzle ORM"
 			"Auth        | Nuxt Auth     | —     | Session-based auth"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -338,12 +338,12 @@ define_stack_preset() {
 		;;
 	7) # Remix
 		STACK_ROWS=(
-			"Language    | TypeScript    | 5.5+  | Strict mode, no \`any\`"
+			'Language    | TypeScript    | 5.5+  | Strict mode, no `any`'
 			"Framework   | Remix         | 2.x   | Nested routes, loader/action pattern"
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first"
 			"Database    | PostgreSQL    | 16    | Via Drizzle ORM"
 			"Auth        | Remix Auth    | —     | Session-based auth"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -356,7 +356,7 @@ define_stack_preset() {
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first"
 			"Database    | —             | —     | Content collections or API-driven"
 			"Auth        | —             | —     | Depends on integration"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -377,12 +377,12 @@ define_stack_preset() {
 		;;
 	10) # Electron
 		STACK_ROWS=(
-			"Language    | TypeScript    | 5.5+  | Strict mode, no \`any\`"
+			'Language    | TypeScript    | 5.5+  | Strict mode, no `any`'
 			"Framework   | Electron      | 33.x  | Main + renderer process"
 			"UI          | React         | 19.x  | Renderer process UI"
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first"
 			"Database    | SQLite        | —     | Local-first via better-sqlite3"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
@@ -402,14 +402,14 @@ define_stack_preset() {
 		;;
 	12) # TanStack Start
 		STACK_ROWS=(
-			"Language    | TypeScript    | 5.5+  | Strict mode, no \`any\`"
+			'Language    | TypeScript    | 5.5+  | Strict mode, no `any`'
 			"Framework   | TanStack Start| 1.x   | Full-stack React with Vite + Nitro"
 			"Routing     | TanStack Router| 1.x  | Type-safe file-based routing"
 			"Data        | TanStack Query| 5.x   | Server state management"
 			"Styling     | Tailwind CSS  | 4.x   | Utility-first, no custom CSS files"
 			"Database    | PostgreSQL    | 16    | Via Drizzle ORM"
 			"Auth        | —             | —     | Flexible (Supabase Auth or custom)"
-			"Testing     | Vitest        | 2.x   | Co-located tests, \`--run\` flag"
+			'Testing     | Vitest        | 2.x   | Co-located tests, `--run` flag'
 			"Linting     | Trunk         | 1.25+ | Single tool for lint + format"
 			"Package Mgr | ${PKG_MGR}    | —     | —"
 		)
