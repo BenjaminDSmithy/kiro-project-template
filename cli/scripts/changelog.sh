@@ -2,15 +2,15 @@
 # Copyright (c) 2026 Binary Sword Pty Ltd. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root.
 #
-# AI-powered changelog generator.
+# AI-powered release notes generator.
 # Gathers conventional commits between git tags and uses Claude or ChatGPT
-# to produce user-facing changelog entries in Keep a Changelog format.
+# to produce user-facing release notes for npm package releases.
 #
 # Usage:
 #   bash scripts/changelog.sh [options] [from-tag] [to-tag]
 #
 # Options:
-#   --write       Write directly to CHANGELOG.md (default: stdout)
+#   --dry-run     Preview to stdout without updating CHANGELOG.md
 #   --model NAME  Override the AI model (default: auto per provider)
 #   --help        Show this help message
 #
@@ -28,7 +28,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${SCRIPT_DIR}"
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
-WRITE_MODE=false
+WRITE_MODE=true
 MODEL_OVERRIDE=""
 CHANGELOG="CHANGELOG.md"
 
@@ -36,8 +36,8 @@ CHANGELOG="CHANGELOG.md"
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
 	case "$1" in
-	--write)
-		WRITE_MODE=true
+	--dry-run)
+		WRITE_MODE=false
 		shift
 		;;
 	--model)
@@ -62,10 +62,14 @@ if [[ ! -f ${ENV_FILE} ]]; then
 	ENV_FILE="${SCRIPT_DIR}/../.env"
 fi
 if [[ -f ${ENV_FILE} ]]; then
-	set -a
-	# shellcheck source=/dev/null
-	source "${ENV_FILE}"
-	set +a
+	# Export only uncommented KEY=VALUE lines (safe for values with special chars)
+	while IFS='=' read -r key value; do
+		# Skip blank lines and comments
+		[[ -z ${key} || ${key} == \#* ]] && continue
+		# Trim leading/trailing whitespace from key
+		key=$(echo "${key}" | xargs)
+		export "${key}=${value}"
+	done <"${ENV_FILE}"
 fi
 
 # ── Detect provider ──────────────────────────────────────────────────────────
@@ -107,21 +111,40 @@ echo "Found ${COMMIT_COUNT} commits in ${RANGE:-all history}" >&2
 echo "Using provider: ${PROVIDER}" >&2
 
 # ── System prompt ─────────────────────────────────────────────────────────────
-# Adjust this prompt to match your project's changelog style.
+# Adjust this prompt to match your project's release notes style.
 read -r -d '' SYSTEM_PROMPT <<'PROMPT_EOF' || true
-You are a changelog writer for an npm package. You receive a list of git commits
-and produce a user-facing changelog entry in Keep a Changelog format.
+You are a release notes writer for an npm package called create-kiro-project.
+You receive a list of git commits and produce user-facing release notes in two
+sections.
+
+Output format (follow exactly):
+
+SECTION 1 — Summary paragraph:
+Write a short, friendly paragraph (2-4 sentences) summarising what this release
+brings. Speak directly to the developer installing the package. Keep it warm and
+informative — no marketing fluff.
+
+SECTION 2 — Technical breakdown:
+Group entries under these headings (omit any that are empty):
+  ### Added
+  ### Changed
+  ### Fixed
+  ### Removed
+  ### Security
 
 Rules:
-- Write from the end-user's perspective — what they gain, not what files changed.
+- Write for the npm package consumer — focus on what they get in this release.
 - Strip conventional commit prefixes (feat, fix, refactor, etc.) from output.
-- Group entries under: Added, Changed, Fixed, Removed, Security (omit empty sections).
-- Each bullet should be a single concise sentence.
+- Each bullet should be a single concise sentence — no fluff.
 - Merge related commits into one bullet where it makes sense.
-- Ignore commits about internal tooling, CI, steering docs, or template files
-  unless they directly affect the end-user experience.
+- Ignore commits about internal tooling, CI, steering docs, linting config,
+  or template files unless they directly affect the package consumer.
+- If any breaking changes exist, add a ### Breaking Changes section before all
+  other headings and describe the migration path.
 - Use Australian English (optimise, behaviour, colour, etc.).
-- Do NOT include a version header — just the grouped sections.
+- Do NOT include a version header — just the summary paragraph then the grouped
+  sections.
+- Separate the summary paragraph from the first ### heading with a blank line.
 - Output raw markdown only — no code fences, no preamble, no commentary.
 PROMPT_EOF
 
@@ -258,7 +281,9 @@ if [[ ${WRITE_MODE} == true ]]; then
 			echo "${ENTRY}"
 		} >"${CHANGELOG}"
 	fi
-	echo "✔ Updated ${CHANGELOG} with version ${VERSION}" >&2
+	echo "Updated ${CHANGELOG} with version ${VERSION}" >&2
 else
 	echo "${ENTRY}"
+	echo ""
+	echo "(dry run — pass without --dry-run to update ${CHANGELOG})" >&2
 fi
