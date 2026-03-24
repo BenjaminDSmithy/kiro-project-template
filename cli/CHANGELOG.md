@@ -49,7 +49,7 @@ Initial release of `create-kiro-project`.
 
 ### Testing
 
-- 151 passing tests across 21 test files (+ 5 E2E tests that run against built dist/)
+- 156 passing tests across 22 test files (including E2E tests that run against built dist/)
 - 12 property-based tests via fast-check verifying correctness invariants
 - Integration tests covering full scaffold, inject, dry-run parity, config resolution, and custom stacks
 - E2E tests exercising the CLI as a subprocess against `dist/index.js`
