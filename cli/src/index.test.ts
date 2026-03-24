@@ -6,7 +6,12 @@ import { parseArgs } from "./index.js";
 describe("parseArgs", () => {
   it("returns defaults when no arguments provided", () => {
     const flags = parseArgs([]);
-    expect(flags).toEqual({ add: false, yes: false });
+    expect(flags).toEqual({
+      add: false,
+      yes: false,
+      dryRun: false,
+      verbose: false,
+    });
   });
 
   it("parses --add flag", () => {
@@ -86,6 +91,8 @@ describe("parseArgs", () => {
       stack: "t4",
       pkg: "yarn",
       yes: true,
+      dryRun: false,
+      verbose: false,
     });
   });
 

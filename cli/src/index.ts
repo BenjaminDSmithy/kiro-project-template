@@ -3,6 +3,17 @@
 /* create-kiro-project CLI entry point */
 
 import { createRequire } from "node:module";
+import path from "node:path";
+
+import { loadConfig } from "./config.js";
+import type { ProjectConfigFile } from "./config.js";
+import { previewAdd, previewInit, formatPlan } from "./dry-run.js";
+import { createLogger } from "./logger.js";
+import type { VerboseLogger } from "./logger.js";
+import { createProgress } from "./progress.js";
+import type { ProgressReporter } from "./progress.js";
+import { gatherConfig } from "./prompts.js";
+import { validateTemplateDir } from "./validator.js";
 
 /**
  * CLI flags parsed from process.argv.
@@ -15,6 +26,9 @@ import { createRequire } from "node:module";
  * @property stack - Stack preset identifier
  * @property pkg - Package manager (npm, pnpm, yarn, bun)
  * @property yes - Accept all defaults without prompting
+ * @property dryRun - Preview operations without writing to disk (--dry-run)
+ * @property verbose - Enable detailed logging to stderr (--verbose)
+ * @property config - Explicit path to a .create-kiro-project.json config file (--config)
  */
 export type CliFlags = {
   add: boolean;
@@ -25,6 +39,24 @@ export type CliFlags = {
   stack?: string;
   pkg?: string;
   yes: boolean;
+  dryRun: boolean;
+  verbose: boolean;
+  config?: string;
+};
+
+/**
+ * Options object passed to `init()` and `add()` for dependency injection.
+ * Created in `main()` based on parsed flags and passed through — commands
+ * don't create their own dependencies.
+ *
+ * @property logger - Verbose logger instance (no-op when --verbose is off)
+ * @property progress - Progress reporter for spinner and file-count feedback
+ * @property configDefaults - Defaults loaded from the config file (may be empty)
+ */
+export type CommandOptions = {
+  logger: VerboseLogger;
+  progress: ProgressReporter;
+  configDefaults: ProjectConfigFile;
 };
 
 const VALID_ONLY_VALUES = ["steering", "hooks", "specs", "settings"] as const;
@@ -39,6 +71,8 @@ export function parseArgs(argv: string[]): CliFlags {
   const flags: CliFlags = {
     add: false,
     yes: false,
+    dryRun: false,
+    verbose: false,
   };
 
   for (let i = 0; i < argv.length; i++) {
@@ -89,6 +123,17 @@ export function parseArgs(argv: string[]): CliFlags {
       case "-y":
         flags.yes = true;
         break;
+      case "--dry-run":
+        flags.dryRun = true;
+        break;
+      case "--verbose":
+        flags.verbose = true;
+        break;
+      case "--config": {
+        const value = argv[++i];
+        if (value) flags.config = value;
+        break;
+      }
     }
   }
 
@@ -108,6 +153,9 @@ Options:
   --yes, -y              Accept all defaults
   --add                  Inject .kiro/ into current directory
   --only <subset>        With --add: only copy steering, hooks, specs, or settings
+  --dry-run              Preview operations without writing to disk
+  --verbose              Enable detailed logging to stderr
+  --config <path>        Path to .create-kiro-project.json config file
   --help                 Show this help message
   --version              Show version number
 `);
@@ -118,6 +166,12 @@ function printVersion(): void {
   const pkg = require("../package.json") as { version: string };
   console.log(pkg.version);
 }
+
+/** Resolve the bundled templates directory relative to the built output. */
+const TEMPLATES_DIR = path.resolve(__dirname, "..", "templates");
+
+/** Active progress reporter — stopped on SIGINT for clean exit. */
+let activeProgress: ProgressReporter | undefined;
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
@@ -134,17 +188,42 @@ async function main(): Promise<void> {
 
   const flags = parseArgs(argv);
 
-  if (flags.add) {
+  // Load config file defaults (explicit path or auto-discovery)
+  const configDefaults = loadConfig(process.cwd(), flags.config);
+
+  // Create dependency instances based on parsed flags
+  const logger = createLogger(flags.verbose);
+  const progress = createProgress();
+  activeProgress = progress;
+
+  // Validate templates directory before any command execution
+  validateTemplateDir(TEMPLATES_DIR);
+
+  const options: CommandOptions = { logger, progress, configDefaults };
+
+  if (flags.dryRun) {
+    // Dry-run mode — gather config via prompts, then preview
+    const config = await gatherConfig(flags);
+
+    if (flags.add) {
+      const plan = await previewAdd(config, TEMPLATES_DIR, flags.only);
+      console.log(formatPlan(plan));
+    } else {
+      const plan = await previewInit(config, TEMPLATES_DIR);
+      console.log(formatPlan(plan));
+    }
+  } else if (flags.add) {
     const { add } = await import("./commands/add.js");
-    await add(flags);
+    await add(flags, options);
   } else {
     const { init } = await import("./commands/init.js");
-    await init(flags);
+    await init(flags, options);
   }
 }
 
-// Graceful exit on Ctrl+C with no partial output
+// Graceful exit on Ctrl+C — stop progress reporter, then exit
 process.on("SIGINT", () => {
+  if (activeProgress) activeProgress.stop();
   process.exit(0);
 });
 
