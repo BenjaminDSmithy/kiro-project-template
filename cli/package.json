@@ -30,5 +30,23 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BinarySword/kiro-project-template.git",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/BinarySword/kiro-project-template#readme",
+  "bugs": "https://github.com/BinarySword/kiro-project-template/issues",
+  "keywords": [
+    "kiro",
+    "scaffold",
+    "template",
+    "cli",
+    "create-project",
+    "project-generator",
+    "ai",
+    "agent"
+  ],
+  "funding": "https://buymeacoffee.com/benjamindsmithy"
 }
