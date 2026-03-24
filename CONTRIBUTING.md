@@ -22,7 +22,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/create-kiro-project.git
+git clone https://github.com/BinarySword/kiro-project-template.git
 
 # Install dependencies
 pnpm install
