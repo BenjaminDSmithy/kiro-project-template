@@ -110,12 +110,20 @@ COMMIT_COUNT=$(echo "${RAW_COMMITS}" | wc -l | tr -d ' ')
 echo "Found ${COMMIT_COUNT} commits in ${RANGE:-all history}" >&2
 echo "Using provider: ${PROVIDER}" >&2
 
+# ── Gather existing changelog for style reference ─────────────────────────────
+EXISTING_ENTRIES=""
+if [[ -f ${CHANGELOG} ]]; then
+	# Extract up to 100 lines of existing entries (skip the header/boilerplate)
+	EXISTING_ENTRIES=$(sed -n '/^## \[/,$ p' "${CHANGELOG}" | head -100)
+fi
+
 # ── System prompt ─────────────────────────────────────────────────────────────
 # Adjust this prompt to match your project's release notes style.
 read -r -d '' SYSTEM_PROMPT <<'PROMPT_EOF' || true
 You are a release notes writer for an npm package called create-kiro-project.
 You receive a list of git commits and produce user-facing release notes in two
-sections.
+sections. You MUST match the exact style, tone, and formatting of the existing
+changelog entries provided as reference.
 
 Output format (follow exactly):
 
@@ -132,10 +140,20 @@ Group entries under these headings (omit any that are empty):
   ### Removed
   ### Security
 
-Rules:
+Formatting rules (CRITICAL — match existing style exactly):
+- Each heading (### Added, ### Changed, etc.) must be preceded by a blank line.
+- Each bullet starts with "- " (hyphen space) and is a single concise sentence
+  ending with a full stop.
+- NO sub-headings (#### ...) under the ### sections — flat bullet lists only.
+- NO nested bullets or indented sub-items.
+- NO "### Testing" section — fold test-related items into ### Added or omit.
+- NO bold text, no inline code blocks in bullets unless naming a specific flag
+  or command (e.g. `--dry-run`).
+- Keep bullets short: one line each, no wrapping into multi-line paragraphs.
+
+Content rules:
 - Write for the npm package consumer — focus on what they get in this release.
 - Strip conventional commit prefixes (feat, fix, refactor, etc.) from output.
-- Each bullet should be a single concise sentence — no fluff.
 - Merge related commits into one bullet where it makes sense.
 - Ignore commits about internal tooling, CI, steering docs, linting config,
   or template files unless they directly affect the package consumer.
@@ -148,9 +166,20 @@ Rules:
 - Output raw markdown only — no code fences, no preamble, no commentary.
 PROMPT_EOF
 
-USER_PROMPT="Generate changelog entries for version ${VERSION} from these commits:
+# Build user prompt with optional style reference
+if [[ -n ${EXISTING_ENTRIES} ]]; then
+	USER_PROMPT="Generate changelog entries for version ${VERSION} from these commits:
+
+${RAW_COMMITS}
+
+Here are the existing changelog entries for style reference — match this format exactly:
+
+${EXISTING_ENTRIES}"
+else
+	USER_PROMPT="Generate changelog entries for version ${VERSION} from these commits:
 
 ${RAW_COMMITS}"
+fi
 
 # ── API call: Anthropic (Claude) ──────────────────────────────────────────────
 call_anthropic() {
@@ -256,18 +285,57 @@ ENTRY="## [${VERSION}] - ${DATE}
 
 ${AI_OUTPUT}"
 
+# ── Remove existing entry for same version (if any) ─────────────────────────
+strip_version_entry() {
+	local file="$1"
+	local ver="$2"
+	local in_target=false
+	local result=""
+	local line
+
+	while IFS= read -r line || [[ -n ${line} ]]; do
+		# Detect start of the target version section
+		if [[ ${line} == "## [${ver}]"* ]]; then
+			in_target=true
+			continue
+		fi
+		# Detect start of the next version section — stop stripping
+		if ${in_target} && [[ ${line} == "## ["* ]]; then
+			in_target=false
+		fi
+		if ! ${in_target}; then
+			result+="${line}"$'\n'
+		fi
+	done <"${file}"
+
+	echo "${result}"
+}
+
 # ── Output or write ──────────────────────────────────────────────────────────
 if [[ ${WRITE_MODE} == true ]]; then
 	if [[ -f ${CHANGELOG} ]]; then
-		EXISTING=$(cat "${CHANGELOG}")
-		# Remove the top heading and any leading blank lines
-		BODY=$(echo "${EXISTING}" | sed '1{/^# Changelog$/d;}' | sed '/./,$!d')
+		# Strip any existing entry for this version so we replace rather than duplicate
+		CLEANED=$(strip_version_entry "${CHANGELOG}" "${VERSION}")
+		# Remove the top heading and boilerplate, then any leading blank lines
+		BODY=$(echo "${CLEANED}" |
+			sed '1{/^# Changelog$/d;}' |
+			sed '/^All notable changes/d' |
+			sed '/^The format is based on/d' |
+			sed '/^and this project adheres/d' |
+			sed '/./,$!d')
 		{
 			echo "# Changelog"
 			echo ""
-			echo "${ENTRY}"
+			echo "All notable changes to this project will be documented in this file."
 			echo ""
-			echo "${BODY}"
+			echo "The format is based on [Keep a Changelog](https://keepachangelog.com/),"
+			echo "and this project adheres to [Semantic Versioning](https://semver.org/)."
+			echo ""
+			echo "${ENTRY}"
+			if [[ -n ${BODY} ]]; then
+				echo ""
+				echo "${BODY}"
+			fi
 		} >"${CHANGELOG}"
 	else
 		{
