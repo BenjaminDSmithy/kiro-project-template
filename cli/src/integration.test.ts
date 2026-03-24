@@ -5,6 +5,7 @@ import {
   mkdir,
   readdir,
   readFile,
+  realpath,
   rm,
   writeFile,
 } from "node:fs/promises";
@@ -12,15 +13,19 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { loadConfig } from "./config.js";
+import { previewInit } from "./dry-run.js";
 import { replacePlaceholders } from "./replacer.js";
-import { STACK_PRESETS } from "./stacks.js";
+import { loadCustomStacks, STACK_PRESETS } from "./stacks.js";
 import { copyDir } from "./utils.js";
 
 /** Shared temp directories for each test. */
 let tempDir: string;
 
 beforeEach(async () => {
-  tempDir = await mkdtemp(path.join(tmpdir(), "integration-test-"));
+  tempDir = await realpath(
+    await mkdtemp(path.join(tmpdir(), "integration-test-")),
+  );
 });
 
 afterEach(async () => {
@@ -332,6 +337,173 @@ describe("Non-interactive mode sanity check", () => {
 
     for (const [index, name] of expectedMappings) {
       expect(STACK_PRESETS[index].name).toBe(name);
+    }
+  });
+});
+
+describe("Dry-run vs normal parity", () => {
+  it("should list the same files in previewInit as would be created by init", async () => {
+    // Arrange — create a mini template structure
+    const realTemplateRoot = path.join(tempDir, "templates-dryrun");
+    await mkdir(path.join(realTemplateRoot, "kiro", "hooks"), {
+      recursive: true,
+    });
+    await mkdir(path.join(realTemplateRoot, "kiro", "settings"), {
+      recursive: true,
+    });
+    await mkdir(path.join(realTemplateRoot, "docs"), { recursive: true });
+    await mkdir(path.join(realTemplateRoot, "root"), { recursive: true });
+
+    await writeFile(
+      path.join(realTemplateRoot, "kiro", "README.md"),
+      "# {{PROJECT_NAME}}",
+      "utf-8",
+    );
+    await writeFile(
+      path.join(realTemplateRoot, "kiro", "hooks", "01-hook.md"),
+      "Hook",
+      "utf-8",
+    );
+    await writeFile(
+      path.join(realTemplateRoot, "docs", "README.md"),
+      "Docs",
+      "utf-8",
+    );
+    await writeFile(
+      path.join(realTemplateRoot, "root", "README.md"),
+      "Root",
+      "utf-8",
+    );
+
+    const config = {
+      projectName: "parity-test",
+      copyrightHolder: "Test",
+      year: "2025",
+      stackChoice: 12, // Custom — no cleanup
+      pkgManager: "npm",
+      cleanupSteering: false,
+      removeExamples: false,
+    };
+
+    // Act — run previewInit
+    const origCwd = process.cwd();
+    process.chdir(tempDir);
+    try {
+      const plan = await previewInit(config, realTemplateRoot);
+
+      // Also simulate the actual init copy
+      const target = path.join(tempDir, config.projectName);
+      await mkdir(target, { recursive: true });
+      await copyDir(
+        path.join(realTemplateRoot, "kiro"),
+        path.join(target, ".kiro"),
+      );
+      await copyDir(
+        path.join(realTemplateRoot, "docs"),
+        path.join(target, "docs"),
+      );
+      const rootEntries = await readdir(path.join(realTemplateRoot, "root"));
+      for (const entry of rootEntries) {
+        await copyDir(
+          path.join(realTemplateRoot, "root", entry),
+          path.join(target, entry),
+        );
+      }
+
+      // Collect actual files created
+      const actualFiles: string[] = [];
+      async function walk(dir: string): Promise<void> {
+        const entries = await readdir(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          const full = path.join(dir, entry.name);
+          if (entry.isDirectory()) {
+            await walk(full);
+          } else {
+            actualFiles.push(full);
+          }
+        }
+      }
+      await walk(target);
+
+      // Assert — plan files should match actual files (compare basenames to
+      // avoid macOS /tmp → /private/var symlink path resolution differences)
+      const planFileSet = new Set(plan.files.map((f) => path.basename(f)));
+      const actualFileSet = new Set(actualFiles.map((f) => path.basename(f)));
+
+      expect(planFileSet).toEqual(actualFileSet);
+      expect(plan.files.length).toBe(actualFiles.length);
+    } finally {
+      process.chdir(origCwd);
+    }
+  });
+});
+
+describe("Config file resolution", () => {
+  it("should find config at nearest ancestor directory", async () => {
+    // Arrange — create nested directories with config at the top
+    const root = path.join(tempDir, "config-walk");
+    const nested = path.join(root, "a", "b", "c");
+    await mkdir(nested, { recursive: true });
+
+    const configData = {
+      copyrightHolder: "Walk Corp",
+      pkgManager: "pnpm",
+    };
+    await writeFile(
+      path.join(root, ".create-kiro-project.json"),
+      JSON.stringify(configData),
+      "utf-8",
+    );
+
+    // Act — load from the deeply nested directory
+    const result = loadConfig(nested);
+
+    // Assert — should find the ancestor config
+    expect(result.copyrightHolder).toBe("Walk Corp");
+    expect(result.pkgManager).toBe("pnpm");
+  });
+
+  it("should return empty object when no config exists", async () => {
+    // Arrange — isolated temp dir with no config file
+    const isolated = path.join(tempDir, "no-config");
+    await mkdir(isolated, { recursive: true });
+
+    // Act
+    const result = loadConfig(isolated);
+
+    // Assert
+    expect(result).toEqual({});
+  });
+});
+
+describe("Custom stacks end-to-end", () => {
+  it("should load custom stacks and assign indices after built-in presets", async () => {
+    // Arrange — write a stacks.json fixture
+    const customStacks = [
+      {
+        name: "MyCustomStack",
+        rows: ["| Framework | Custom | 1.0 | None |"],
+        approved: "Custom approved list",
+        keepSteering: ["00-core-rules.md"],
+      },
+    ];
+    const stacksPath = path.join(tempDir, "stacks.json");
+    await writeFile(stacksPath, JSON.stringify(customStacks), "utf-8");
+
+    // Act — load custom stacks merged with built-in
+    const merged = loadCustomStacks(stacksPath, STACK_PRESETS);
+
+    // Assert — custom stack exists at index 13 (after 0-12 built-in)
+    const builtInCount = Object.keys(STACK_PRESETS).length;
+    expect(merged[builtInCount]).toBeDefined();
+    expect(merged[builtInCount].name).toBe("MyCustomStack");
+    expect(merged[builtInCount].rows).toEqual([
+      "| Framework | Custom | 1.0 | None |",
+    ]);
+
+    // Assert — all built-in presets are preserved
+    for (let i = 0; i < builtInCount; i++) {
+      expect(merged[i].name).toBe(STACK_PRESETS[i].name);
     }
   });
 });

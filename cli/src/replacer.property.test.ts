@@ -26,13 +26,14 @@ Name again: {{PROJECT_NAME}}`;
 
 describe("replacePlaceholders — Property Tests", () => {
   /**
-   * **Validates: Requirements R4.1, R4.2**
+   * **Validates: Requirements R4.1, R4.2, 5.3**
    *
    * Property 1: Placeholder Completeness
+   * Property 5: Placeholder Exhaustion
    *
    * For any set of replacement values (including special characters),
    * no {{PROJECT_NAME}}, {{COPYRIGHT_HOLDER}}, or {{YEAR}} tokens
-   * shall remain in any processed file.
+   * shall remain in any processed file after replacePlaceholders() completes.
    */
   it(
     "should leave no placeholder tokens after replacement for any input values",
