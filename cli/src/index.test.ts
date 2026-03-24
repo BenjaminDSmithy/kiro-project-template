@@ -1,4 +1,9 @@
-/* Tests for CLI argument parsing */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * Tests for CLI argument parsing
+ */
 
 import { describe, expect, it } from "vitest";
 import { parseArgs } from "./index.js";

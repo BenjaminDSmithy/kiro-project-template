@@ -1,4 +1,9 @@
-/* create-kiro-project shared prompts module */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * create-kiro-project shared prompts module
+ */
 
 import path from "node:path";
 import prompts from "prompts";

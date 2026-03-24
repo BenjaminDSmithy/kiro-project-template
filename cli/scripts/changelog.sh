@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root.
+#
 # Generates CHANGELOG.md entries from conventional commits between tags.
 # Follows the Keep a Changelog format (https://keepachangelog.com/).
 # Usage: bash scripts/changelog.sh [from-tag] [to-tag]

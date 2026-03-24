@@ -1,4 +1,9 @@
-/* create-kiro-project index property tests */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * create-kiro-project index property tests
+ */
 
 import * as fc from "fast-check";
 import { describe, it, expect } from "vitest";

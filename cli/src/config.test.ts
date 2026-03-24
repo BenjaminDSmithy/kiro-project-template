@@ -1,4 +1,9 @@
-/* Unit tests for configuration file loader module */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * Unit tests for configuration file loader module
+ */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";

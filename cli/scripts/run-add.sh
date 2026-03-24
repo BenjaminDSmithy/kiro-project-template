@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root.
+#
 # Run the CLI add command (inject .kiro/ into current directory)
 # Builds first if needed, then runs the CLI with --add flag
 set -euo pipefail

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root.
+#
 # Pre-publish safety checks for create-kiro-project.
 # Run before `npm publish` to catch common release mistakes.
 set -euo pipefail

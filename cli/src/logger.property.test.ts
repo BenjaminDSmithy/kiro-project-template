@@ -1,4 +1,9 @@
-/* Property-based tests for verbose logger zero overhead */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * Property-based tests for verbose logger zero overhead
+ */
 
 import * as fc from "fast-check";
 import { afterEach, describe, it, vi } from "vitest";

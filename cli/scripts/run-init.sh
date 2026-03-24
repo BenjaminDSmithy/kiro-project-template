@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root.
+#
 # Run the CLI init command (interactive mode)
 # Builds first if needed, then runs the CLI entry point
 set -euo pipefail

@@ -1,4 +1,9 @@
-/* create-kiro-project dry-run property tests */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * create-kiro-project dry-run property tests
+ */
 
 import * as fc from "fast-check";
 import { afterEach, beforeEach, describe, it } from "vitest";

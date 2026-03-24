@@ -1,4 +1,9 @@
-/* create-kiro-project — init command (scaffold) */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * create-kiro-project — init command (scaffold)
+ */
 
 import { existsSync } from "node:fs";
 import { mkdir, readdir, unlink, writeFile } from "node:fs/promises";

@@ -1,4 +1,9 @@
-/* create-kiro-project — add command (inject .kiro/) */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * create-kiro-project — add command (inject .kiro/)
+ */
 
 import { existsSync } from "node:fs";
 import path from "node:path";

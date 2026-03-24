@@ -1,4 +1,9 @@
-/* Tests for gatherConfig prompt skipping and --yes defaults */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * Tests for gatherConfig prompt skipping and --yes defaults
+ */
 
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";

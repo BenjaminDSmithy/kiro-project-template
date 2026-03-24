@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root.
+#
 # copy-templates.sh
 # Copies template files from the repository root into cli/templates/ at build time.
 # Run from the cli/ directory (or via `pnpm prebuild`).

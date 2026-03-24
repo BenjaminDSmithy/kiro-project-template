@@ -1,4 +1,9 @@
-/* create-kiro-project dry-run unit tests */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * create-kiro-project dry-run unit tests
+ */
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {

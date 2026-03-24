@@ -1,4 +1,9 @@
-/* Property-based tests for placeholder replacement completeness */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * Property-based tests for placeholder replacement completeness
+ */
 
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";

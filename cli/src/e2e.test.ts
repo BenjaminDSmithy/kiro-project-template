@@ -1,4 +1,9 @@
-/* create-kiro-project — E2E tests via built CLI */
+/*
+ * Copyright (c) 2026 Benjamin D. Smith. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root.
+ *
+ * create-kiro-project — E2E tests via built CLI
+ */
 
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
