@@ -58,6 +58,10 @@ show_project_banner "Setup Wizard"
 header "Step 1 · Project Identity"
 
 ask "Project name" "${DEFAULT_PROJECT_NAME}" PROJECT_NAME
+if ! validate_project_name "${PROJECT_NAME}"; then
+	err "Invalid project name."
+	exit 1
+fi
 ask "Copyright holder (company or person)" "" COPYRIGHT_HOLDER
 while true; do
 	ask "Copyright year (e.g. 2026 or 2022-2026)" "${DEFAULT_YEAR}" YEAR
