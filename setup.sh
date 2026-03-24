@@ -610,16 +610,16 @@ fi
 header "Setup Complete"
 
 echo ""
-echo -e "  ${BOLD}Project:${NC}     ${PROJECT_NAME}"
-echo -e "  ${BOLD}Copyright:${NC}   ${YEAR} ${COPYRIGHT_HOLDER}"
-echo -e "  ${BOLD}Stack:${NC}       ${STACK_NAME}"
-echo -e "  ${BOLD}Pkg Manager:${NC} ${PKG_MGR}"
+echo -e "  ${COLOR_BOLD}Project:${COLOR_RESET}     ${PROJECT_NAME}"
+echo -e "  ${COLOR_BOLD}Copyright:${COLOR_RESET}   ${YEAR} ${COPYRIGHT_HOLDER}"
+echo -e "  ${COLOR_BOLD}Stack:${COLOR_RESET}       ${STACK_NAME}"
+echo -e "  ${COLOR_BOLD}Pkg Manager:${COLOR_RESET} ${PKG_MGR}"
 echo ""
 
 if [[ ${#CHANGED_FILES[@]} -gt 0 ]]; then
 	info "Files updated:"
 	for f in "${CHANGED_FILES[@]}"; do
-		echo -e "    ${GREEN}•${NC} ${f}"
+		echo -e "    ${COLOR_GREEN}•${COLOR_RESET} ${f}"
 	done
 	echo ""
 fi
