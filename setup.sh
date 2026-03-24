@@ -104,7 +104,14 @@ echo "   13)  Custom            (skip tech stack pre-fill)"
 echo ""
 
 if [[ -z ${STACK_CHOICE-} ]]; then
-	ask "Stack [1-13]" "13" STACK_CHOICE
+	while true; do
+		ask "Stack [1-13]" "13" STACK_CHOICE
+		if validate_choice "${STACK_CHOICE}" 1 13; then
+			break
+		fi
+		err "Please enter a number between 1 and 13."
+		unset STACK_CHOICE
+	done
 fi
 
 case "${STACK_CHOICE}" in
@@ -127,9 +134,8 @@ case "${STACK_CHOICE}" in
 12) STACK_NAME="TanStack Start" ;;
 13) STACK_NAME="Custom" ;;
 *)
-	warn "Invalid choice, defaulting to Custom."
-	STACK_CHOICE="13"
-	STACK_NAME="Custom"
+	err "Unexpected stack choice: ${STACK_CHOICE}"
+	exit 1
 	;;
 esac
 
