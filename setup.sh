@@ -387,6 +387,208 @@ define_stack_preset() {
 define_stack_preset
 
 # ═══════════════════════════════════════════════════════════════════════════
+# Step 3b: Run Official Stack Scaffolder
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ---------------------------------------------------------------------------
+# Resolve the dlx (download-and-execute) prefix for the selected pkg manager.
+# npx is the default; the user can opt for their pkg manager's equivalent.
+#
+# Sets: DLX_PREFIX  (e.g. "npx", "pnpm dlx", "yarn dlx", "bunx")
+#       CREATE_PREFIX (e.g. "npx", "pnpm create", "yarn create", "bun create")
+# ---------------------------------------------------------------------------
+resolve_runner_prefixes() {
+	case "${PKG_MGR}" in
+	npm)
+		DLX_PREFIX="npx"
+		CREATE_PREFIX="npx"
+		;;
+	pnpm)
+		if [[ ${USE_NPX} == "true" ]]; then
+			DLX_PREFIX="npx"
+		else
+			DLX_PREFIX="pnpm dlx"
+		fi
+		CREATE_PREFIX="pnpm create"
+		;;
+	yarn)
+		if [[ ${USE_NPX} == "true" ]]; then
+			DLX_PREFIX="npx"
+		else
+			DLX_PREFIX="yarn dlx"
+		fi
+		CREATE_PREFIX="yarn create"
+		;;
+	bun)
+		if [[ ${USE_NPX} == "true" ]]; then
+			DLX_PREFIX="npx"
+		else
+			DLX_PREFIX="bunx"
+		fi
+		CREATE_PREFIX="bun create"
+		;;
+	*)
+		DLX_PREFIX="npx"
+		CREATE_PREFIX="npx"
+		;;
+	esac
+}
+
+# Ask the user whether to use npx or their package manager's equivalent.
+# Only relevant when the selected package manager is not npm.
+USE_NPX="true"
+if [[ ${PKG_MGR} != "npm" && ${PKG_MGR} != "N/A" ]]; then
+	# Determine the alternative dlx command name for display
+	case "${PKG_MGR}" in
+	pnpm) _alt_dlx="pnpm dlx" ;;
+	yarn) _alt_dlx="yarn dlx" ;;
+	bun) _alt_dlx="bunx" ;;
+	*) _alt_dlx="" ;;
+	esac
+
+	if [[ -n ${_alt_dlx} ]]; then
+		echo ""
+		info "Some scaffolders default to npx to download and run packages."
+		info "You can use ${_alt_dlx} instead to stay consistent with ${PKG_MGR}."
+		echo ""
+		echo "    1)  Use npx everywhere (default, always works)"
+		echo "    2)  Use ${_alt_dlx} where possible (consistent with ${PKG_MGR})"
+		echo ""
+
+		if [[ -z ${DLX_CHOICE-} ]]; then
+			ask "Runner preference [1-2]" "1" DLX_CHOICE
+		fi
+
+		if [[ ${DLX_CHOICE} == "2" ]]; then
+			USE_NPX="false"
+		fi
+	fi
+	unset _alt_dlx
+fi
+
+resolve_runner_prefixes
+
+# ---------------------------------------------------------------------------
+# get_scaffolder_command — Returns the scaffolder command and source URL
+# Sets: SCAFFOLDER_CMD, SCAFFOLDER_URL, SCAFFOLDER_NOTE
+# ---------------------------------------------------------------------------
+get_scaffolder_command() {
+	SCAFFOLDER_CMD=""
+	SCAFFOLDER_URL=""
+	SCAFFOLDER_NOTE=""
+
+	case "${STACK_CHOICE}" in
+	1) # T3
+		SCAFFOLDER_CMD="${CREATE_PREFIX} t3-app@latest"
+		SCAFFOLDER_URL="https://create.t3.gg"
+		;;
+	2) # T4 — bun only
+		SCAFFOLDER_CMD="bun create t4-app@latest"
+		SCAFFOLDER_URL="https://t4stack.com"
+		if [[ ${PKG_MGR} != "bun" ]]; then
+			SCAFFOLDER_NOTE="T4 officially supports bun only. The scaffolder will use bun regardless of your package manager selection."
+		fi
+		;;
+	3) # Supabase + Next.js
+		SCAFFOLDER_CMD="${CREATE_PREFIX} next-app@latest"
+		SCAFFOLDER_URL="https://nextjs.org/docs/getting-started/installation"
+		;;
+	4) # Vite + React
+		if [[ ${PKG_MGR} == "npm" ]]; then
+			SCAFFOLDER_CMD="npm create vite@latest -- --template react-ts"
+		else
+			SCAFFOLDER_CMD="${CREATE_PREFIX} vite@latest --template react-ts"
+		fi
+		SCAFFOLDER_URL="https://vite.dev/guide/"
+		;;
+	5) # SvelteKit
+		SCAFFOLDER_CMD="${DLX_PREFIX} sv create"
+		SCAFFOLDER_URL="https://svelte.dev/docs/kit/creating-a-project"
+		;;
+	6) # Nuxt 3
+		SCAFFOLDER_CMD="${DLX_PREFIX} nuxi@latest init"
+		SCAFFOLDER_URL="https://nuxt.com/docs/getting-started/installation"
+		;;
+	7) # Remix
+		SCAFFOLDER_CMD="${DLX_PREFIX} create-remix@latest"
+		SCAFFOLDER_URL="https://remix.run/docs/en/main/start/quickstart"
+		;;
+	8) # Astro
+		SCAFFOLDER_CMD="${CREATE_PREFIX} astro@latest"
+		SCAFFOLDER_URL="https://astro.build/docs"
+		;;
+	9) # Flutter + Supabase
+		SCAFFOLDER_CMD="flutter create"
+		SCAFFOLDER_URL="https://docs.flutter.dev/get-started/install"
+		SCAFFOLDER_NOTE="Requires the Flutter SDK to be installed."
+		;;
+	10) # Electron
+		SCAFFOLDER_CMD="${DLX_PREFIX} create-electron-app@latest"
+		SCAFFOLDER_URL="https://www.electronforge.io"
+		;;
+	11) # Python FastAPI — no official scaffolder
+		SCAFFOLDER_CMD=""
+		SCAFFOLDER_URL=""
+		SCAFFOLDER_NOTE="No official scaffolder available for FastAPI. Set up manually."
+		;;
+	12) # TanStack Start
+		SCAFFOLDER_CMD="${DLX_PREFIX} @tanstack/create-router@latest"
+		SCAFFOLDER_URL="https://tanstack.com/start/latest/docs/framework/react/quick-start"
+		;;
+	13) # Custom — no scaffolding
+		SCAFFOLDER_CMD=""
+		SCAFFOLDER_URL=""
+		;;
+	*) ;;
+	esac
+}
+
+get_scaffolder_command
+
+if [[ -n ${SCAFFOLDER_CMD} ]]; then
+	header "Step 3b · Stack Scaffolder"
+
+	echo ""
+	echo "  The following official scaffolder will initialise your project:"
+	echo ""
+	echo -e "    ${COLOR_BOLD}Command:${COLOR_RESET}  ${SCAFFOLDER_CMD}"
+	echo -e "    ${COLOR_BOLD}Source:${COLOR_RESET}   ${SCAFFOLDER_URL}"
+
+	if [[ -n ${SCAFFOLDER_NOTE} ]]; then
+		echo ""
+		warn "${SCAFFOLDER_NOTE}"
+	fi
+
+	echo ""
+	echo "    1)  Yes — run the scaffolder now"
+	echo "    2)  No  — skip (you can run it manually later)"
+	echo ""
+
+	if [[ -z ${SCAFFOLD_CHOICE-} ]]; then
+		ask "Run scaffolder? [1-2]" "1" SCAFFOLD_CHOICE
+	fi
+
+	if [[ ${SCAFFOLD_CHOICE} == "1" ]]; then
+		info "Running: ${SCAFFOLDER_CMD}"
+		echo ""
+		if eval "${SCAFFOLDER_CMD}"; then
+			success "Scaffolder completed successfully."
+		else
+			warn "Scaffolder exited with a non-zero status. You may need to run it manually."
+			warn "Command: ${SCAFFOLDER_CMD}"
+		fi
+	else
+		info "Skipped scaffolder. Run it manually later:"
+		info "  ${SCAFFOLDER_CMD}"
+	fi
+elif [[ -n ${SCAFFOLDER_NOTE} ]]; then
+	header "Step 3b · Stack Scaffolder"
+	echo ""
+	info "${SCAFFOLDER_NOTE}"
+	echo ""
+fi
+
+# ═══════════════════════════════════════════════════════════════════════════
 # Placeholder Replacement
 # ═══════════════════════════════════════════════════════════════════════════
 header "Applying replacements"
