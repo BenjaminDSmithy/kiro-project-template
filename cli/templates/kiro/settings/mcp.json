@@ -1,0 +1,103 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest", "--read-only"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      },
+      "disabled": true,
+      "autoApprove": [
+        "list_tables",
+        "execute_sql",
+        "apply_migration",
+        "list_migrations",
+        "list_extensions",
+        "get_project_url",
+        "get_publishable_keys",
+        "generate_typescript_types"
+      ]
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": ["fetch"]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "."],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [
+        "git_status",
+        "git_diff_unstaged",
+        "git_diff_staged",
+        "git_log",
+        "git_add",
+        "git_commit",
+        "git_show",
+        "git_diff",
+        "git_branch",
+        "git_reset",
+        "git_checkout",
+        "git_create_branch"
+      ]
+    },
+    "chrome": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [
+        "take_screenshot",
+        "take_snapshot",
+        "navigate_page",
+        "click",
+        "fill",
+        "list_pages",
+        "new_page",
+        "evaluate_script"
+      ]
+    },
+    "docker": {
+      "command": "uvx",
+      "args": ["mcp-server-docker"],
+      "env": {},
+      "disabled": true,
+      "autoApprove": ["list_containers", "list_images", "fetch_container_logs"]
+    },
+    "time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": ["get_current_time", "convert_time"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [
+        "create_entities",
+        "create_relations",
+        "add_observations",
+        "delete_entities",
+        "delete_observations",
+        "delete_relations",
+        "read_graph",
+        "search_nodes",
+        "open_nodes"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": ["sequentialthinking"]
+    }
+  }
+}
