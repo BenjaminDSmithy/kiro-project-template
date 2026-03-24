@@ -155,7 +155,14 @@ echo "    5)  N/A (not applicable)"
 echo ""
 
 if [[ -z ${PKG_CHOICE-} ]]; then
-	ask "Package manager [1-5]" "2" PKG_CHOICE
+	while true; do
+		ask "Package manager [1-5]" "2" PKG_CHOICE
+		if validate_choice "${PKG_CHOICE}" 1 5; then
+			break
+		fi
+		err "Please enter a number between 1 and 5."
+		unset PKG_CHOICE
+	done
 fi
 
 case "${PKG_CHOICE}" in
@@ -195,12 +202,8 @@ case "${PKG_CHOICE}" in
 	PKG_TEST=""
 	;;
 *)
-	warn "Invalid choice, defaulting to pnpm."
-	PKG_MGR="pnpm"
-	PKG_INSTALL="pnpm install"
-	PKG_DEV="pnpm dev"
-	PKG_BUILD="pnpm build"
-	PKG_TEST="pnpm test -- --run"
+	err "Unexpected package manager choice: ${PKG_CHOICE}"
+	exit 1
 	;;
 esac
 
