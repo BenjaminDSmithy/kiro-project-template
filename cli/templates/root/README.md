@@ -32,6 +32,7 @@ Also available via `pnpm create kiro-project` and `bunx create-kiro-project`.
 
 - `AGENTS.md` for shared cross-tool instructions
 - `.codex/` for project-scoped Codex agents and safety rules
+- [`docs/CODEX.md`](docs/CODEX.md) for Codex-specific setup and usage examples
 
 ### Steering Docs (47 files)
 
