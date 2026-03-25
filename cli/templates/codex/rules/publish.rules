@@ -1,0 +1,42 @@
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Pushing branches should stay user-approved in this starter.",
+    match = [
+        "git push",
+        "git push origin main",
+        "git push --set-upstream origin codex-starter",
+    ],
+    not_match = [
+        "git pull",
+        "git status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", "publish"],
+    decision = "prompt",
+    justification = "Publishing packages should stay user-approved.",
+    match = [
+        "npm publish",
+        "npm publish --tag next",
+    ],
+    not_match = [
+        "npm pack",
+        "npm test",
+    ],
+)
+
+prefix_rule(
+    pattern = ["pnpm", "publish"],
+    decision = "prompt",
+    justification = "Publishing packages should stay user-approved.",
+    match = [
+        "pnpm publish",
+        "pnpm publish --tag next",
+    ],
+    not_match = [
+        "pnpm test",
+        "pnpm build",
+    ],
+)

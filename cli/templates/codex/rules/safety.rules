@@ -1,0 +1,13 @@
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Use non-destructive git commands unless the user explicitly asks for a hard reset.",
+    match = [
+        "git reset --hard",
+        "git reset --hard HEAD~1",
+    ],
+    not_match = [
+        "git reset --soft HEAD~1",
+        "git checkout -b feature-branch",
+    ],
+)
