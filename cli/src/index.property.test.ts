@@ -26,6 +26,7 @@ const OTHER_FLAG_SEGMENTS: readonly (readonly string[])[] = [
   ["--year", "2025"],
   ["--stack", "T3"],
   ["--pkg", "pnpm"],
+  ["--host", "codex"],
   ["--only", "hooks"],
 ] as const;
 

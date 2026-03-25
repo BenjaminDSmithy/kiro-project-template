@@ -167,7 +167,7 @@ describe("Dry-Run Property Tests", () => {
    * Property 2: Dry-Run Purity (previewAdd with --only subset)
    *
    * For any valid ProjectConfig and any --only subset value, calling
-   * previewAdd(config, templatesDir, only) produces zero side effects.
+   * previewAdd(config, templatesDir, "kiro", only) produces zero side effects.
    */
   it(
     "previewAdd with --only subset should produce zero side effects on the filesystem",
@@ -182,7 +182,7 @@ describe("Dry-Run Property Tests", () => {
             const before = snapshotDir(tmpDir);
 
             // Act — call previewAdd with the generated config and subset
-            await previewAdd(config, TEMPLATES_DIR, only);
+            await previewAdd(config, TEMPLATES_DIR, "kiro", only);
 
             // Assert — the temp directory is unchanged
             const after = snapshotDir(tmpDir);
@@ -277,6 +277,18 @@ describe("Dry-Run Property Tests", () => {
           await copyDir(
             path.join(TEMPLATES_DIR, "docs"),
             path.join(targetDir, "docs"),
+          );
+
+          // Copy scripts/ → scripts/
+          await copyDir(
+            path.join(TEMPLATES_DIR, "scripts"),
+            path.join(targetDir, "scripts"),
+          );
+
+          // Copy vscode/ → .vscode/
+          await copyDir(
+            path.join(TEMPLATES_DIR, "vscode"),
+            path.join(targetDir, ".vscode"),
           );
 
           // Copy root/ entries directly into target

@@ -31,6 +31,7 @@ describe("E2E — CLI invocation", () => {
     expect(output).toContain("--config");
     expect(output).toContain("--add");
     expect(output).toContain("--only");
+    expect(output).toContain("--host");
     expect(output).toContain("--yes");
   });
 

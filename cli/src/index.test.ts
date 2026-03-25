@@ -59,6 +59,11 @@ describe("parseArgs", () => {
     expect(flags.pkg).toBe("pnpm");
   });
 
+  it("parses --host with value", () => {
+    const flags = parseArgs(["--host", "codex"]);
+    expect(flags.host).toBe("codex");
+  });
+
   it("parses --only with valid value", () => {
     const flags = parseArgs(["--only", "steering"]);
     expect(flags.only).toBe("steering");
@@ -84,6 +89,8 @@ describe("parseArgs", () => {
       "t4",
       "--pkg",
       "yarn",
+      "--host",
+      "codex",
       "-y",
     ]);
 
@@ -95,6 +102,7 @@ describe("parseArgs", () => {
       year: "2024",
       stack: "t4",
       pkg: "yarn",
+      host: "codex",
       yes: true,
       dryRun: false,
       verbose: false,

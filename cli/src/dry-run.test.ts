@@ -17,6 +17,7 @@ import path from "node:path";
 import { tmpdir } from "node:os";
 
 import { previewInit, previewAdd, formatPlan } from "./dry-run.js";
+import type { HostTarget } from "./hosts.js";
 import type { DryRunPlan } from "./dry-run.js";
 import type { ProjectConfig } from "./prompts.js";
 import { STACK_PRESETS } from "./stacks.js";
@@ -87,6 +88,8 @@ describe("dry-run", () => {
       expect(dirPaths.some((d) => d.includes(".kiro/hooks"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".kiro/steering"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".kiro/specs"))).toBe(true);
+      expect(dirPaths.some((d) => d.includes("/scripts"))).toBe(true);
+      expect(dirPaths.some((d) => d.includes("/.vscode"))).toBe(true);
       expect(dirPaths.some((d) => d.includes("/docs"))).toBe(true);
     });
 
@@ -175,7 +178,7 @@ describe("dry-run", () => {
       const config = makeConfig();
 
       // Act
-      const plan = await previewAdd(config, TEMPLATES_DIR, "hooks");
+      const plan = await previewAdd(config, TEMPLATES_DIR, "kiro", "hooks");
 
       // Assert — all files should be under the hooks/ subdirectory
       expect(plan.files.length).toBeGreaterThan(0);
@@ -188,6 +191,24 @@ describe("dry-run", () => {
         plan.directories.some((d) => d.replace(/\\/g, "/").endsWith("/hooks")),
       ).toBe(true);
     });
+
+    it.each([
+      ["kiro", ".kiro/"],
+      ["codex", ".codex/"],
+      ["portable", "AGENTS.md"],
+      ["all", ".codex/"],
+    ] satisfies [HostTarget, string][])(
+      "should respect host target %s",
+      async (host, expectedPath) => {
+        const config = makeConfig();
+        const plan = await previewAdd(config, TEMPLATES_DIR, host);
+
+        const normalisedFiles = plan.files.map((file) => file.replace(/\\/g, "/"));
+        expect(normalisedFiles.some((file) => file.includes(expectedPath))).toBe(
+          true,
+        );
+      },
+    );
   });
 
   describe("formatPlan", () => {

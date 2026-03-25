@@ -257,6 +257,48 @@ describe("Add mode integration", () => {
     );
     expect(hookContent).toBe("Hook: existing-project (C) 2025 Owner");
   });
+
+  it("should copy .codex/ and AGENTS.md for a codex host target", async () => {
+    const target = path.join(tempDir, "existing-codex-project");
+    await mkdir(target, { recursive: true });
+
+    await writeFile(path.join(target, "README.md"), "# Existing", "utf-8");
+
+    const codexSrc = path.join(tempDir, "codex-template");
+    const rootSrc = path.join(tempDir, "root-template");
+    await mkdir(path.join(codexSrc, "agents"), { recursive: true });
+    await mkdir(rootSrc, { recursive: true });
+
+    await writeFile(
+      path.join(codexSrc, "agents", "worker.toml"),
+      'name = "worker"\ndescription = "{{PROJECT_NAME}}"',
+      "utf-8",
+    );
+    await writeFile(
+      path.join(rootSrc, "AGENTS.md"),
+      "# AGENTS\nShared instructions",
+      "utf-8",
+    );
+
+    await copyDir(codexSrc, path.join(target, ".codex"));
+    await copyDir(path.join(rootSrc, "AGENTS.md"), path.join(target, "AGENTS.md"));
+    await replacePlaceholders(path.join(target, ".codex"), {
+      "{{PROJECT_NAME}}": "existing-codex-project",
+      "{{COPYRIGHT_HOLDER}}": "Owner",
+      "{{YEAR}}": "2025",
+    });
+
+    const topLevel = await readdir(target);
+    expect(topLevel).toContain(".codex");
+    expect(topLevel).toContain("AGENTS.md");
+    expect(topLevel).toContain("README.md");
+
+    const worker = await readFile(
+      path.join(target, ".codex", "agents", "worker.toml"),
+      "utf-8",
+    );
+    expect(worker).toContain('description = "existing-codex-project"');
+  });
 });
 
 describe("--only flag", () => {
@@ -378,7 +420,9 @@ describe("Dry-run vs normal parity", () => {
       recursive: true,
     });
     await mkdir(path.join(realTemplateRoot, "docs"), { recursive: true });
+    await mkdir(path.join(realTemplateRoot, "scripts"), { recursive: true });
     await mkdir(path.join(realTemplateRoot, "root"), { recursive: true });
+    await mkdir(path.join(realTemplateRoot, "vscode"), { recursive: true });
 
     await writeFile(
       path.join(realTemplateRoot, "codex", "agents", "worker.toml"),
@@ -401,8 +445,18 @@ describe("Dry-run vs normal parity", () => {
       "utf-8",
     );
     await writeFile(
+      path.join(realTemplateRoot, "scripts", "bootstrap.sh"),
+      "#!/usr/bin/env bash",
+      "utf-8",
+    );
+    await writeFile(
       path.join(realTemplateRoot, "root", "README.md"),
       "Root",
+      "utf-8",
+    );
+    await writeFile(
+      path.join(realTemplateRoot, "vscode", "settings.json"),
+      "{}",
       "utf-8",
     );
 
@@ -436,6 +490,14 @@ describe("Dry-run vs normal parity", () => {
       await copyDir(
         path.join(realTemplateRoot, "docs"),
         path.join(target, "docs"),
+      );
+      await copyDir(
+        path.join(realTemplateRoot, "scripts"),
+        path.join(target, "scripts"),
+      );
+      await copyDir(
+        path.join(realTemplateRoot, "vscode"),
+        path.join(target, ".vscode"),
       );
       const rootEntries = await readdir(path.join(realTemplateRoot, "root"));
       for (const entry of rootEntries) {
