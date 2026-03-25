@@ -9,76 +9,86 @@
 # Usage:
 #   chmod +x setup.sh
 #   ./setup.sh
+#   ./setup.sh --dry-run          # Preview what would happen without changes
 #
 # Or non-interactively:
 #   PROJECT_NAME="My App" COPYRIGHT_HOLDER="Acme Inc" YEAR="2026" ./setup.sh
+#
+# Headless env vars (all optional — defaults shown):
+#   HEADLESS=false          # Skip interactive prompts
+#   PROJECT_NAME            # Defaults to folder name
+#   COPYRIGHT_HOLDER        # Required
+#   YEAR                    # Defaults to current year
+#   STACK_CHOICE=13         # 1-13 (see menu)
+#   PKG_CHOICE=2            # 1-5 (see menu)
+#   DLX_CHOICE=1            # 1=npx everywhere, 2=pkg manager equivalent
+#   SCAFFOLD_CHOICE=1       # 1=run scaffolder, 2=skip
+#   SCAFFOLD_DIR=.          # Directory to scaffold into (. or subdirectory)
+#   CLEANUP_CHOICE=2        # 1=remove other steering docs, 2=keep
+#   EXAMPLES_CHOICE=2       # 1=remove example specs, 2=keep
+#   REMOVE_SELF=y           # y=delete setup.sh, n=keep
 # ============================================================================
 
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# Cross-platform sed in-place helper
+# Flags — parsed from command-line arguments
+# Usage: ./setup.sh --headless --dry-run
 # ---------------------------------------------------------------------------
-# macOS sed requires -i '' while GNU/Linux sed requires -i (no argument).
-# This function abstracts the difference.
-sed_inplace() {
-	if [[ "$(uname -s)" == "Darwin" ]]; then
-		sed -i '' "$@"
-	else
-		sed -i "$@"
-	fi
-}
+for arg in "$@"; do
+	case "${arg}" in
+	--headless) HEADLESS=true ;;
+	--dry-run) DRY_RUN=true ;;
+	*) ;;
+	esac
+done
+export HEADLESS="${HEADLESS:-false}"
+export DRY_RUN="${DRY_RUN:-false}"
 
 # ---------------------------------------------------------------------------
-# Colours
+# Source shared libraries
 # ---------------------------------------------------------------------------
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-CYAN='\033[0;36m'
-YELLOW='\033[1;33m'
-BOLD='\033[1m'
-NC='\033[0m'
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-info() { echo -e "${CYAN}ℹ${NC}  $1"; }
-success() { echo -e "${GREEN}✔${NC}  $1"; }
-warn() { echo -e "${YELLOW}⚠${NC}  $1"; }
-err() { echo -e "${RED}✘${NC}  $1"; }
-header() {
-	echo -e "\n${BOLD}$1${NC}"
-	echo "─────────────────────────────────────────"
-}
-
-ask() {
-	local prompt="$1" default="$2" var="$3"
-	if [[ -n ${!var-} ]]; then return; fi
-	# shellcheck disable=SC2034 # input is used via eval on the next line
-	if [[ -n ${default} ]]; then
-		read -rp "$(echo -e "${CYAN}?${NC}  ${prompt} ${YELLOW}[${default}]${NC}: ")" input
-		eval "${var}=\"\${input:-${default}}\""
-	else
-		read -rp "$(echo -e "${CYAN}?${NC}  ${prompt}: ")" input
-		eval "${var}=\"\${input}\""
-	fi
-}
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/scripts/lib/utils.sh"
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/scripts/lib/validation.sh"
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/scripts/lib/banner.sh"
 
 # ---------------------------------------------------------------------------
 # Detect project name from folder
 # ---------------------------------------------------------------------------
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_PROJECT_NAME="$(basename "${SCRIPT_DIR}")"
 DEFAULT_YEAR="$(date +%Y)"
 
 # ---------------------------------------------------------------------------
 # Banner
 # ---------------------------------------------------------------------------
-echo ""
-echo -e "${BOLD}╔═══════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}║         Kiro Project Template — Setup Wizard          ║${NC}"
-echo -e "${BOLD}╚═══════════════════════════════════════════════════════╝${NC}"
-echo ""
+show_project_banner "Setup Wizard"
+
+# ---------------------------------------------------------------------------
+# Dry-run mode banner
+# ---------------------------------------------------------------------------
+if [[ ${DRY_RUN} == "true" ]]; then
+	echo ""
+	warn "DRY-RUN MODE — no files will be modified, no commands will be executed."
+	echo ""
+fi
+
+# ---------------------------------------------------------------------------
+# run_cmd — Execute a command, or print it in dry-run mode
+# Usage: run_cmd <command-string>
+# ---------------------------------------------------------------------------
+run_cmd() {
+	local cmd="$1"
+	if [[ ${DRY_RUN} == "true" ]]; then
+		info "[dry-run] Would execute: ${cmd}"
+		return 0
+	fi
+	bash -c "${cmd}"
+}
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Step 1: Project Identity
@@ -86,8 +96,19 @@ echo ""
 header "Step 1 · Project Identity"
 
 ask "Project name" "${DEFAULT_PROJECT_NAME}" PROJECT_NAME
+if ! validate_project_name "${PROJECT_NAME}"; then
+	err "Invalid project name."
+	exit 1
+fi
 ask "Copyright holder (company or person)" "" COPYRIGHT_HOLDER
-ask "Copyright year" "${DEFAULT_YEAR}" YEAR
+while true; do
+	ask "Copyright year (e.g. 2026 or 2022-2026)" "${DEFAULT_YEAR}" YEAR
+	if validate_copyright_year "${YEAR}"; then
+		break
+	fi
+	err "Invalid format. Use a 4-digit year or a range (e.g. 2022-2026)."
+	unset YEAR
+done
 
 if [[ -z ${COPYRIGHT_HOLDER} ]]; then
 	err "Copyright holder is required."
@@ -121,7 +142,14 @@ echo "   13)  Custom            (skip tech stack pre-fill)"
 echo ""
 
 if [[ -z ${STACK_CHOICE-} ]]; then
-	ask "Stack [1-13]" "13" STACK_CHOICE
+	while true; do
+		ask "Stack [1-13]" "13" STACK_CHOICE
+		if validate_choice "${STACK_CHOICE}" 1 13; then
+			break
+		fi
+		err "Please enter a number between 1 and 13."
+		unset STACK_CHOICE
+	done
 fi
 
 case "${STACK_CHOICE}" in
@@ -144,9 +172,8 @@ case "${STACK_CHOICE}" in
 12) STACK_NAME="TanStack Start" ;;
 13) STACK_NAME="Custom" ;;
 *)
-	warn "Invalid choice, defaulting to Custom."
-	STACK_CHOICE="13"
-	STACK_NAME="Custom"
+	err "Unexpected stack choice: ${STACK_CHOICE}"
+	exit 1
 	;;
 esac
 
@@ -166,7 +193,14 @@ echo "    5)  N/A (not applicable)"
 echo ""
 
 if [[ -z ${PKG_CHOICE-} ]]; then
-	ask "Package manager [1-5]" "2" PKG_CHOICE
+	while true; do
+		ask "Package manager [1-5]" "2" PKG_CHOICE
+		if validate_choice "${PKG_CHOICE}" 1 5; then
+			break
+		fi
+		err "Please enter a number between 1 and 5."
+		unset PKG_CHOICE
+	done
 fi
 
 case "${PKG_CHOICE}" in
@@ -206,12 +240,8 @@ case "${PKG_CHOICE}" in
 	PKG_TEST=""
 	;;
 *)
-	warn "Invalid choice, defaulting to pnpm."
-	PKG_MGR="pnpm"
-	PKG_INSTALL="pnpm install"
-	PKG_DEV="pnpm dev"
-	PKG_BUILD="pnpm build"
-	PKG_TEST="pnpm test -- --run"
+	err "Unexpected package manager choice: ${PKG_CHOICE}"
+	exit 1
 	;;
 esac
 
@@ -395,6 +425,270 @@ define_stack_preset() {
 define_stack_preset
 
 # ═══════════════════════════════════════════════════════════════════════════
+# Step 3b: Run Official Stack Scaffolder
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ---------------------------------------------------------------------------
+# Resolve the dlx (download-and-execute) prefix for the selected pkg manager.
+# npx is the default; the user can opt for their pkg manager's equivalent.
+#
+# Sets: DLX_PREFIX  (e.g. "npx", "pnpm dlx", "yarn dlx", "bunx")
+#       CREATE_PREFIX (e.g. "npx", "pnpm create", "yarn create", "bun create")
+# ---------------------------------------------------------------------------
+resolve_runner_prefixes() {
+	case "${PKG_MGR}" in
+	npm)
+		DLX_PREFIX="npx"
+		CREATE_PREFIX="npx"
+		;;
+	pnpm)
+		if [[ ${USE_NPX} == "true" ]]; then
+			DLX_PREFIX="npx"
+		else
+			DLX_PREFIX="pnpm dlx"
+		fi
+		CREATE_PREFIX="pnpm create"
+		;;
+	yarn)
+		if [[ ${USE_NPX} == "true" ]]; then
+			DLX_PREFIX="npx"
+		else
+			DLX_PREFIX="yarn dlx"
+		fi
+		CREATE_PREFIX="yarn create"
+		;;
+	bun)
+		if [[ ${USE_NPX} == "true" ]]; then
+			DLX_PREFIX="npx"
+		else
+			DLX_PREFIX="bunx"
+		fi
+		CREATE_PREFIX="bun create"
+		;;
+	*)
+		DLX_PREFIX="npx"
+		CREATE_PREFIX="npx"
+		;;
+	esac
+}
+
+# Ask the user whether to use npx or their package manager's equivalent.
+# Only relevant when the selected package manager is not npm.
+USE_NPX="true"
+if [[ ${PKG_MGR} != "npm" && ${PKG_MGR} != "N/A" ]]; then
+	# Determine the alternative dlx command name for display
+	case "${PKG_MGR}" in
+	pnpm) _alt_dlx="pnpm dlx" ;;
+	yarn) _alt_dlx="yarn dlx" ;;
+	bun) _alt_dlx="bunx" ;;
+	*) _alt_dlx="" ;;
+	esac
+
+	if [[ -n ${_alt_dlx} ]]; then
+		echo ""
+		info "Some scaffolders default to npx to download and run packages."
+		info "You can use ${_alt_dlx} instead to stay consistent with ${PKG_MGR}."
+		echo ""
+		echo "    1)  Use npx everywhere (default, always works)"
+		echo "    2)  Use ${_alt_dlx} where possible (consistent with ${PKG_MGR})"
+		echo ""
+
+		if [[ -z ${DLX_CHOICE-} ]]; then
+			ask "Runner preference [1-2]" "1" DLX_CHOICE
+		fi
+
+		if [[ ${DLX_CHOICE} == "2" ]]; then
+			USE_NPX="false"
+		fi
+	fi
+	unset _alt_dlx
+fi
+
+resolve_runner_prefixes
+
+# ---------------------------------------------------------------------------
+# get_scaffolder_command — Returns the scaffolder command and source URL
+# Sets: SCAFFOLDER_CMD, SCAFFOLDER_URL, SCAFFOLDER_NOTE
+# ---------------------------------------------------------------------------
+get_scaffolder_command() {
+	SCAFFOLDER_CMD=""
+	SCAFFOLDER_URL=""
+	SCAFFOLDER_NOTE=""
+
+	case "${STACK_CHOICE}" in
+	1) # T3
+		SCAFFOLDER_CMD="${CREATE_PREFIX} t3-app@latest"
+		SCAFFOLDER_URL="https://create.t3.gg"
+		;;
+	2) # T4 — bun only
+		SCAFFOLDER_CMD="bun create t4-app@latest"
+		SCAFFOLDER_URL="https://t4stack.com"
+		if [[ ${PKG_MGR} != "bun" ]]; then
+			SCAFFOLDER_NOTE="T4 officially supports bun only. The scaffolder will use bun regardless of your package manager selection."
+		fi
+		;;
+	3) # Supabase + Next.js
+		SCAFFOLDER_CMD="${CREATE_PREFIX} next-app@latest"
+		SCAFFOLDER_URL="https://nextjs.org/docs/getting-started/installation"
+		;;
+	4) # Vite + React
+		if [[ ${PKG_MGR} == "npm" ]]; then
+			SCAFFOLDER_CMD="npm create vite@latest -- --template react-ts"
+		else
+			SCAFFOLDER_CMD="${CREATE_PREFIX} vite@latest --template react-ts"
+		fi
+		SCAFFOLDER_URL="https://vite.dev/guide/"
+		;;
+	5) # SvelteKit
+		SCAFFOLDER_CMD="${DLX_PREFIX} sv create"
+		SCAFFOLDER_URL="https://svelte.dev/docs/kit/creating-a-project"
+		;;
+	6) # Nuxt 3
+		SCAFFOLDER_CMD="${DLX_PREFIX} nuxi@latest init"
+		SCAFFOLDER_URL="https://nuxt.com/docs/getting-started/installation"
+		;;
+	7) # Remix
+		SCAFFOLDER_CMD="${DLX_PREFIX} create-remix@latest"
+		SCAFFOLDER_URL="https://remix.run/docs/en/main/start/quickstart"
+		;;
+	8) # Astro
+		SCAFFOLDER_CMD="${CREATE_PREFIX} astro@latest"
+		SCAFFOLDER_URL="https://astro.build/docs"
+		;;
+	9) # Flutter + Supabase
+		SCAFFOLDER_CMD="flutter create"
+		SCAFFOLDER_URL="https://docs.flutter.dev/get-started/install"
+		SCAFFOLDER_NOTE="Requires the Flutter SDK to be installed."
+		;;
+	10) # Electron
+		SCAFFOLDER_CMD="${DLX_PREFIX} create-electron-app@latest"
+		SCAFFOLDER_URL="https://www.electronforge.io"
+		;;
+	11) # Python FastAPI — no official scaffolder
+		SCAFFOLDER_CMD=""
+		SCAFFOLDER_URL=""
+		SCAFFOLDER_NOTE="No official scaffolder available for FastAPI. Set up manually."
+		;;
+	12) # TanStack Start
+		SCAFFOLDER_CMD="${DLX_PREFIX} @tanstack/create-router@latest"
+		SCAFFOLDER_URL="https://tanstack.com/start/latest/docs/framework/react/quick-start"
+		;;
+	13) # Custom — no scaffolding
+		SCAFFOLDER_CMD=""
+		SCAFFOLDER_URL=""
+		;;
+	*) ;;
+	esac
+}
+
+get_scaffolder_command
+
+if [[ -n ${SCAFFOLDER_CMD} ]]; then
+	header "Step 3b · Stack Scaffolder"
+
+	# --- Prerequisite check ---------------------------------------------------
+	# Determine which tool the scaffolder needs and verify it's installed.
+	_scaffolder_tool="${SCAFFOLDER_CMD%% *}" # first word of the command
+	case "${_scaffolder_tool}" in
+	npx | npm) _prereq="npx" ;;
+	pnpm) _prereq="pnpm" ;;
+	yarn) _prereq="yarn" ;;
+	bun | bunx) _prereq="bun" ;;
+	flutter) _prereq="flutter" ;;
+	*) _prereq="" ;;
+	esac
+
+	if [[ -n ${_prereq} ]] && ! command -v "${_prereq}" &>/dev/null; then
+		err "${_prereq} is not installed but is required by the scaffolder."
+		warn "Install ${_prereq} first, then run the scaffolder manually:"
+		warn "  ${SCAFFOLDER_CMD}"
+		# Skip scaffolding — fall through to placeholder replacement
+	else
+		# --- Scaffold target directory ----------------------------------------
+		echo ""
+		echo "  The following official scaffolder will initialise your project:"
+		echo ""
+		echo -e "    ${COLOR_BOLD}Command:${COLOR_RESET}  ${SCAFFOLDER_CMD}"
+		echo -e "    ${COLOR_BOLD}Source:${COLOR_RESET}   ${SCAFFOLDER_URL}"
+
+		if [[ -n ${SCAFFOLDER_NOTE} ]]; then
+			echo ""
+			warn "${SCAFFOLDER_NOTE}"
+		fi
+
+		echo ""
+		info "Most scaffolders create a new subdirectory. You can also scaffold"
+		info "into the current directory (.) if the scaffolder supports it."
+		echo ""
+		echo "    1)  Current directory (.) — scaffold in place"
+		echo "    2)  New subdirectory   — let the scaffolder create one"
+		echo ""
+
+		if [[ -z ${SCAFFOLD_DIR_CHOICE-} ]]; then
+			ask "Scaffold location [1-2]" "2" SCAFFOLD_DIR_CHOICE
+		fi
+
+		if [[ ${SCAFFOLD_DIR_CHOICE} == "1" ]]; then
+			SCAFFOLD_DIR="."
+			info "Will scaffold into the current directory."
+		else
+			SCAFFOLD_DIR=""
+			info "Will let the scaffolder create a new subdirectory."
+		fi
+
+		echo ""
+		echo "    1)  Yes — run the scaffolder now"
+		echo "    2)  No  — skip (you can run it manually later)"
+		echo ""
+
+		if [[ -z ${SCAFFOLD_CHOICE-} ]]; then
+			ask "Run scaffolder? [1-2]" "1" SCAFFOLD_CHOICE
+		fi
+
+		if [[ ${SCAFFOLD_CHOICE} == "1" ]]; then
+			# Append target directory to command if user chose current dir
+			_full_cmd="${SCAFFOLDER_CMD}"
+			if [[ -n ${SCAFFOLD_DIR} ]]; then
+				_full_cmd="${SCAFFOLDER_CMD} ${SCAFFOLD_DIR}"
+			fi
+
+			info "Running: ${_full_cmd}"
+			echo ""
+			if run_cmd "${_full_cmd}"; then
+				success "Scaffolder completed successfully."
+
+				# --- Nested git repo warning ----------------------------------
+				# Some scaffolders run `git init` inside the new project. If we
+				# are already in a git repo, warn about the nested .git directory.
+				if [[ ${DRY_RUN} != "true" ]]; then
+					# Check for any new .git dirs that aren't the repo root's
+					_root_git="${SCRIPT_DIR}/.git"
+					while IFS= read -r -d '' _nested_git; do
+						if [[ ${_nested_git} != "${_root_git}" ]]; then
+							warn "Nested .git directory detected: ${_nested_git}"
+							warn "The scaffolder ran 'git init' inside the new project."
+							warn "You may want to remove it: rm -rf ${_nested_git}"
+						fi
+					done < <(find "${SCRIPT_DIR}" -maxdepth 3 -name ".git" -type d -print0 2>/dev/null)
+				fi
+			else
+				warn "Scaffolder exited with a non-zero status. You may need to run it manually."
+				warn "Command: ${_full_cmd}"
+			fi
+		else
+			info "Skipped scaffolder. Run it manually later:"
+			info "  ${SCAFFOLDER_CMD}"
+		fi
+	fi
+	unset _prereq _scaffolder_tool _full_cmd _root_git _nested_git
+elif [[ -n ${SCAFFOLDER_NOTE} ]]; then
+	header "Step 3b · Stack Scaffolder"
+	echo ""
+	info "${SCAFFOLDER_NOTE}"
+	echo ""
+fi
+
+# ═══════════════════════════════════════════════════════════════════════════
 # Placeholder Replacement
 # ═══════════════════════════════════════════════════════════════════════════
 header "Applying replacements"
@@ -409,15 +703,11 @@ TARGET_FILES=(
 	"docs/CONTRIBUTING.md"
 	"docs/API.md"
 	"docs/DEPLOYMENT.md"
-	"docs/GITFLOW.md"
 	"docs/ADR/000-template.md"
 	"docs/examples/TECH-STACK-example.md"
 	"bugs.md"
 	"package.json"
 	"LICENSE"
-	"scripts/changelog.sh"
-	"scripts/prepublish.sh"
-	"scripts/release.sh"
 )
 
 CHANGED_FILES=()
@@ -441,17 +731,29 @@ for file in "${TARGET_FILES[@]}"; do
 	SAFE_COPYRIGHT="${SAFE_COPYRIGHT//\//\\/}"
 
 	if grep -q '{{PROJECT_NAME}}' "${filepath}" 2>/dev/null; then
-		sed_inplace "s/{{PROJECT_NAME}}/${SAFE_PROJECT_NAME}/g" "${filepath}"
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would replace {{PROJECT_NAME}} in ${file}"
+		else
+			sed_inplace "s/{{PROJECT_NAME}}/${SAFE_PROJECT_NAME}/g" "${filepath}"
+		fi
 		changed=true
 	fi
 
 	if grep -q '{{COPYRIGHT_HOLDER}}' "${filepath}" 2>/dev/null; then
-		sed_inplace "s/{{COPYRIGHT_HOLDER}}/${SAFE_COPYRIGHT}/g" "${filepath}"
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would replace {{COPYRIGHT_HOLDER}} in ${file}"
+		else
+			sed_inplace "s/{{COPYRIGHT_HOLDER}}/${SAFE_COPYRIGHT}/g" "${filepath}"
+		fi
 		changed=true
 	fi
 
 	if grep -q '{{YEAR}}' "${filepath}" 2>/dev/null; then
-		sed_inplace "s/{{YEAR}}/${YEAR}/g" "${filepath}"
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would replace {{YEAR}} in ${file}"
+		else
+			sed_inplace "s/{{YEAR}}/${YEAR}/g" "${filepath}"
+		fi
 		changed=true
 	fi
 
@@ -469,14 +771,19 @@ if [[ ${STACK_CHOICE} != "13" ]] && [[ ${#STACK_ROWS[@]} -gt 0 ]]; then
 
 	TECH_STACK_FILE="${SCRIPT_DIR}/docs/TECH-STACK.md"
 
-	# Build the Core Stack table rows
-	CORE_TABLE=""
-	for row in "${STACK_ROWS[@]}"; do
-		CORE_TABLE="${CORE_TABLE}| ${row} |
-"
-	done
+	if [[ ${DRY_RUN} == "true" ]]; then
+		info "[dry-run] Would generate: docs/TECH-STACK.md (${STACK_NAME} preset)"
+		CHANGED_FILES+=("docs/TECH-STACK.md (generated)")
+	else
 
-	cat >"${TECH_STACK_FILE}" <<TECHEOF
+		# Build the Core Stack table rows
+		CORE_TABLE=""
+		for row in "${STACK_ROWS[@]}"; do
+			CORE_TABLE="${CORE_TABLE}| ${row} |
+"
+		done
+
+		cat >"${TECH_STACK_FILE}" <<TECHEOF
 # Tech Stack
 
 | Field        | Value      |
@@ -556,8 +863,9 @@ Copyright (C) ${YEAR} ${COPYRIGHT_HOLDER}. All rights reserved.
 \`\`\`
 TECHEOF
 
-	success "Generated: docs/TECH-STACK.md (${STACK_NAME} preset)"
-	CHANGED_FILES+=("docs/TECH-STACK.md (generated)")
+		success "Generated: docs/TECH-STACK.md (${STACK_NAME} preset)"
+		CHANGED_FILES+=("docs/TECH-STACK.md (generated)")
+	fi # end dry-run guard
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -586,27 +894,62 @@ if [[ ${CLEANUP_CHOICE} == "1" ]]; then
 	case "${STACK_CHOICE}" in
 	1) # T3 — keep 60, remove 53 (default Next.js patterns overlap with T3), 61, 62
 		for f in "53-nextjs.md" "61-t4-stack.md" "62-tanstack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	2) # T4 — keep 61, remove 53, 60, 62
 		for f in "53-nextjs.md" "60-t3-stack.md" "62-tanstack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	3) # Supabase + Next.js (Default) — keep 53, remove 60, 61, 62
 		for f in "60-t3-stack.md" "61-t4-stack.md" "62-tanstack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	12) # TanStack Start — keep 62, remove 53, 60, 61
 		for f in "53-nextjs.md" "60-t3-stack.md" "61-t4-stack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	*) # Other stacks (Vite, Svelte, Nuxt, etc.) — remove all 4 stack-specific docs
 		for f in "53-nextjs.md" "60-t3-stack.md" "61-t4-stack.md" "62-tanstack.md"; do
-			[[ -f "${STEERING_DIR}/${f}" ]] && rm -f "${STEERING_DIR}/${f}" && REMOVED_STEERING+=("${f}")
+			if [[ -f "${STEERING_DIR}/${f}" ]]; then
+				if [[ ${DRY_RUN} == "true" ]]; then
+					info "[dry-run] Would remove: .kiro/steering/${f}"
+				else
+					rm -f "${STEERING_DIR}/${f}"
+				fi
+				REMOVED_STEERING+=("${f}")
+			fi
 		done
 		;;
 	esac
@@ -643,8 +986,12 @@ if [[ ${EXAMPLES_CHOICE} == "1" ]]; then
 	SPECS_DIR="${SCRIPT_DIR}/.kiro/specs"
 	for spec_dir in "${SPECS_DIR}"/✅_* "${SPECS_DIR}"/📋_* "${SPECS_DIR}"/🚧_* "${SPECS_DIR}"/⏸️_*; do
 		if [[ -d ${spec_dir} ]]; then
-			rm -rf "${spec_dir}"
-			success "Removed: $(basename "${spec_dir}")"
+			if [[ ${DRY_RUN} == "true" ]]; then
+				info "[dry-run] Would remove: $(basename "${spec_dir}")"
+			else
+				rm -rf "${spec_dir}"
+				success "Removed: $(basename "${spec_dir}")"
+			fi
 		fi
 	done
 else
@@ -657,16 +1004,16 @@ fi
 header "Setup Complete"
 
 echo ""
-echo -e "  ${BOLD}Project:${NC}     ${PROJECT_NAME}"
-echo -e "  ${BOLD}Copyright:${NC}   ${YEAR} ${COPYRIGHT_HOLDER}"
-echo -e "  ${BOLD}Stack:${NC}       ${STACK_NAME}"
-echo -e "  ${BOLD}Pkg Manager:${NC} ${PKG_MGR}"
+echo -e "  ${COLOR_BOLD}Project:${COLOR_RESET}     ${PROJECT_NAME}"
+echo -e "  ${COLOR_BOLD}Copyright:${COLOR_RESET}   ${YEAR} ${COPYRIGHT_HOLDER}"
+echo -e "  ${COLOR_BOLD}Stack:${COLOR_RESET}       ${STACK_NAME}"
+echo -e "  ${COLOR_BOLD}Pkg Manager:${COLOR_RESET} ${PKG_MGR}"
 echo ""
 
 if [[ ${#CHANGED_FILES[@]} -gt 0 ]]; then
 	info "Files updated:"
 	for f in "${CHANGED_FILES[@]}"; do
-		echo -e "    ${GREEN}•${NC} ${f}"
+		echo -e "    ${COLOR_GREEN}•${COLOR_RESET} ${f}"
 	done
 	echo ""
 fi
@@ -683,8 +1030,12 @@ if [[ -z ${REMOVE_SELF-} ]]; then
 fi
 
 if [[ ${REMOVE_SELF} == "y" || ${REMOVE_SELF} == "Y" ]]; then
-	rm -f "${SCRIPT_DIR}/setup.sh"
-	success "Removed setup.sh"
+	if [[ ${DRY_RUN} == "true" ]]; then
+		info "[dry-run] Would remove: setup.sh"
+	else
+		rm -f "${SCRIPT_DIR}/setup.sh"
+		success "Removed setup.sh"
+	fi
 else
 	info "Kept setup.sh — you can delete it manually later."
 fi
