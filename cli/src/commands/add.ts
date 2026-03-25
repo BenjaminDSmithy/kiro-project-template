@@ -10,15 +10,22 @@ import path from "node:path";
 import prompts from "prompts";
 
 import type { CliFlags, CommandOptions } from "../index.js";
+import { resolveHostTarget } from "../hosts.js";
 import { gatherConfig } from "../prompts.js";
 import { replacePlaceholders } from "../replacer.js";
-import { copyDir, log, success, warn } from "../utils.js";
+import { copyDir, error, log, success, warn } from "../utils.js";
 
 /** Resolve the bundled templates directory relative to the built output. */
 const TEMPLATES_DIR = path.resolve(__dirname, "..", "templates");
 
 /** Valid values for the --only flag. */
 const VALID_ONLY_TARGETS = ["steering", "hooks", "specs", "settings"] as const;
+
+type CopyTarget = {
+  dest: string;
+  label: string;
+  src: string;
+};
 
 /**
  * Inject `.kiro/` (or a subset) into the current working directory.
@@ -35,12 +42,19 @@ export async function add(
   options?: CommandOptions,
 ): Promise<void> {
   const config = await gatherConfig(flags);
+  const host = resolveHostTarget(flags.host, "add");
 
   const kiroTemplateSrc = path.join(TEMPLATES_DIR, "kiro");
   const kiroTargetDir = path.join(process.cwd(), ".kiro");
+  const copyTargets = buildAddTargets(host);
 
   // Determine what to copy based on --only flag
   if (flags.only) {
+    if (host !== "kiro") {
+      error("--only is only supported with --host kiro.");
+      process.exit(1);
+    }
+
     // Validate the --only value (should already be validated by arg parser, but be safe)
     if (
       !VALID_ONLY_TARGETS.includes(
@@ -80,15 +94,18 @@ export async function add(
     return;
   }
 
-  // No --only flag — copy the entire .kiro/ directory
-  if (existsSync(kiroTargetDir)) {
-    warn("A .kiro/ directory already exists in the current directory.");
+  // No --only flag — copy the requested host targets
+  const existingTargets = copyTargets.filter((target) => existsSync(target.dest));
+  if (existingTargets.length > 0) {
+    warn(
+      `Existing target(s) detected: ${existingTargets.map((target) => target.label).join(", ")}`,
+    );
 
     const { overwrite } = await prompts(
       {
         type: "confirm",
         name: "overwrite",
-        message: "Overwrite existing .kiro/ directory?",
+        message: "Overwrite existing host config files?",
         initial: false,
       },
       { onCancel: () => process.exit(0) },
@@ -100,20 +117,31 @@ export async function add(
     }
   }
 
-  options?.progress.start("Injecting .kiro/...");
+  options?.progress.start(
+    `Injecting ${copyTargets.map((target) => target.label).join(", ")}...`,
+  );
 
-  await copyDir(kiroTemplateSrc, kiroTargetDir);
-  options?.logger.fileOp("copy", ".kiro/");
-  options?.progress.tick("copied");
+  for (const target of copyTargets) {
+    await copyDir(target.src, target.dest);
+    options?.logger.fileOp("copy", target.label);
+    options?.progress.tick("copied");
+  }
 
   options?.progress.update("Replacing placeholders...");
 
-  // Replace placeholders across the entire .kiro/ directory
-  const modified = await replacePlaceholders(kiroTargetDir, {
-    "{{PROJECT_NAME}}": config.projectName,
-    "{{COPYRIGHT_HOLDER}}": config.copyrightHolder,
-    "{{YEAR}}": config.year,
-  });
+  const replacementRoots = copyTargets
+    .map((target) => target.dest)
+    .filter((dest) => [".kiro", ".codex"].includes(path.basename(dest)));
+
+  const modified: string[] = [];
+  for (const root of replacementRoots) {
+    const updated = await replacePlaceholders(root, {
+      "{{PROJECT_NAME}}": config.projectName,
+      "{{COPYRIGHT_HOLDER}}": config.copyrightHolder,
+      "{{YEAR}}": config.year,
+    });
+    modified.push(...updated);
+  }
 
   for (const file of modified) {
     options?.logger.fileOp("replace", file);
@@ -122,7 +150,7 @@ export async function add(
 
   options?.progress.stop();
 
-  printSummary(undefined, modified.length, options);
+  printSummary(copyTargets.map((target) => target.label), modified.length, options);
 }
 
 /**
@@ -133,15 +161,49 @@ export async function add(
  * @param options - Optional command dependencies for progress summary
  */
 function printSummary(
-  only: string | undefined,
+  targets: string[] | undefined,
   filesUpdated: number,
   options?: CommandOptions,
 ): void {
-  const target = only ? `.kiro/${only}/` : ".kiro/";
+  const target =
+    targets && targets.length > 0 ? targets.join(", ") : "host config";
   success(`\n✔ Injected ${target} successfully!\n`);
   log(`  Target:       ${target}`);
   log(`  Placeholders: ${filesUpdated} file(s) updated`);
   if (options?.progress) {
     log(`  Operations:   ${options.progress.summary()}`);
   }
+}
+
+function buildAddTargets(
+  host: ReturnType<typeof resolveHostTarget>,
+): CopyTarget[] {
+  const cwd = process.cwd();
+  const targets: CopyTarget[] = [];
+
+  if (host === "all" || host === "kiro") {
+    targets.push({
+      src: path.join(TEMPLATES_DIR, "kiro"),
+      dest: path.join(cwd, ".kiro"),
+      label: ".kiro/",
+    });
+  }
+
+  if (host === "all" || host === "codex") {
+    targets.push({
+      src: path.join(TEMPLATES_DIR, "codex"),
+      dest: path.join(cwd, ".codex"),
+      label: ".codex/",
+    });
+  }
+
+  if (host === "all" || host === "codex" || host === "portable") {
+    targets.push({
+      src: path.join(TEMPLATES_DIR, "root", "AGENTS.md"),
+      dest: path.join(cwd, "AGENTS.md"),
+      label: "AGENTS.md",
+    });
+  }
+
+  return targets;
 }
