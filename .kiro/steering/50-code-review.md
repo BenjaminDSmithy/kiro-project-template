@@ -6,6 +6,8 @@ inclusion: manual
 
 Reference with `#code-review` when reviewing PRs or requesting reviews.
 
+For a deeper structural diff review focused on production-risk bug classes, pair this with `#pre-landing-review` (`72-pre-landing-review.md`).
+
 ## What Reviewers Check
 
 | Priority | Area           | What to look for                                    |

@@ -18,6 +18,15 @@ Each spec folder contains three files:
 | `design.md`                | Architecture + interfaces + correctness properties |
 | `tasks.md`                 | Implementation checklist with effort estimates     |
 
+For non-trivial features, `design.md` should also include:
+
+- `Premise Challenge`
+- `Scope Mode`
+- `What Already Exists`
+- `Failure Modes Registry`
+- `NOT in Scope`
+- `Deployment and Rollback`
+
 ## Folder Naming
 
 Format: `{status}_{XX}_{kebab-name}/`
@@ -47,6 +56,21 @@ Format: `{status}_{XX}_{kebab-name}/`
 _For any_ [universal quantification], [expected behaviour/outcome].
 **Validates: Requirements [RX.Y]**
 ```
+
+## Design Review Requirements
+
+When a feature spans multiple components, async flows, or external integrations:
+
+| Requirement              | Minimum Expectation                                  |
+| ------------------------ | ---------------------------------------------------- |
+| Premise challenge        | Confirm the problem is correctly framed              |
+| Reuse inventory          | Identify existing files or services to extend        |
+| Architecture             | Include an ASCII diagram                             |
+| Failure modes            | Map likely failures, handling, and test coverage     |
+| Scope boundaries         | Explicitly list `NOT in Scope` items                 |
+| Rollout posture          | Document deployment order and rollback plan          |
+
+Reference `32-feature-planning.md` when turning a rough idea into a real spec.
 
 ## Task Formatting
 

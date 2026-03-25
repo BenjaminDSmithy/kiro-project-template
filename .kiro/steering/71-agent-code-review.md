@@ -6,6 +6,8 @@ inclusion: manual
 
 Reference with `#agent-code-review` when requesting automated review of code changes. This complements `50-code-review.md` (human review etiquette) with structured agent review patterns.
 
+For a stricter structural production-risk pass on the current diff, also reference `#pre-landing-review` (`72-pre-landing-review.md`).
+
 Adapted from Claude Code's code-review and pr-review-toolkit plugins for use with Kiro's agent capabilities.
 
 ## Review Perspectives
@@ -163,3 +165,5 @@ This agent review supplements, not replaces, human review (`50-code-review.md`):
 | Mechanical bug detection                | Business logic correctness  |
 | Confidence-scored findings              | Contextual understanding    |
 | Consistent coverage of all perspectives | Nuanced trade-off decisions |
+
+For structural checks such as enum completeness beyond the diff, TOCTOU races, AI trust boundaries, and negative-path test gaps, use `72-pre-landing-review.md` alongside this file.
