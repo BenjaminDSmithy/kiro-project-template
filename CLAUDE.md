@@ -160,7 +160,7 @@ Australian English: `optimise`, `behaviour`, `colour`, `analyse`, `licence` (nou
 
 ## Project Structure
 
-<!-- TODO: Adapt to your actual project layout -->
+<!-- [CUSTOMISE] Adapt to your actual project layout -->
 
 ### Decision Tree: Where Does This Code Go?
 
