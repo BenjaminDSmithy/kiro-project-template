@@ -18,8 +18,33 @@ The Codex layer in this starter is intentionally split into:
 - `.codex/config.toml` for project-level Codex settings
 - `.codex/agents/` for custom and overridden subagents
 - `.codex/rules/` for approval and safety rules around risky commands
+- `.agents/skills/` for repository-scoped Codex skills shared with the team
 
 If you are using the Codex CLI or the Codex IDE extension in a trusted project, those files become the local operating context for Codex.
+
+The Codex IDE extension uses the same agent as the Codex CLI and shares the same configuration, so the checked-in repo files below work across both surfaces.
+
+## Recommended Repo Layout
+
+```text
+AGENTS.md
+.codex/
+  config.toml
+  agents/
+  rules/
+.agents/
+  skills/
+    release-check/
+      SKILL.md
+    qa-regression/
+      SKILL.md
+    docs-audit/
+      SKILL.md
+apps/web/AGENTS.override.md
+packages/api/AGENTS.override.md
+```
+
+Use the root `AGENTS.md` for shared repository defaults, and place `AGENTS.override.md` as close as possible to specialized work. Codex loads instruction files from the repo root down to the current directory, with closer files overriding broader guidance.
 
 ## CLI Scaffolding
 
@@ -49,6 +74,7 @@ npx create-kiro-project --dry-run --host codex --name my-app --yes
 | `.codex/config.toml`    | Agent runtime limits such as max threads and depth |
 | `.codex/agents/*.toml`  | Named specialist agents for scoped work |
 | `.codex/rules/*.rules`  | Prefix-based approval and safety rules for risky commands |
+| `.agents/skills/*/SKILL.md` | Repository-scoped skills for repeated Codex workflows |
 | `.codex/README.md`      | Short local reference for the Codex pack |
 
 ## Included Agents
@@ -69,6 +95,14 @@ Two of these agents intentionally override built-in Codex roles:
 
 That keeps the familiar names while adding project-specific expectations.
 
+## Included Shared Skills
+
+| Skill Name        | Use It For |
+| ----------------- | ---------- |
+| `release-check`   | Final release-readiness review across versioning, changelog, rollout, and rollback notes |
+| `qa-regression`   | Short risk-based manual regression plan for a feature or bugfix |
+| `docs-audit`      | Documentation drift checks across README, docs, scripts, and config |
+
 ## Included Rule Packs
 
 | Rule File               | Purpose |
@@ -79,6 +113,22 @@ That keeps the familiar names while adding project-specific expectations.
 | `safety.rules`          | Blocks or prompts before destructive cleanup commands |
 
 These rules are deliberately conservative. Tighten or relax them after you see how your team actually works.
+
+## First-Run Verification
+
+Confirm that Codex is loading the repo instructions:
+
+```bash
+codex --ask-for-approval never "Summarize the current instructions."
+```
+
+If your repository uses nested overrides, verify the active instruction chain from a subdirectory:
+
+```bash
+codex --cd apps/web --ask-for-approval never "Show which instruction files are active."
+```
+
+Use `/skills` in the CLI or IDE extension, or mention a skill explicitly with `$release-check`, `$qa-regression`, or `$docs-audit`.
 
 ## Practical Usage Patterns
 
@@ -116,12 +166,27 @@ Use the qa_auditor agent to produce a short regression checklist for the payment
 Use the explorer agent to trace how invite acceptance works end to end and cite the concrete files and functions involved.
 ```
 
+### 6. Explicit Skill Invocation
+
+```text
+Use $release-check to review this release candidate for version bumps, changelog coverage, rollback notes, and risky publish commands.
+```
+
+## Nested Override Examples
+
+See the checked-in samples for a monorepo-friendly override layout:
+
+- `docs/examples/codex-monorepo/apps/web/AGENTS.override.md`
+- `docs/examples/codex-monorepo/packages/api/AGENTS.override.md`
+
 ## Customization Checklist
 
 - Update `AGENTS.md` with your real product context, architecture boundaries, and commands
+- Add or remove repository skills in `.agents/skills/` as your team workflows solidify
 - Remove any agent roles your team will not actually invoke
-- Add nested `AGENTS.md` files for large packages or services with local conventions
+- Add nested `AGENTS.override.md` files for packages or services with local conventions
 - Tighten `safety.rules` if your repo contains stateful infrastructure or production-facing scripts
+- Uncomment and tune the shared defaults in `.codex/config.toml` when your approval and sandbox policy is settled
 - Extend `release.rules` if you use Changesets, custom release scripts, or environment promotion tooling
 
 ## Recommended Branch Scope

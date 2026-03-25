@@ -4,7 +4,7 @@
 | ------------ | ---------- |
 | Type         | Index      |
 | Status       | Active     |
-| Last Updated | 2026-03-16 |
+| Last Updated | 2026-03-25 |
 
 ---
 
@@ -24,7 +24,7 @@ This directory contains project documentation templates and examples. Each templ
 | [CODEX.md](CODEX.md)               | Codex-specific setup, agent roles, and usage    |
 | [GITFLOW.md](GITFLOW.md)           | Gitflow branching and release workflow guide    |
 | [ADR/](ADR/)                       | Architecture Decision Records                   |
-| [examples/](examples/)             | Filled-in examples of each template             |
+| [examples/](examples/)             | Filled-in examples of each template, including Codex override samples |
 
 ## Conventions
 
