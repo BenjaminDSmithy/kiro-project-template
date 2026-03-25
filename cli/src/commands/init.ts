@@ -11,6 +11,12 @@ import path from "node:path";
 import prompts from "prompts";
 
 import type { CliFlags, CommandOptions } from "../index.js";
+import {
+  includesCodexHost,
+  includesKiroHost,
+  includesVSCodeTemplate,
+  resolveHostTarget,
+} from "../hosts.js";
 import type { VerboseLogger } from "../logger.js";
 import type { ProgressReporter } from "../progress.js";
 import { gatherConfig } from "../prompts.js";
@@ -39,6 +45,7 @@ export async function init(
   options?: CommandOptions,
 ): Promise<void> {
   const config = await gatherConfig(flags);
+  const host = resolveHostTarget(flags.host, "init");
   const targetDir = path.resolve(process.cwd(), config.projectName);
 
   // Handle existing directory
@@ -65,31 +72,37 @@ export async function init(
 
   options?.progress.start("Scaffolding project...");
 
-  // Copy all template directories into the target
-  await copyDir(
-    path.join(TEMPLATES_DIR, "kiro"),
-    path.join(targetDir, ".kiro"),
-  );
-  options?.logger.fileOp("copy", ".kiro/");
-  options?.progress.tick("copied");
+  // Copy host-specific template directories into the target
+  if (includesKiroHost(host)) {
+    await copyDir(
+      path.join(TEMPLATES_DIR, "kiro"),
+      path.join(targetDir, ".kiro"),
+    );
+    options?.logger.fileOp("copy", ".kiro/");
+    options?.progress.tick("copied");
+  }
 
-  await copyDir(
-    path.join(TEMPLATES_DIR, "codex"),
-    path.join(targetDir, ".codex"),
-  );
-  options?.logger.fileOp("copy", ".codex/");
-  options?.progress.tick("copied");
+  if (includesCodexHost(host)) {
+    await copyDir(
+      path.join(TEMPLATES_DIR, "codex"),
+      path.join(targetDir, ".codex"),
+    );
+    options?.logger.fileOp("copy", ".codex/");
+    options?.progress.tick("copied");
+  }
 
   await copyDir(path.join(TEMPLATES_DIR, "docs"), path.join(targetDir, "docs"));
   options?.logger.fileOp("copy", "docs/");
   options?.progress.tick("copied");
 
-  await copyDir(
-    path.join(TEMPLATES_DIR, "vscode"),
-    path.join(targetDir, ".vscode"),
-  );
-  options?.logger.fileOp("copy", ".vscode/");
-  options?.progress.tick("copied");
+  if (includesVSCodeTemplate(host)) {
+    await copyDir(
+      path.join(TEMPLATES_DIR, "vscode"),
+      path.join(targetDir, ".vscode"),
+    );
+    options?.logger.fileOp("copy", ".vscode/");
+    options?.progress.tick("copied");
+  }
 
   await copyDir(
     path.join(TEMPLATES_DIR, "scripts"),
