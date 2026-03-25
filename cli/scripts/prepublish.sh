@@ -60,7 +60,7 @@ fi
 printf "  ok CHANGELOG.md mentions version %s\n" "${CURRENT_VERSION}"
 
 # 7. Templates present
-for dir in templates/kiro templates/docs templates/vscode templates/scripts; do
+for dir in templates/kiro templates/codex templates/docs templates/vscode templates/scripts; do
 	if [[ ! -d ${dir} ]]; then
 		printf "  x Missing %s -- run pnpm prebuild first.\n" "${dir}"
 		exit 1

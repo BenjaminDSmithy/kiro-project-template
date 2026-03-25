@@ -28,12 +28,26 @@ for subdir in hooks settings specs steering; do
 	fi
 done
 
+# --- codex/ templates ---
+CODEX_DEST="${TEMPLATES_DIR}/codex"
+rm -rf "${CODEX_DEST}"
+
+if [[ -d "${REPO_ROOT}/.codex" ]]; then
+	cp -R "${REPO_ROOT}/.codex" "${CODEX_DEST}"
+	echo "  ok .codex/"
+else
+	echo "  skip .codex/ not found"
+fi
+
 # --- docs/ templates ---
 DOCS_DEST="${TEMPLATES_DIR}/docs"
 find "${DOCS_DEST}" -mindepth 1 ! -name 'README.md' -exec rm -rf {} + 2>/dev/null || true
 
 if [[ -d "${REPO_ROOT}/docs" ]]; then
-	rsync -a --exclude='.DS_Store' "${REPO_ROOT}/docs/" "${DOCS_DEST}/"
+	rsync -a \
+		--exclude='.DS_Store' \
+		--exclude='MULTI-AGENT-IDE-STARTER-REPORT.md' \
+		"${REPO_ROOT}/docs/" "${DOCS_DEST}/"
 	echo "  ok docs/"
 else
 	echo "  skip docs/ not found"
@@ -43,7 +57,7 @@ fi
 ROOT_DEST="${TEMPLATES_DIR}/root"
 find "${ROOT_DEST}" -mindepth 1 ! -name 'README.md' -exec rm -rf {} + 2>/dev/null || true
 
-ROOT_FILES=(README.md LICENSE .gitignore package.json .env.example setup.sh)
+ROOT_FILES=(README.md AGENTS.md LICENSE .gitignore package.json .env.example setup.sh)
 for file in "${ROOT_FILES[@]}"; do
 	if [[ -f "${REPO_ROOT}/${file}" ]]; then
 		cp "${REPO_ROOT}/${file}" "${ROOT_DEST}/${file}"
