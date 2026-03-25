@@ -41,15 +41,22 @@ describe("Full scaffold integration", () => {
   it("should copy templates, replace placeholders, and leave no tokens", async () => {
     // Arrange — create a mini template structure mimicking bundled templates
     const templateRoot = path.join(tempDir, "templates");
+    const codexSrc = path.join(templateRoot, "codex");
     const kiroSrc = path.join(templateRoot, "kiro");
     const docsSrc = path.join(templateRoot, "docs");
     const rootSrc = path.join(templateRoot, "root");
 
+    await mkdir(path.join(codexSrc, "agents"), { recursive: true });
     await mkdir(path.join(kiroSrc, "hooks"), { recursive: true });
     await mkdir(path.join(kiroSrc, "settings"), { recursive: true });
     await mkdir(docsSrc, { recursive: true });
     await mkdir(rootSrc, { recursive: true });
 
+    await writeFile(
+      path.join(codexSrc, "agents", "worker.toml"),
+      'name = "worker"\ndescription = "Worker for {{PROJECT_NAME}}"',
+      "utf-8",
+    );
     await writeFile(
       path.join(kiroSrc, "README.md"),
       "# {{PROJECT_NAME}} Kiro Config\nCopyright {{YEAR}} {{COPYRIGHT_HOLDER}}",
@@ -80,6 +87,7 @@ describe("Full scaffold integration", () => {
     const target = path.join(tempDir, "my-project");
     await mkdir(target, { recursive: true });
 
+    await copyDir(codexSrc, path.join(target, ".codex"));
     await copyDir(kiroSrc, path.join(target, ".kiro"));
     await copyDir(docsSrc, path.join(target, "docs"));
     await copyDir(rootSrc, path.join(target, "root-files"));
@@ -92,9 +100,13 @@ describe("Full scaffold integration", () => {
 
     // Assert — file structure exists
     const topLevel = await readdir(target);
+    expect(topLevel).toContain(".codex");
     expect(topLevel).toContain(".kiro");
     expect(topLevel).toContain("docs");
     expect(topLevel).toContain("root-files");
+
+    const codexContents = await readdir(path.join(target, ".codex"));
+    expect(codexContents).toContain("agents");
 
     const kiroContents = await readdir(path.join(target, ".kiro"));
     expect(kiroContents).toContain("hooks");
@@ -115,6 +127,12 @@ describe("Full scaffold integration", () => {
       "utf-8",
     );
     expect(hookContent).toBe("Hook for my-project");
+
+    const codexWorker = await readFile(
+      path.join(target, ".codex", "agents", "worker.toml"),
+      "utf-8",
+    );
+    expect(codexWorker).toContain('description = "Worker for my-project"');
 
     const rootReadme = await readFile(
       path.join(target, "root-files", "README.md"),
@@ -350,6 +368,9 @@ describe("Dry-run vs normal parity", () => {
   it("should list the same files in previewInit as would be created by init", async () => {
     // Arrange — create a mini template structure
     const realTemplateRoot = path.join(tempDir, "templates-dryrun");
+    await mkdir(path.join(realTemplateRoot, "codex", "agents"), {
+      recursive: true,
+    });
     await mkdir(path.join(realTemplateRoot, "kiro", "hooks"), {
       recursive: true,
     });
@@ -359,6 +380,11 @@ describe("Dry-run vs normal parity", () => {
     await mkdir(path.join(realTemplateRoot, "docs"), { recursive: true });
     await mkdir(path.join(realTemplateRoot, "root"), { recursive: true });
 
+    await writeFile(
+      path.join(realTemplateRoot, "codex", "agents", "worker.toml"),
+      'name = "worker"\ndescription = "{{PROJECT_NAME}}"',
+      "utf-8",
+    );
     await writeFile(
       path.join(realTemplateRoot, "kiro", "README.md"),
       "# {{PROJECT_NAME}}",
@@ -402,6 +428,10 @@ describe("Dry-run vs normal parity", () => {
       await copyDir(
         path.join(realTemplateRoot, "kiro"),
         path.join(target, ".kiro"),
+      );
+      await copyDir(
+        path.join(realTemplateRoot, "codex"),
+        path.join(target, ".codex"),
       );
       await copyDir(
         path.join(realTemplateRoot, "docs"),
