@@ -26,6 +26,7 @@
 #   SCAFFOLD_DIR=.          # Directory to scaffold into (. or subdirectory)
 #   CLEANUP_CHOICE=2        # 1=remove other steering docs, 2=keep
 #   EXAMPLES_CHOICE=2       # 1=remove example specs, 2=keep
+#   IDE_CHOICE=1            # 1=Kiro, 2=Claude Code, 3=Both
 #   REMOVE_SELF=y           # y=delete setup.sh, n=keep
 # ============================================================================
 
@@ -999,6 +1000,92 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════
+# Step 6: AI IDE / Agent Configuration
+# ═══════════════════════════════════════════════════════════════════════════
+header "Step 6 · AI IDE / Agent Configuration"
+
+echo ""
+echo "  Which AI coding IDE or agent do you use?"
+echo ""
+echo "    1)  Kiro only          (already installed: .kiro/)"
+echo "    2)  Claude Code        (install CLAUDE.md + .claude/)"
+echo "    3)  Both Kiro + Claude Code"
+echo "    4)  Skip               (configure later)"
+echo ""
+
+if [[ -z ${IDE_CHOICE-} ]]; then
+	ask "IDE choice [1-4]" "1" IDE_CHOICE
+fi
+
+CLAUDE_TEMPLATES="${SCRIPT_DIR}/cli/templates/claude"
+IDE_NAME="Kiro"
+
+install_claude_templates() {
+	if [[ ! -d ${CLAUDE_TEMPLATES} ]]; then
+		warn "Claude templates not found at cli/templates/claude/ — skipping."
+		return
+	fi
+
+	# Copy CLAUDE.md to project root
+	if [[ -f "${CLAUDE_TEMPLATES}/CLAUDE.md" ]]; then
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would copy: CLAUDE.md"
+		else
+			cp "${CLAUDE_TEMPLATES}/CLAUDE.md" "${SCRIPT_DIR}/CLAUDE.md"
+			success "Installed: CLAUDE.md"
+			CHANGED_FILES+=("CLAUDE.md")
+		fi
+	fi
+
+	# Copy .claude/ directory
+	if [[ -d "${CLAUDE_TEMPLATES}/.claude" ]]; then
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would copy: .claude/ ($(ls "${CLAUDE_TEMPLATES}/.claude" | wc -l | tr -d ' ') files)"
+		else
+			mkdir -p "${SCRIPT_DIR}/.claude"
+			cp -R "${CLAUDE_TEMPLATES}/.claude/." "${SCRIPT_DIR}/.claude/"
+			success "Installed: .claude/ ($(ls "${SCRIPT_DIR}/.claude" | wc -l | tr -d ' ') files)"
+			CHANGED_FILES+=(".claude/ (installed)")
+		fi
+	fi
+
+	# Ensure .claude/settings.local.json is gitignored
+	GITIGNORE="${SCRIPT_DIR}/.gitignore"
+	if [[ -f ${GITIGNORE} ]] && ! grep -q 'settings\.local\.json' "${GITIGNORE}" 2>/dev/null; then
+		if [[ ${DRY_RUN} == "true" ]]; then
+			info "[dry-run] Would add .claude/settings.local.json to .gitignore"
+		else
+			printf '\n# Claude Code local settings\n.claude/settings.local.json\n' >>"${GITIGNORE}"
+			success "Updated: .gitignore (added .claude/settings.local.json)"
+		fi
+	fi
+}
+
+case "${IDE_CHOICE}" in
+1)
+	IDE_NAME="Kiro"
+	info "Kiro configuration already in place (.kiro/)."
+	;;
+2)
+	IDE_NAME="Claude Code"
+	install_claude_templates
+	;;
+3)
+	IDE_NAME="Kiro + Claude Code"
+	install_claude_templates
+	info "Kiro configuration already in place (.kiro/)."
+	;;
+4)
+	IDE_NAME="None (manual)"
+	info "Skipped AI IDE configuration. Run setup.sh again or copy templates manually from cli/templates/."
+	;;
+*)
+	IDE_NAME="Kiro"
+	info "Invalid choice — defaulting to Kiro only."
+	;;
+esac
+
+# ═══════════════════════════════════════════════════════════════════════════
 # Summary
 # ═══════════════════════════════════════════════════════════════════════════
 header "Setup Complete"
@@ -1008,6 +1095,7 @@ echo -e "  ${COLOR_BOLD}Project:${COLOR_RESET}     ${PROJECT_NAME}"
 echo -e "  ${COLOR_BOLD}Copyright:${COLOR_RESET}   ${YEAR} ${COPYRIGHT_HOLDER}"
 echo -e "  ${COLOR_BOLD}Stack:${COLOR_RESET}       ${STACK_NAME}"
 echo -e "  ${COLOR_BOLD}Pkg Manager:${COLOR_RESET} ${PKG_MGR}"
+echo -e "  ${COLOR_BOLD}AI IDE:${COLOR_RESET}      ${IDE_NAME}"
 echo ""
 
 if [[ ${#CHANGED_FILES[@]} -gt 0 ]]; then
@@ -1018,8 +1106,8 @@ if [[ ${#CHANGED_FILES[@]} -gt 0 ]]; then
 	echo ""
 fi
 
-info "Remaining TODO markers in steering and doc files need manual customisation."
-info "Search for <!-- TODO: to find them."
+info "Remaining TODO/CUSTOMISE markers in steering and doc files need manual customisation."
+info "Search for <!-- TODO: or <!-- [CUSTOMISE] to find them."
 echo ""
 
 # ═══════════════════════════════════════════════════════════════════════════
