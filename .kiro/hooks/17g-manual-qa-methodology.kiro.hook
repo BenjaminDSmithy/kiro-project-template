@@ -1,0 +1,12 @@
+{
+  "name": "QA Methodology Run",
+  "version": "1.0.0",
+  "description": "Run a structured QA pass using the manual QA methodology",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Use steering doc `33-qa-methodology.md` if available. Perform a structured QA pass in the best available mode: Diff-Aware, Full, or Quick.\n\nRules:\n- If browser tooling is available, use it and gather evidence\n- If browser tooling is unavailable, state the limitation explicitly and do the best possible code-and-doc based QA review\n- Default to report-only mode unless the user has explicitly asked you to fix issues\n\nRequired output:\n1. Mode used\n2. Health score\n3. Severity summary\n4. Well-evidenced findings with repro steps and expected vs actual behaviour\n5. Top 3 fixes"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Security Audit",
+  "version": "1.0.0",
+  "description": "Run a manual security audit and threat-model review",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Use steering doc `74-security-audit.md` if available. Run a structured security review in Daily or Comprehensive mode depending on scope and risk.\n\nReview at least:\n1. Secrets and sensitive data exposure\n2. Authentication and authorisation paths\n3. Validation and injection risk\n4. Dependency and supply-chain risk\n5. CI/CD and infrastructure security\n6. AI/tooling trust boundaries\n\nRequired output:\n- severity-tagged findings with evidence, risk, and recommended fix\n- explicitly clean areas where no issue was found\n- escalation note if a fix would be security-sensitive and confidence is low"
+  }
+}

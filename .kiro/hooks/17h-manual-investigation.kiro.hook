@@ -1,0 +1,12 @@
+{
+  "name": "Root Cause Investigation",
+  "version": "1.0.0",
+  "description": "Run a root-cause-first debugging workflow before making bug-fix changes",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Use steering doc `34-investigation.md` if available. Investigate the current bug or failure using a reproduce -> isolate -> hypothesise -> confirm -> implement -> verify flow.\n\nRules:\n- Do not edit production code until you have a root-cause hypothesis\n- Capture repro steps, evidence, and suspected failing boundary first\n- Fix the root cause, not the symptom\n- Add regression coverage when appropriate\n- If confidence remains low after repeated attempts, escalate with a blocked or needs-context summary"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Documentation Sync",
+  "version": "1.0.0",
+  "description": "Cross-check shipped changes against project documentation and update drifted docs",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Use steering doc `73-document-release.md` if available. Compare the current diff or recent shipped work against project documentation and update drifted docs.\n\nCheck at least:\n- README.md\n- docs/README.md\n- docs/ARCHITECTURE.md\n- docs/API.md\n- docs/DEPLOYMENT.md\n- docs/CONTRIBUTING.md\n- CHANGELOG.md\n\nRules:\n- Never clobber changelog history\n- Never bump version numbers silently\n- Prefer precise edits over broad rewrites\n- Report each document as updated, unchanged, or follow-up needed"
+  }
+}

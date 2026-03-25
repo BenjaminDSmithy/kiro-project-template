@@ -1,0 +1,12 @@
+{
+  "name": "Safety Mode",
+  "version": "1.0.0",
+  "description": "Activate an advisory safety workflow for destructive commands and edit scope",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Use steering doc `35-safety-guardrails.md` if available. Activate safety mode for the current conversation.\n\nRequired behaviour:\n1. State the active edit boundary at the start of the task; if unclear, ask the user to name the directory or module boundary\n2. Ask for explicit confirmation before destructive shell, git, SQL, or infrastructure commands\n3. Avoid edits outside the agreed boundary unless you explain why and ask first\n4. Call out irreversible risk even if the user prefers speed\n\nThis workflow is advisory unless the host can enforce it, but you should still treat it as strict operating mode."
+  }
+}

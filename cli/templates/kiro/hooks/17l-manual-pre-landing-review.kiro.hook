@@ -1,0 +1,12 @@
+{
+  "name": "Pre-Landing Review",
+  "version": "1.0.0",
+  "description": "Run a manual structural review of the current diff before merge or release",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Use steering docs `72-pre-landing-review.md` and `71-agent-code-review.md` if available. Review the current diff or PR for structural production risks that tests and linters often miss.\n\nFocus on:\n- SQL and data safety\n- concurrency and race conditions\n- enum and value completeness beyond the diff\n- AI and trust boundaries\n- conditional side effects\n- crypto and token safety\n- negative-path and authz test gaps\n\nOutput format:\nReview: N issues (X critical, Y informational)\n\nInclude specific file and line references plus recommended fixes."
+  }
+}

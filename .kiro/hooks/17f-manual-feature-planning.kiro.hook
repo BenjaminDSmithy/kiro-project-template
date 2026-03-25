@@ -1,0 +1,12 @@
+{
+  "name": "Feature Planning Review",
+  "version": "1.0.0",
+  "description": "Run a manual feature-planning review before implementation or spec finalisation",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Use steering doc `32-feature-planning.md` if available. Review the current feature idea, draft spec, or implementation plan before code is written.\n\nRequired outputs:\n1. Premise challenge\n2. Scope mode recommendation (Expansion, Hold Scope, Reduction)\n3. What already exists in the codebase\n4. Architecture review with ASCII diagram if non-trivial\n5. Failure modes registry\n6. NOT in Scope section\n7. Deployment and rollback notes\n\nIf a spec `design.md` is already in context, update it to include missing planning sections. If no spec exists yet, produce a structured planning memo the user can turn into one."
+  }
+}
