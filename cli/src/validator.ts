@@ -9,7 +9,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 
 /** Subdirectories expected inside the templates directory. */
-const REQUIRED_SUBDIRS = ["kiro", "docs", "root"] as const;
+const REQUIRED_SUBDIRS = ["kiro", "codex", "docs", "root"] as const;
 
 /**
  * Builds a user-friendly error message for a missing template path,
@@ -24,7 +24,7 @@ function missingPathError(missingPath: string): string {
 
 /**
  * Asserts that the templates directory exists and contains expected
- * subdirectories (kiro/, docs/, root/). Throws a user-friendly error
+ * subdirectories (kiro/, codex/, docs/, root/). Throws a user-friendly error
  * if missing — not a cryptic ENOENT.
  *
  * @param templatesDir - Absolute path to the bundled templates directory

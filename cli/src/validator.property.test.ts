@@ -14,7 +14,7 @@ import { tmpdir } from "node:os";
 import { validateTemplateDir } from "./validator.js";
 
 /** All subdirectories required by the template validator. */
-const REQUIRED_SUBDIRS = ["kiro", "docs", "root"] as const;
+const REQUIRED_SUBDIRS = ["kiro", "codex", "docs", "root"] as const;
 
 describe("validateTemplateDir — Property Tests", () => {
   let tmpDir: string;
@@ -32,7 +32,7 @@ describe("validateTemplateDir — Property Tests", () => {
    *
    * Property 4: Template Validation Completeness
    *
-   * For any templates directory missing one or more of kiro/, docs/, root/,
+   * For any templates directory missing one or more of kiro/, codex/, docs/, root/,
    * validateTemplateDir() throws a descriptive error before any copy
    * operation begins.
    */
@@ -42,7 +42,7 @@ describe("validateTemplateDir — Property Tests", () => {
     () => {
       fc.assert(
         fc.property(
-          fc.subarray([...REQUIRED_SUBDIRS], { minLength: 0, maxLength: 2 }),
+          fc.subarray([...REQUIRED_SUBDIRS], { minLength: 0, maxLength: 3 }),
           (presentDirs) => {
             // Arrange — create a fresh temp dir with only the selected subset
             const testDir = mkdtempSync(path.join(tmpDir, "templates-"));

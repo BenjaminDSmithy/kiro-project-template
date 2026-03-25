@@ -26,6 +26,7 @@ describe("validateTemplateDir", () => {
   it("should pass when all required subdirectories exist", () => {
     // Arrange
     mkdirSync(path.join(tmpDir, "kiro"));
+    mkdirSync(path.join(tmpDir, "codex"));
     mkdirSync(path.join(tmpDir, "docs"));
     mkdirSync(path.join(tmpDir, "root"));
 
@@ -48,6 +49,7 @@ describe("validateTemplateDir", () => {
 
   it("should throw when kiro/ subdirectory is missing", () => {
     // Arrange
+    mkdirSync(path.join(tmpDir, "codex"));
     mkdirSync(path.join(tmpDir, "docs"));
     mkdirSync(path.join(tmpDir, "root"));
 
@@ -60,6 +62,7 @@ describe("validateTemplateDir", () => {
   it("should throw when docs/ subdirectory is missing", () => {
     // Arrange
     mkdirSync(path.join(tmpDir, "kiro"));
+    mkdirSync(path.join(tmpDir, "codex"));
     mkdirSync(path.join(tmpDir, "root"));
 
     // Act & Assert
@@ -71,11 +74,24 @@ describe("validateTemplateDir", () => {
   it("should throw when root/ subdirectory is missing", () => {
     // Arrange
     mkdirSync(path.join(tmpDir, "kiro"));
+    mkdirSync(path.join(tmpDir, "codex"));
     mkdirSync(path.join(tmpDir, "docs"));
 
     // Act & Assert
     expect(() => validateTemplateDir(tmpDir)).toThrow(
       new RegExp(`Template directory not found at .*root`),
+    );
+  });
+
+  it("should throw when codex/ subdirectory is missing", () => {
+    // Arrange
+    mkdirSync(path.join(tmpDir, "kiro"));
+    mkdirSync(path.join(tmpDir, "docs"));
+    mkdirSync(path.join(tmpDir, "root"));
+
+    // Act & Assert
+    expect(() => validateTemplateDir(tmpDir)).toThrow(
+      new RegExp(`Template directory not found at .*codex`),
     );
   });
 
