@@ -73,6 +73,13 @@ export async function init(
   options?.logger.fileOp("copy", ".kiro/");
   options?.progress.tick("copied");
 
+  await copyDir(
+    path.join(TEMPLATES_DIR, "codex"),
+    path.join(targetDir, ".codex"),
+  );
+  options?.logger.fileOp("copy", ".codex/");
+  options?.progress.tick("copied");
+
   await copyDir(path.join(TEMPLATES_DIR, "docs"), path.join(targetDir, "docs"));
   options?.logger.fileOp("copy", "docs/");
   options?.progress.tick("copied");

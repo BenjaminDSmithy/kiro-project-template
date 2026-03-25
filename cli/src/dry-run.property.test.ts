@@ -267,6 +267,12 @@ describe("Dry-Run Property Tests", () => {
             path.join(targetDir, ".kiro"),
           );
 
+          // Copy codex/ → .codex/
+          await copyDir(
+            path.join(TEMPLATES_DIR, "codex"),
+            path.join(targetDir, ".codex"),
+          );
+
           // Copy docs/ → docs/
           await copyDir(
             path.join(TEMPLATES_DIR, "docs"),

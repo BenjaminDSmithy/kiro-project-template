@@ -78,10 +78,12 @@ describe("dry-run", () => {
       // Act
       const plan = await previewInit(config, TEMPLATES_DIR);
 
-      // Assert — check for key .kiro subdirectories and docs
+      // Assert — check for key .kiro/.codex subdirectories and docs
       const dirPaths = plan.directories.map((d) =>
         d.replace(tmpDir, "").replace(/\\/g, "/"),
       );
+      expect(dirPaths.some((d) => d.includes(".codex/agents"))).toBe(true);
+      expect(dirPaths.some((d) => d.includes(".codex/rules"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".kiro/hooks"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".kiro/steering"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".kiro/specs"))).toBe(true);

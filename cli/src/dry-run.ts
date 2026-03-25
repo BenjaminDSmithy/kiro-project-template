@@ -36,7 +36,7 @@ export type DryRunPlan = {
 /**
  * Simulates the `init` command and returns a plan of all file operations.
  *
- * Walks the `kiro/`, `docs/`, and `root/` template directories to enumerate
+ * Walks the `kiro/`, `codex/`, `docs/`, and `root/` template directories to enumerate
  * files and directories that would be created. Scans file contents for `{{`
  * tokens to identify placeholder replacements. Determines which steering docs
  * and example specs would be removed based on the resolved config.
@@ -65,6 +65,13 @@ export async function previewInit(
   await walkTemplate(
     path.join(templatesDir, "kiro"),
     path.join(targetDir, ".kiro"),
+    plan,
+  );
+
+  // Walk codex/ → .codex/
+  await walkTemplate(
+    path.join(templatesDir, "codex"),
+    path.join(targetDir, ".codex"),
     plan,
   );
 
