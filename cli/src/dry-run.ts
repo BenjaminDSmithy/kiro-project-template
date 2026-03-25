@@ -9,6 +9,12 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 
+import {
+  includesCodexHost,
+  includesKiroHost,
+  includesVSCodeTemplate,
+} from "./hosts.js";
+import type { HostTarget } from "./hosts.js";
 import type { ProjectConfig } from "./prompts.js";
 import { STACK_PRESETS } from "./stacks.js";
 
@@ -48,6 +54,7 @@ export type DryRunPlan = {
 export async function previewInit(
   config: ProjectConfig,
   templatesDir: string,
+  host: HostTarget = "all",
 ): Promise<DryRunPlan> {
   const plan: DryRunPlan = {
     directories: [],
@@ -61,19 +68,21 @@ export async function previewInit(
   // The target project directory itself
   plan.directories.push(targetDir);
 
-  // Walk kiro/ → .kiro/
-  await walkTemplate(
-    path.join(templatesDir, "kiro"),
-    path.join(targetDir, ".kiro"),
-    plan,
-  );
+  if (includesKiroHost(host)) {
+    await walkTemplate(
+      path.join(templatesDir, "kiro"),
+      path.join(targetDir, ".kiro"),
+      plan,
+    );
+  }
 
-  // Walk codex/ → .codex/
-  await walkTemplate(
-    path.join(templatesDir, "codex"),
-    path.join(targetDir, ".codex"),
-    plan,
-  );
+  if (includesCodexHost(host)) {
+    await walkTemplate(
+      path.join(templatesDir, "codex"),
+      path.join(targetDir, ".codex"),
+      plan,
+    );
+  }
 
   // Walk docs/ → docs/
   await walkTemplate(
@@ -82,22 +91,30 @@ export async function previewInit(
     plan,
   );
 
+  // Walk scripts/ → scripts/
+  await walkTemplate(
+    path.join(templatesDir, "scripts"),
+    path.join(targetDir, "scripts"),
+    plan,
+  );
+
+  if (includesVSCodeTemplate(host)) {
+    await walkTemplate(
+      path.join(templatesDir, "vscode"),
+      path.join(targetDir, ".vscode"),
+      plan,
+    );
+  }
+
   // Walk root/ → target root (files copied directly, not into a subdirectory)
   const rootTemplateDir = path.join(templatesDir, "root");
   const rootEntries = await readdir(rootTemplateDir);
   for (const entry of rootEntries) {
-    const srcPath = path.join(rootTemplateDir, entry);
-    const destPath = path.join(targetDir, entry);
-    const info = await stat(srcPath);
-
-    if (info.isDirectory()) {
-      await walkTemplate(srcPath, destPath, plan);
-    } else if (info.isFile()) {
-      plan.files.push(destPath);
-      if (await containsPlaceholder(srcPath)) {
-        plan.replacements.push(destPath);
-      }
-    }
+    await recordTemplatePath(
+      path.join(rootTemplateDir, entry),
+      path.join(targetDir, entry),
+      plan,
+    );
   }
 
   // Steering cleanup removals
@@ -159,6 +176,7 @@ export async function previewInit(
 export async function previewAdd(
   config: ProjectConfig,
   templatesDir: string,
+  host: HostTarget = "kiro",
   only?: string,
 ): Promise<DryRunPlan> {
   const plan: DryRunPlan = {
@@ -168,16 +186,40 @@ export async function previewAdd(
     removals: [],
   };
 
-  const kiroTargetDir = path.join(process.cwd(), ".kiro");
+  if (only && host !== "kiro") {
+    throw new Error("--only is only supported with --host kiro");
+  }
 
   if (only) {
     // Walk only the specified subset
+    const kiroTargetDir = path.join(process.cwd(), ".kiro");
     const subSrc = path.join(templatesDir, "kiro", only);
     const subDest = path.join(kiroTargetDir, only);
     await walkTemplate(subSrc, subDest, plan);
   } else {
-    // Walk the entire kiro/ template directory
-    await walkTemplate(path.join(templatesDir, "kiro"), kiroTargetDir, plan);
+    if (host === "all" || host === "kiro") {
+      await walkTemplate(
+        path.join(templatesDir, "kiro"),
+        path.join(process.cwd(), ".kiro"),
+        plan,
+      );
+    }
+
+    if (host === "all" || host === "codex") {
+      await walkTemplate(
+        path.join(templatesDir, "codex"),
+        path.join(process.cwd(), ".codex"),
+        plan,
+      );
+    }
+
+    if (host === "all" || host === "codex" || host === "portable") {
+      await recordTemplatePath(
+        path.join(templatesDir, "root", "AGENTS.md"),
+        path.join(process.cwd(), "AGENTS.md"),
+        plan,
+      );
+    }
   }
 
   return plan;
@@ -248,6 +290,26 @@ async function walkTemplate(
       if (await containsPlaceholder(srcPath)) {
         plan.replacements.push(destPath);
       }
+    }
+  }
+}
+
+async function recordTemplatePath(
+  srcPath: string,
+  destPath: string,
+  plan: DryRunPlan,
+): Promise<void> {
+  const info = await stat(srcPath);
+
+  if (info.isDirectory()) {
+    await walkTemplate(srcPath, destPath, plan);
+    return;
+  }
+
+  if (info.isFile()) {
+    plan.files.push(destPath);
+    if (await containsPlaceholder(srcPath)) {
+      plan.replacements.push(destPath);
     }
   }
 }
