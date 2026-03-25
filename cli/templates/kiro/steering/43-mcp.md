@@ -41,6 +41,17 @@ Workspace config overrides user config for server name conflicts.
 | Test immediately after adding | Don't wait for issues — verify with a sample call |
 | Disable unused servers        | Set `disabled: true` to improve startup time      |
 
+## Verification Workflow
+
+After adding or changing an MCP server:
+
+1. confirm the command and args are correct
+2. reload or reconnect the server if needed
+3. make one sample call immediately
+4. record any auth or environment requirements in project docs
+
+If the server provides documentation or compatibility lookup, use it before adding unfamiliar dependencies or integrations.
+
 ## Preferred MCP Servers
 
 | Domain   | Server   | Use Case                    |
@@ -49,6 +60,12 @@ Workspace config overrides user config for server name conflicts.
 | Git      | git      | Commits, diffs, history     |
 | Browser  | chrome   | Visual testing, screenshots |
 | Docker   | docker   | Container management        |
+
+Documentation servers such as Context7 are recommended when available for:
+
+- dependency compatibility checks
+- framework API verification
+- reducing reliance on stale memory
 
 ## Troubleshooting
 

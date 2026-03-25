@@ -76,6 +76,31 @@ describe("Property Tests", () => {
 | Missing `act()` wrapper    | Wrap state updates in `act()`  |
 | Hard-coded delays          | Polling or event-based waiting |
 
+## Command Hygiene
+
+Keep test output compact in agent workflows to avoid context bloat and timeouts.
+
+| Situation              | Preferred Approach                                 |
+| ---------------------- | -------------------------------------------------- |
+| Focused debugging      | Run the smallest relevant test selection first     |
+| Automated verification | Use quiet or summary reporters where available     |
+| Large suites           | Fail fast locally, then run the broader suite      |
+
+Examples:
+
+```bash
+pnpm test -- --run path/to/file.test.ts
+pnpm test -- --run --reporter=dot
+pnpm vitest --run -t "specific behaviour"
+```
+
+Rules:
+
+- Start with the narrowest failing test or file when debugging
+- Expand to related suites before declaring the fix complete
+- Run the broader verification set before marking a task done
+- If a test runner supports `--silent`, `--reporter`, or name filtering, use them deliberately
+
 ## Pre-Commit Checklist
 
 - [ ] No `.only()` calls in code
