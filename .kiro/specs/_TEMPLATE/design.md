@@ -9,6 +9,29 @@ Key capabilities:
 - Capability 1
 - Capability 2
 
+## Premise Challenge
+
+### Is this the right problem?
+
+<!-- Confirm the problem being solved, or explain the better framing -->
+
+### Scope Mode
+
+<!-- Expansion | Hold Scope | Reduction -->
+
+### What Already Exists
+
+| Sub-problem | Existing file/module | Reuse, extend, or replace? | Notes |
+| ----------- | -------------------- | -------------------------- | ----- |
+| <!-- ... --> | <!-- ... --> | <!-- ... --> | <!-- ... --> |
+
+### Current -> This Plan -> Ideal
+
+```text
+CURRENT STATE        -> THIS PLAN         -> IDEAL FUTURE STATE
+[today's reality]       [planned delta]      [12-month target]
+```
+
 ## Architecture
 
 ### High-Level Architecture
@@ -21,6 +44,14 @@ Key capabilities:
 │ • Component B   │    │ • Component D    │    │ • Component F   │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
+
+### Data Flow Paths
+
+For each important new flow, describe all four paths:
+
+| Flow | Happy path | Nil path | Empty path | Error path |
+| ---- | ---------- | -------- | ---------- | ---------- |
+| <!-- Flow name --> | <!-- ... --> | <!-- ... --> | <!-- ... --> | <!-- ... --> |
 
 ## Components and Interfaces
 
@@ -60,6 +91,12 @@ export type TableType = typeof tableName.$inferSelect;
 export type NewTableType = typeof tableName.$inferInsert;
 ```
 
+## Failure Modes Registry
+
+| Codepath | Failure mode | Handling | User sees | Test coverage |
+| -------- | ------------ | -------- | --------- | ------------- |
+| <!-- ... --> | <!-- ... --> | <!-- ... --> | <!-- ... --> | <!-- ... --> |
+
 ## Correctness Properties
 
 _Properties are characteristics that should hold true across all valid executions._
@@ -82,12 +119,30 @@ _For any_ [input/condition], [expected behaviour/outcome].
 2. **Not found**: Return 404 with resource identifier
 3. **Server errors**: Return 500, log details, return safe message
 
+## Security and Trust Boundaries
+
+- Authentication and authorisation checks
+- Data ownership boundaries
+- External service trust assumptions
+- Validation points for user or model-generated input
+
 ## Testing Strategy
 
 ### Unit Tests
 
 - Core business logic
 - Edge cases and error paths
+
+### New User Flows
+
+- [ ] Happy path
+- [ ] Failure path
+
+### New Data Flows
+
+- [ ] Nil input path
+- [ ] Empty input path
+- [ ] Error path
 
 ### Property-Based Tests
 
@@ -110,6 +165,20 @@ describe("Property Tests", () => {
 
 - Authentication/authorisation approach
 - Data protection requirements
+
+## NOT in Scope
+
+| Item | Rationale |
+| ---- | --------- |
+| <!-- deferred work --> | <!-- why not now --> |
+
+## Deployment and Rollback
+
+- Rollout order:
+- Migration safety:
+- Feature flag:
+- Post-deploy verification:
+- Rollback plan:
 
 ## Dependencies
 
