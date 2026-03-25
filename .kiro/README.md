@@ -6,9 +6,9 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 
 ```text
 .kiro/
-├── hooks/                    # Agent automation hooks (34 hooks)
+├── hooks/                    # Agent automation hooks (48 hooks)
 │   ├── 01–09                 # File-triggered quality checks
-│   ├── 10–17e                # User-triggered manual tasks
+│   ├── 10–17l                # User-triggered manual tasks
 │   ├── 17–19                 # Spec task lifecycle hooks
 │   ├── 20–22                 # File create/delete/stop automation
 │   ├── 23–26                 # Sync and automation hooks
@@ -24,15 +24,16 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 │   ├── 📋_01_sample-user-notifications/  # Example: planned spec
 │   ├── 🚧_02_sample-dashboard/     # Example: in-progress spec
 │   └── ⏸️_03_sample-payments/      # Example: on-hold spec (blocked)
-└── steering/                 # AI guidance documents (40 files)
+└── steering/                 # AI guidance documents (47 files)
     ├── 00–03                 # Core rules, product, tech, structure
     ├── 10–12                 # Development standards (code, errors, testing)
     ├── 20–21                 # Workflow standards (git, task completion)
-    ├── 30–31                 # Reference guides (hooks, kiro best practices)
+    ├── 30–35                 # Workflow guides (hooks, planning, QA, debugging, safety)
     ├── 40–52                 # Domain standards (security, API, DB, docs, etc.)
     ├── 53–59                 # Framework and tooling (Next.js, Tailwind, i18n, etc.)
     ├── 60–62                 # Stack presets (T3, T4, TanStack)
-    └── 63–65                 # Advanced patterns (stack selection, monorepo, errors)
+    ├── 63–65                 # Advanced patterns (stack selection, monorepo, errors)
+    └── 70–74                 # Design, review, release, and audit workflows
 ```
 
 ## Getting Started
@@ -50,20 +51,20 @@ This directory contains the AI agent configuration for [Kiro](https://kiro.dev).
 | 00–03 | Core (rules, product, tech, structure)                             | Always           |
 | 10–12 | Development (code style, errors, testing)                          | Always/fileMatch |
 | 20–21 | Workflow (git, task completion)                                    | Always           |
-| 30–31 | Reference guides (hooks, best practices)                           | Manual           |
+| 30–35 | Workflow guides (hooks, planning, QA, debugging, safety)           | Manual           |
 | 40–52 | Domain (security, auth, API, DB, docs, CI)                         | Always/fileMatch |
 | 53–59 | Framework & tooling (Next.js, Tailwind, i18n, perf, env, realtime) | fileMatch        |
 | 60–62 | Stack presets (T3, T4, TanStack)                                   | fileMatch        |
 | 63    | Stack selection decision tree                                      | Manual           |
 | 64–65 | Advanced patterns (monorepo, error boundaries)                     | fileMatch        |
-| 70–71 | Design & review (frontend design, agent review)                    | fileMatch/Manual |
+| 70–74 | Design, review, release, and audit workflows                       | fileMatch/Manual |
 
 ## Hook Numbering
 
 | Range  | Category          | Trigger                                          |
 | ------ | ----------------- | ------------------------------------------------ |
 | 01–09  | Quality gates     | fileEdited / agentStop                           |
-| 10–17e | Manual tasks      | userTriggered                                    |
+| 10–17l | Manual tasks      | userTriggered                                    |
 | 17–19  | Task lifecycle    | pre/postTaskExecution                            |
 | 20–22  | File automation   | fileCreated / fileDeleted / agentStop            |
 | 23–26  | Sync & automation | fileEdited / fileCreated / postToolUse           |

@@ -69,3 +69,5 @@ Hooks automate workflows by triggering actions on IDE events. Location: `.kiro/h
 | `0X-`  | File-triggered quality checks                              |
 | `1X-`  | User-triggered manual tasks                                |
 | `2X-`  | Automation (lifecycle, tool intercept, file create/delete) |
+
+Suffix letters may be used to extend a hook family, for example `17a-` through `17l-`.
