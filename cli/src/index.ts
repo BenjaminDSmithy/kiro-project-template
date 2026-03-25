@@ -12,6 +12,7 @@ import path from "node:path";
 import { loadConfig } from "./config.js";
 import type { ProjectConfigFile } from "./config.js";
 import { previewAdd, previewInit, formatPlan } from "./dry-run.js";
+import { resolveHostTarget } from "./hosts.js";
 import { createLogger } from "./logger.js";
 import type { VerboseLogger } from "./logger.js";
 import { createProgress } from "./progress.js";
@@ -23,7 +24,8 @@ import { validateTemplateDir } from "./validator.js";
  * CLI flags parsed from process.argv.
  *
  * @property add - Whether to run in inject mode (--add)
- * @property only - Subset of .kiro/ to inject (steering, hooks, specs, settings)
+ * @property only - With --add and --host kiro, subset of .kiro/ to inject
+ * @property host - Agent host target (all, kiro, codex, portable)
  * @property name - Project name
  * @property copyright - Copyright holder
  * @property year - Copyright year
@@ -37,6 +39,7 @@ import { validateTemplateDir } from "./validator.js";
 export type CliFlags = {
   add: boolean;
   only?: "steering" | "hooks" | "specs" | "settings";
+  host?: string;
   name?: string;
   copyright?: string;
   year?: string;
@@ -98,6 +101,11 @@ export function parseArgs(argv: string[]): CliFlags {
         }
         break;
       }
+      case "--host": {
+        const value = argv[++i];
+        if (value) flags.host = value;
+        break;
+      }
       case "--name": {
         const value = argv[++i];
         if (value) flags.name = value;
@@ -154,9 +162,10 @@ Options:
   --year <year>          Copyright year
   --stack <preset>       Stack preset
   --pkg <manager>        Package manager (npm, pnpm, yarn, bun)
+  --host <target>        Agent host target (all, kiro, codex, portable)
   --yes, -y              Accept all defaults
   --add                  Inject .kiro/ into current directory
-  --only <subset>        With --add: only copy steering, hooks, specs, or settings
+  --only <subset>        With --add and --host kiro: only copy steering, hooks, specs, or settings
   --dry-run              Preview operations without writing to disk
   --verbose              Enable detailed logging to stderr
   --config <path>        Path to .create-kiro-project.json config file
@@ -190,6 +199,7 @@ async function main(): Promise<void> {
   }
 
   const flags = parseArgs(argv);
+  const host = resolveHostTarget(flags.host, flags.add ? "add" : "init");
 
   // Load config file defaults (explicit path or auto-discovery)
   const configDefaults = loadConfig(process.cwd(), flags.config);
@@ -209,10 +219,10 @@ async function main(): Promise<void> {
     const config = await gatherConfig(flags);
 
     if (flags.add) {
-      const plan = await previewAdd(config, TEMPLATES_DIR, flags.only);
+      const plan = await previewAdd(config, TEMPLATES_DIR, host, flags.only);
       console.log(formatPlan(plan));
     } else {
-      const plan = await previewInit(config, TEMPLATES_DIR);
+      const plan = await previewInit(config, TEMPLATES_DIR, host);
       console.log(formatPlan(plan));
     }
   } else if (flags.add) {
