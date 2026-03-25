@@ -414,32 +414,32 @@ Always ask before:
 
 Domain-specific rules are in `.claude/` as markdown files. Claude Code auto-loads these when relevant:
 
-| File | Domain |
-| --- | --- |
-| `CLAUDE.md` (this file) | Core rules, always loaded |
-| `.claude/api-standards.md` | REST API conventions |
-| `.claude/database.md` | Database design with Supabase + Drizzle |
-| `.claude/react-components.md` | React component patterns |
-| `.claude/docker.md` | Docker and container standards |
-| `.claude/accessibility.md` | WCAG AA compliance |
-| `.claude/logging.md` | Structured logging and observability |
-| `.claude/authorisation.md` | RBAC and permission architecture |
-| `.claude/cicd.md` | CI/CD pipeline standards |
-| `.claude/documentation.md` | Documentation conventions |
-| `.claude/performance.md` | Performance optimisation |
-| `.claude/state-management.md` | State management patterns |
-| `.claude/nextjs.md` | Next.js App Router specifics |
-| `.claude/tailwind-shadcn.md` | Tailwind + shadcn/ui patterns |
-| `.claude/i18n.md` | Internationalisation |
-| `.claude/env-variables.md` | Environment variable management |
-| `.claude/realtime.md` | Real-time features (Supabase) |
-| `.claude/error-boundaries.md` | Error boundary patterns |
-| `.claude/monorepo.md` | Monorepo conventions |
-| `.claude/t3-stack.md` | T3 stack specifics |
-| `.claude/t4-stack.md` | T4 stack specifics |
-| `.claude/tanstack.md` | TanStack Start/Router/Query |
-| `.claude/code-review.md` | Code review checklist |
-| `.claude/pre-landing-review.md` | Pre-merge review |
-| `.claude/security-audit.md` | Security audit methodology |
-| `.claude/frontend-design.md` | Frontend design patterns |
-| `.claude/bug-tracking.md` | Bug tracking workflow |
+| File                           | Domain                                   |
+| ------------------------------ | ---------------------------------------- |
+| `CLAUDE.md` (this file)        | Core rules, always loaded                |
+| `.claude/api-standards.md`     | REST API conventions                     |
+| `.claude/database.md`          | Database design with Supabase + Drizzle  |
+| `.claude/react-components.md`  | React component patterns                 |
+| `.claude/docker.md`            | Docker and container standards           |
+| `.claude/accessibility.md`     | WCAG AA compliance                       |
+| `.claude/logging.md`           | Structured logging and observability     |
+| `.claude/authorisation.md`     | RBAC and permission architecture         |
+| `.claude/cicd.md`              | CI/CD pipeline standards                 |
+| `.claude/documentation.md`     | Documentation conventions                |
+| `.claude/performance.md`       | Performance optimisation                 |
+| `.claude/state-management.md`  | State management patterns                |
+| `.claude/nextjs.md`            | Next.js App Router specifics             |
+| `.claude/tailwind-shadcn.md`   | Tailwind + shadcn/ui patterns            |
+| `.claude/i18n.md`              | Internationalisation                     |
+| `.claude/env-variables.md`     | Environment variable management          |
+| `.claude/realtime.md`          | Real-time features (Supabase)            |
+| `.claude/error-boundaries.md`  | Error boundary patterns                  |
+| `.claude/monorepo.md`          | Monorepo conventions                     |
+| `.claude/t3-stack.md`          | T3 stack specifics                       |
+| `.claude/t4-stack.md`          | T4 stack specifics                       |
+| `.claude/tanstack.md`          | TanStack Start/Router/Query              |
+| `.claude/code-review.md`       | Code review checklist                    |
+| `.claude/pre-landing-review.md`| Pre-merge review                         |
+| `.claude/security-audit.md`    | Security audit methodology               |
+| `.claude/frontend-design.md`   | Frontend design patterns                 |
+| `.claude/bug-tracking.md`      | Bug tracking workflow                    |
