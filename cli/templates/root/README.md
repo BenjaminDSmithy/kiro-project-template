@@ -11,8 +11,14 @@ npx create-kiro-project
 # Scaffold non-interactively
 npx create-kiro-project --name my-app --stack T3 --pkg pnpm --yes
 
+# Scaffold with Codex config only
+npx create-kiro-project --host codex --name my-app --yes
+
 # Inject .kiro/ into an existing project
 npx create-kiro-project --add
+
+# Inject Codex config into an existing project
+npx create-kiro-project --add --host codex
 
 # Preview what would happen (no files written)
 npx create-kiro-project --dry-run --name my-app --stack T3 --yes
