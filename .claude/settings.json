@@ -1,0 +1,40 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILES=$(git diff --name-only HEAD 2>/dev/null | grep -E '\\.(ts|tsx|js|jsx|json|css)$' | head -20); if [ -n \"$FILES\" ]; then echo \"$FILES\" | xargs trunk check --fix 2>/dev/null || true; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.file_path // empty' 2>/dev/null); if [ -n \"$FILE\" ] && [ -f \"$FILE\" ]; then SECRETS=$(grep -nEi '(sk_live_|sk_test_|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36}|xox[bpsa]-|-----BEGIN (RSA |EC )?PRIVATE KEY|password\\s*=\\s*[\"'\\x27][^\"'\\x27]{8,})' \"$FILE\" 2>/dev/null); if [ -n \"$SECRETS\" ]; then echo \"SECRET DETECTED in $FILE:\"; echo \"$SECRETS\"; echo \"Use environment variables instead of hardcoded secrets.\"; exit 1; fi; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(trunk check*)",
+      "Bash(trunk fmt*)",
+      "Bash(pnpm test*)",
+      "Bash(pnpm tsc*)",
+      "Bash(pnpm build*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch*)",
+      "Bash(ls *)"
+    ]
+  }
+}
