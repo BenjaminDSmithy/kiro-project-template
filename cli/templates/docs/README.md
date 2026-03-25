@@ -21,7 +21,7 @@ This directory contains project documentation templates and examples. Each templ
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines and workflow            |
 | [API.md](API.md)                   | API reference and endpoint documentation        |
 | [DEPLOYMENT.md](DEPLOYMENT.md)     | Deployment procedures and environments          |
-| [GITFLOW.md](GITFLOW.md)           | Gitflow branching model and release workflow    |
+| [GITFLOW.md](GITFLOW.md)           | Gitflow branching and release workflow guide    |
 | [ADR/](ADR/)                       | Architecture Decision Records                   |
 | [examples/](examples/)             | Filled-in examples of each template             |
 

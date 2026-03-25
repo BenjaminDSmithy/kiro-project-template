@@ -1,6 +1,6 @@
 # Kiro Project Template
 
-An opinionated project template with comprehensive [Kiro](https://kiro.dev) AI agent configuration — 40 steering docs, 34 hooks, spec templates, and a CLI scaffolder with 13 built-in stack presets.
+An opinionated project template with comprehensive [Kiro](https://kiro.dev) AI agent configuration — 47 steering docs, 48 hooks, spec templates, and a CLI scaffolder with 13 built-in stack presets.
 
 ## Quick Start
 
@@ -22,29 +22,30 @@ Also available via `pnpm create kiro-project` and `bunx create-kiro-project`.
 
 ## What's Included
 
-### Steering Docs (40 files)
+### Steering Docs (47 files)
 
 AI guidance documents that keep Kiro aligned with your project conventions:
 
-| Range | Category            | Inclusion        |
-| ----- | ------------------- | ---------------- |
-| 00–03 | Core rules          | Always           |
-| 10–12 | Development         | Always/fileMatch |
-| 20–21 | Workflow            | Always           |
-| 30–31 | Kiro guides         | Manual           |
-| 40–52 | Domain standards    | Always/fileMatch |
-| 53–59 | Framework & tooling | fileMatch        |
-| 60–65 | Stack & patterns    | fileMatch/Manual |
-| 70–71 | Design & review     | fileMatch/Manual |
+| Range | Category                    | Inclusion        |
+| ----- | --------------------------- | ---------------- |
+| 00–03 | Core rules                  | Always           |
+| 10–12 | Development                 | Always/fileMatch |
+| 20–21 | Workflow                    | Always           |
+| 30–35 | Planning & workflow guides  | Manual           |
+| 40–52 | Domain standards            | Always/fileMatch |
+| 53–65 | Framework, stack & patterns | fileMatch/Manual |
+| 70–74 | Design, review & audit      | fileMatch/Manual |
 
-### Hooks (34 files)
+Notable manual workflows now included: feature planning, QA methodology, investigation, safety guardrails, pre-landing review, documentation sync, and security audit.
+
+### Hooks (48 files)
 
 Automated quality checks and agent behaviours triggered by IDE events:
 
 | Range  | Category        | Trigger Type                  |
 | ------ | --------------- | ----------------------------- |
 | 01–09  | Quality gates   | fileEdited / agentStop        |
-| 10–17e | Manual tasks    | userTriggered                 |
+| 10–17l | Manual tasks    | userTriggered                 |
 | 17–19  | Task lifecycle  | pre/postTaskExecution         |
 | 20–22  | File automation | fileCreated/Deleted/agentStop |
 | 23–30  | Sync & safety   | fileEdited/preToolUse/post\*  |
@@ -83,10 +84,10 @@ Four example specs are included demonstrating the full spec lifecycle (planned �
 
 ```text
 .kiro/                    # Kiro AI agent configuration
-├── hooks/                # 34 automation hooks
+├── hooks/                # 48 automation hooks
 ├── settings/mcp.json     # MCP server configuration
 ├── specs/                # Feature specifications + templates
-└── steering/             # 40 AI guidance documents
+└── steering/             # 47 AI guidance documents
 cli/                      # create-kiro-project CLI (published to npm)
 ├── src/                  # TypeScript source
 ├── templates/            # Bundled template files
