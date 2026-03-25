@@ -131,7 +131,7 @@ export async function add(
 
   const replacementRoots = copyTargets
     .map((target) => target.dest)
-    .filter((dest) => [".kiro", ".codex"].includes(path.basename(dest)));
+    .filter((dest) => [".kiro", ".codex", ".agents"].includes(path.basename(dest)));
 
   const modified: string[] = [];
   for (const root of replacementRoots) {
@@ -194,6 +194,11 @@ function buildAddTargets(
       src: path.join(TEMPLATES_DIR, "codex"),
       dest: path.join(cwd, ".codex"),
       label: ".codex/",
+    });
+    targets.push({
+      src: path.join(TEMPLATES_DIR, "agents"),
+      dest: path.join(cwd, ".agents"),
+      label: ".agents/",
     });
   }
 

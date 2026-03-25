@@ -5,6 +5,7 @@ This file is the portable base layer for coding agents working in this repositor
 If host-specific files also exist, follow them in addition to this file:
 
 - `.codex/`
+- `.agents/skills/`
 - `.kiro/`
 - `.claude/`
 - `.cursor/`

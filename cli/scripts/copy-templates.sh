@@ -39,6 +39,17 @@ else
 	echo "  skip .codex/ not found"
 fi
 
+# --- agents/ templates ---
+AGENTS_DEST="${TEMPLATES_DIR}/agents"
+rm -rf "${AGENTS_DEST}"
+
+if [[ -d "${REPO_ROOT}/.agents" ]]; then
+	cp -R "${REPO_ROOT}/.agents" "${AGENTS_DEST}"
+	echo "  ok .agents/"
+else
+	echo "  skip .agents/ not found"
+fi
+
 # --- docs/ templates ---
 DOCS_DEST="${TEMPLATES_DIR}/docs"
 find "${DOCS_DEST}" -mindepth 1 ! -name 'README.md' -exec rm -rf {} + 2>/dev/null || true

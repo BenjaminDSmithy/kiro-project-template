@@ -42,7 +42,7 @@ export type DryRunPlan = {
 /**
  * Simulates the `init` command and returns a plan of all file operations.
  *
- * Walks the `kiro/`, `codex/`, `docs/`, and `root/` template directories to enumerate
+ * Walks the `kiro/`, `codex/`, `agents/`, `docs/`, and `root/` template directories to enumerate
  * files and directories that would be created. Scans file contents for `{{`
  * tokens to identify placeholder replacements. Determines which steering docs
  * and example specs would be removed based on the resolved config.
@@ -80,6 +80,11 @@ export async function previewInit(
     await walkTemplate(
       path.join(templatesDir, "codex"),
       path.join(targetDir, ".codex"),
+      plan,
+    );
+    await walkTemplate(
+      path.join(templatesDir, "agents"),
+      path.join(targetDir, ".agents"),
       plan,
     );
   }
@@ -164,8 +169,8 @@ export async function previewInit(
 /**
  * Simulates the `add` command and returns a plan of all file operations.
  *
- * Walks the `kiro/` template directory (or a subset when `only` is provided)
- * to enumerate files that would be copied into `.kiro/`. Scans file contents
+ * Walks the host-specific template directories (or a Kiro subset when `only`
+ * is provided) to enumerate files that would be copied. Scans file contents
  * for `{{` tokens to identify placeholder replacements.
  *
  * @param config - Resolved project configuration
@@ -209,6 +214,11 @@ export async function previewAdd(
       await walkTemplate(
         path.join(templatesDir, "codex"),
         path.join(process.cwd(), ".codex"),
+        plan,
+      );
+      await walkTemplate(
+        path.join(templatesDir, "agents"),
+        path.join(process.cwd(), ".agents"),
         plan,
       );
     }

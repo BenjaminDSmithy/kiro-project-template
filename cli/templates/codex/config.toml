@@ -1,3 +1,14 @@
+# Team defaults you can uncomment and tune for a shared Codex setup.
+# approval_policy = "on-request"
+# sandbox_mode = "workspace-write"
+# web_search = "cached"
+# project_doc_fallback_filenames = ["TEAM_GUIDE.md", ".agents.md"]
+# project_doc_max_bytes = 65536
+#
+# Optional tool-level web search scoping:
+# [tools]
+# web_search = { context_size = "medium", allowed_domains = ["developers.openai.com", "platform.openai.com"] }
+
 [agents]
 max_threads = 6
 max_depth = 1

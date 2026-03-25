@@ -85,6 +85,7 @@ describe("dry-run", () => {
       );
       expect(dirPaths.some((d) => d.includes(".codex/agents"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".codex/rules"))).toBe(true);
+      expect(dirPaths.some((d) => d.includes(".agents/skills"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".kiro/hooks"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".kiro/steering"))).toBe(true);
       expect(dirPaths.some((d) => d.includes(".kiro/specs"))).toBe(true);
@@ -195,8 +196,10 @@ describe("dry-run", () => {
     it.each([
       ["kiro", ".kiro/"],
       ["codex", ".codex/"],
+      ["codex", ".agents/"],
       ["portable", "AGENTS.md"],
       ["all", ".codex/"],
+      ["all", ".agents/"],
     ] satisfies [HostTarget, string][])(
       "should respect host target %s",
       async (host, expectedPath) => {

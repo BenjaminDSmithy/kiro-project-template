@@ -41,17 +41,26 @@ describe("Full scaffold integration", () => {
   it("should copy templates, replace placeholders, and leave no tokens", async () => {
     // Arrange — create a mini template structure mimicking bundled templates
     const templateRoot = path.join(tempDir, "templates");
+    const agentsSrc = path.join(templateRoot, "agents");
     const codexSrc = path.join(templateRoot, "codex");
     const kiroSrc = path.join(templateRoot, "kiro");
     const docsSrc = path.join(templateRoot, "docs");
     const rootSrc = path.join(templateRoot, "root");
 
+    await mkdir(path.join(agentsSrc, "skills", "release-check"), {
+      recursive: true,
+    });
     await mkdir(path.join(codexSrc, "agents"), { recursive: true });
     await mkdir(path.join(kiroSrc, "hooks"), { recursive: true });
     await mkdir(path.join(kiroSrc, "settings"), { recursive: true });
     await mkdir(docsSrc, { recursive: true });
     await mkdir(rootSrc, { recursive: true });
 
+    await writeFile(
+      path.join(agentsSrc, "skills", "release-check", "SKILL.md"),
+      "---\nname: release-check\ndescription: Release audit\n---\n",
+      "utf-8",
+    );
     await writeFile(
       path.join(codexSrc, "agents", "worker.toml"),
       'name = "worker"\ndescription = "Worker for {{PROJECT_NAME}}"',
@@ -87,6 +96,7 @@ describe("Full scaffold integration", () => {
     const target = path.join(tempDir, "my-project");
     await mkdir(target, { recursive: true });
 
+    await copyDir(agentsSrc, path.join(target, ".agents"));
     await copyDir(codexSrc, path.join(target, ".codex"));
     await copyDir(kiroSrc, path.join(target, ".kiro"));
     await copyDir(docsSrc, path.join(target, "docs"));
@@ -100,10 +110,14 @@ describe("Full scaffold integration", () => {
 
     // Assert — file structure exists
     const topLevel = await readdir(target);
+    expect(topLevel).toContain(".agents");
     expect(topLevel).toContain(".codex");
     expect(topLevel).toContain(".kiro");
     expect(topLevel).toContain("docs");
     expect(topLevel).toContain("root-files");
+
+    const agentsContents = await readdir(path.join(target, ".agents"));
+    expect(agentsContents).toContain("skills");
 
     const codexContents = await readdir(path.join(target, ".codex"));
     expect(codexContents).toContain("agents");
@@ -264,11 +278,20 @@ describe("Add mode integration", () => {
 
     await writeFile(path.join(target, "README.md"), "# Existing", "utf-8");
 
+    const agentsSrc = path.join(tempDir, "agents-template");
     const codexSrc = path.join(tempDir, "codex-template");
     const rootSrc = path.join(tempDir, "root-template");
+    await mkdir(path.join(agentsSrc, "skills", "release-check"), {
+      recursive: true,
+    });
     await mkdir(path.join(codexSrc, "agents"), { recursive: true });
     await mkdir(rootSrc, { recursive: true });
 
+    await writeFile(
+      path.join(agentsSrc, "skills", "release-check", "SKILL.md"),
+      "---\nname: release-check\ndescription: Release audit\n---\n",
+      "utf-8",
+    );
     await writeFile(
       path.join(codexSrc, "agents", "worker.toml"),
       'name = "worker"\ndescription = "{{PROJECT_NAME}}"',
@@ -280,6 +303,7 @@ describe("Add mode integration", () => {
       "utf-8",
     );
 
+    await copyDir(agentsSrc, path.join(target, ".agents"));
     await copyDir(codexSrc, path.join(target, ".codex"));
     await copyDir(path.join(rootSrc, "AGENTS.md"), path.join(target, "AGENTS.md"));
     await replacePlaceholders(path.join(target, ".codex"), {
@@ -289,6 +313,7 @@ describe("Add mode integration", () => {
     });
 
     const topLevel = await readdir(target);
+    expect(topLevel).toContain(".agents");
     expect(topLevel).toContain(".codex");
     expect(topLevel).toContain("AGENTS.md");
     expect(topLevel).toContain("README.md");
@@ -298,6 +323,9 @@ describe("Add mode integration", () => {
       "utf-8",
     );
     expect(worker).toContain('description = "existing-codex-project"');
+
+    const skills = await readdir(path.join(target, ".agents", "skills"));
+    expect(skills).toContain("release-check");
   });
 });
 
@@ -410,6 +438,9 @@ describe("Dry-run vs normal parity", () => {
   it("should list the same files in previewInit as would be created by init", async () => {
     // Arrange — create a mini template structure
     const realTemplateRoot = path.join(tempDir, "templates-dryrun");
+    await mkdir(path.join(realTemplateRoot, "agents", "skills", "release-check"), {
+      recursive: true,
+    });
     await mkdir(path.join(realTemplateRoot, "codex", "agents"), {
       recursive: true,
     });
@@ -424,6 +455,11 @@ describe("Dry-run vs normal parity", () => {
     await mkdir(path.join(realTemplateRoot, "root"), { recursive: true });
     await mkdir(path.join(realTemplateRoot, "vscode"), { recursive: true });
 
+    await writeFile(
+      path.join(realTemplateRoot, "agents", "skills", "release-check", "SKILL.md"),
+      "---\nname: release-check\ndescription: Release audit\n---\n",
+      "utf-8",
+    );
     await writeFile(
       path.join(realTemplateRoot, "codex", "agents", "worker.toml"),
       'name = "worker"\ndescription = "{{PROJECT_NAME}}"',
@@ -486,6 +522,10 @@ describe("Dry-run vs normal parity", () => {
       await copyDir(
         path.join(realTemplateRoot, "codex"),
         path.join(target, ".codex"),
+      );
+      await copyDir(
+        path.join(realTemplateRoot, "agents"),
+        path.join(target, ".agents"),
       );
       await copyDir(
         path.join(realTemplateRoot, "docs"),

@@ -89,6 +89,13 @@ export async function init(
     );
     options?.logger.fileOp("copy", ".codex/");
     options?.progress.tick("copied");
+
+    await copyDir(
+      path.join(TEMPLATES_DIR, "agents"),
+      path.join(targetDir, ".agents"),
+    );
+    options?.logger.fileOp("copy", ".agents/");
+    options?.progress.tick("copied");
   }
 
   await copyDir(path.join(TEMPLATES_DIR, "docs"), path.join(targetDir, "docs"));

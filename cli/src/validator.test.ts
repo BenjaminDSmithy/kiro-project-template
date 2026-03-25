@@ -27,6 +27,7 @@ describe("validateTemplateDir", () => {
     // Arrange
     mkdirSync(path.join(tmpDir, "kiro"));
     mkdirSync(path.join(tmpDir, "codex"));
+    mkdirSync(path.join(tmpDir, "agents"));
     mkdirSync(path.join(tmpDir, "docs"));
     mkdirSync(path.join(tmpDir, "root"));
 
@@ -50,6 +51,7 @@ describe("validateTemplateDir", () => {
   it("should throw when kiro/ subdirectory is missing", () => {
     // Arrange
     mkdirSync(path.join(tmpDir, "codex"));
+    mkdirSync(path.join(tmpDir, "agents"));
     mkdirSync(path.join(tmpDir, "docs"));
     mkdirSync(path.join(tmpDir, "root"));
 
@@ -63,6 +65,7 @@ describe("validateTemplateDir", () => {
     // Arrange
     mkdirSync(path.join(tmpDir, "kiro"));
     mkdirSync(path.join(tmpDir, "codex"));
+    mkdirSync(path.join(tmpDir, "agents"));
     mkdirSync(path.join(tmpDir, "root"));
 
     // Act & Assert
@@ -75,6 +78,7 @@ describe("validateTemplateDir", () => {
     // Arrange
     mkdirSync(path.join(tmpDir, "kiro"));
     mkdirSync(path.join(tmpDir, "codex"));
+    mkdirSync(path.join(tmpDir, "agents"));
     mkdirSync(path.join(tmpDir, "docs"));
 
     // Act & Assert
@@ -86,12 +90,26 @@ describe("validateTemplateDir", () => {
   it("should throw when codex/ subdirectory is missing", () => {
     // Arrange
     mkdirSync(path.join(tmpDir, "kiro"));
+    mkdirSync(path.join(tmpDir, "agents"));
     mkdirSync(path.join(tmpDir, "docs"));
     mkdirSync(path.join(tmpDir, "root"));
 
     // Act & Assert
     expect(() => validateTemplateDir(tmpDir)).toThrow(
       new RegExp(`Template directory not found at .*codex`),
+    );
+  });
+
+  it("should throw when agents/ subdirectory is missing", () => {
+    // Arrange
+    mkdirSync(path.join(tmpDir, "kiro"));
+    mkdirSync(path.join(tmpDir, "codex"));
+    mkdirSync(path.join(tmpDir, "docs"));
+    mkdirSync(path.join(tmpDir, "root"));
+
+    // Act & Assert
+    expect(() => validateTemplateDir(tmpDir)).toThrow(
+      new RegExp(`Template directory not found at .*agents`),
     );
   });
 
