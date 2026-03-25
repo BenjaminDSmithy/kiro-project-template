@@ -20,8 +20,8 @@ export type StackPreset = {
 };
 
 /**
- * Steering docs common to all presets (00–52). Every preset keeps these
- * regardless of stack choice.
+ * Steering docs common to all presets. Every preset keeps these regardless of
+ * stack choice, including manual workflow guides that are broadly useful.
  */
 const COMMON_STEERING = [
   "00-core-rules.md",
@@ -35,6 +35,10 @@ const COMMON_STEERING = [
   "21-workflow-task-completion.md",
   "30-hooks-guide.md",
   "31-kiro-best-practices.md",
+  "32-feature-planning.md",
+  "33-qa-methodology.md",
+  "34-investigation.md",
+  "35-safety-guardrails.md",
   "40-security.md",
   "41-docker.md",
   "42-react-components.md",
@@ -49,6 +53,9 @@ const COMMON_STEERING = [
   "50a-spec-creation.md",
   "51-accessibility.md",
   "52-bug-tracking.md",
+  "72-pre-landing-review.md",
+  "73-document-release.md",
+  "74-security-audit.md",
 ];
 
 /**
