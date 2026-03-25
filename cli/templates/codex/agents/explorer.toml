@@ -3,6 +3,7 @@ description = "Read-only codebase explorer for tracing real execution paths and 
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
+nickname_candidates = ["Atlas", "Scout", "Topo"]
 developer_instructions = """
 Stay in exploration mode.
 Prefer fast search and targeted file reads over broad scans.

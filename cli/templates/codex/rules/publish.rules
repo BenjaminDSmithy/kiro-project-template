@@ -40,3 +40,17 @@ prefix_rule(
         "pnpm build",
     ],
 )
+
+prefix_rule(
+    pattern = ["bun", "publish"],
+    decision = "prompt",
+    justification = "Publishing packages should stay user-approved.",
+    match = [
+        "bun publish",
+        "bun publish --tag next",
+    ],
+    not_match = [
+        "bun install",
+        "bun run build",
+    ],
+)

@@ -1,0 +1,27 @@
+prefix_rule(
+    pattern = ["git", "tag"],
+    decision = "prompt",
+    justification = "Tagging a release should stay user-approved.",
+    match = [
+        "git tag v1.2.3",
+        "git tag -a v1.2.3 -m release",
+    ],
+    not_match = [
+        "git status",
+        "git branch --show-current",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "release", "create"],
+    decision = "prompt",
+    justification = "Creating GitHub releases should stay user-approved.",
+    match = [
+        "gh release create v1.2.3",
+        "gh release create v1.2.3 --notes-file CHANGELOG.md",
+    ],
+    not_match = [
+        "gh release view v1.2.3",
+        "gh pr view 123",
+    ],
+)

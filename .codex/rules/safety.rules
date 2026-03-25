@@ -11,3 +11,32 @@ prefix_rule(
         "git checkout -b feature-branch",
     ],
 )
+
+prefix_rule(
+    pattern = ["git", "clean", ["-fd", "-fdx", "-xdf"]],
+    decision = "prompt",
+    justification = "Cleaning untracked files can remove local work or generated assets unexpectedly.",
+    match = [
+        "git clean -fd",
+        "git clean -fdx",
+        "git clean -xdf",
+    ],
+    not_match = [
+        "git clean -n",
+        "git status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "prompt",
+    justification = "Recursive force deletion should stay user-approved.",
+    match = [
+        "rm -rf dist",
+        "rm -rf .next .turbo",
+    ],
+    not_match = [
+        "rm README.md",
+        "rmdir tmp",
+    ],
+)

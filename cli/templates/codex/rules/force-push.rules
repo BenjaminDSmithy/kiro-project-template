@@ -1,0 +1,13 @@
+prefix_rule(
+    pattern = ["git", "push", ["--force", "--force-with-lease"]],
+    decision = "prompt",
+    justification = "Force-pushes can rewrite shared history and should stay user-approved.",
+    match = [
+        "git push --force origin feature-branch",
+        "git push --force-with-lease origin codex-starter",
+    ],
+    not_match = [
+        "git push origin feature-branch",
+        "git pull --rebase",
+    ],
+)

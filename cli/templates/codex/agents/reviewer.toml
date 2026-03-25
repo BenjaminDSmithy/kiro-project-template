@@ -3,6 +3,7 @@ description = "Change reviewer focused on correctness, security, regressions, an
 model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
+nickname_candidates = ["Delta", "Echo", "Sable"]
 developer_instructions = """
 Review like a code owner.
 Prioritize correctness, security, behavior regressions, auth gaps, data-loss risk, race conditions, and missing tests.
