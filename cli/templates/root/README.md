@@ -1,6 +1,6 @@
 # Kiro Project Template
 
-An opinionated project template with comprehensive [Kiro](https://kiro.dev) AI agent configuration — 47 steering docs, 48 hooks, spec templates, and a CLI scaffolder with 13 built-in stack presets.
+An opinionated project template with comprehensive [Kiro](https://kiro.dev) AI agent configuration, a portable `AGENTS.md` base layer, Codex project config, and a CLI scaffolder with 13 built-in stack presets.
 
 ## Quick Start
 
@@ -21,6 +21,11 @@ npx create-kiro-project --dry-run --name my-app --stack T3 --yes
 Also available via `pnpm create kiro-project` and `bunx create-kiro-project`.
 
 ## What's Included
+
+### Portable Agent Base
+
+- `AGENTS.md` for shared cross-tool instructions
+- `.codex/` for project-scoped Codex agents and safety rules
 
 ### Steering Docs (47 files)
 
@@ -83,11 +88,13 @@ Four example specs are included demonstrating the full spec lifecycle (planned �
 ## Project Structure
 
 ```text
+.codex/                   # Codex project config (agents, rules, limits)
 .kiro/                    # Kiro AI agent configuration
 ├── hooks/                # 48 automation hooks
 ├── settings/mcp.json     # MCP server configuration
 ├── specs/                # Feature specifications + templates
 └── steering/             # 47 AI guidance documents
+AGENTS.md                 # Portable cross-tool agent instructions
 cli/                      # create-kiro-project CLI (published to npm)
 ├── src/                  # TypeScript source
 ├── templates/            # Bundled template files
